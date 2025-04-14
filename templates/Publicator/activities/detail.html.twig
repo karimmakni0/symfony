@@ -1,0 +1,214 @@
+{% extends 'PubBase.html.twig' %}
+
+{% block title %}Activity Details{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+    <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">Activity Details</h1>
+        <div class="text-15 text-light-1">View and manage activity information</div>
+    </div>
+    <div class="col-auto">
+        <a href="{{ path('app_publicator_activities') }}" class="button h-50 px-24 -blue-1-05 text-blue-1 hover-animation">
+            <i class="icon-arrow-left mr-10"></i>
+            Back to Activities
+        </a>
+    </div>
+</div>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30 fade-in">
+            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-4">
+                <div class="row x-gap-10 y-gap-10 items-center">
+                    <div class="col-auto">
+                        <div class="d-flex items-center">
+                            <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
+                            <div class="fw-500">{{ message }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<div class="py-30 px-30 rounded-4 bg-white shadow-3 fade-in">
+    {% if activity %}
+        <div class="row y-gap-30">
+            <!-- Activity Details -->
+            <div class="col-xl-8">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="text-22 fw-600 mb-15">{{ activity.activityName }}</h2>
+                        
+                        <div class="row x-gap-10 y-gap-10 items-center pb-20">
+                            <div class="col-auto">
+                                <div class="d-flex items-center">
+                                    <i class="icon-location text-16 mr-5 text-light-1"></i>
+                                    <div class="text-15">{{ activity.activityDestination }}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-auto">
+                                <div class="d-flex items-center">
+                                    <i class="icon-clock text-16 mr-5 text-light-1"></i>
+                                    <div class="text-15">{{ activity.activityDuration ?: 'Not specified' }}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-auto">
+                                <div class="d-flex items-center">
+                                    <i class="icon-tag text-16 mr-5 text-light-1"></i>
+                                    <div class="text-15">{{ activity.activityGenre ?: 'Not specified' }}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-auto">
+                                <div class="d-flex items-center">
+                                    <i class="icon-dollar text-16 mr-5 text-light-1"></i>
+                                    <div class="text-15">${{ activity.activityPrice ?: '0.00' }}</div>
+                                </div>
+                            </div>
+                             <div class="col-auto">
+                                <div class="d-flex items-center">
+                                    <i class="icon-user text-16 mr-5 text-light-1"></i>
+                                    <div class="text-15">{{ activity.MaxNumber ?: '50' }}</div>
+                                </div>
+                            </div>
+                            {% if activity.activityDate %}
+                                <div class="col-auto">
+                                    <div class="d-flex items-center">
+                                        <i class="icon-calendar text-16 mr-5 text-light-1"></i>
+                                        <div class="text-15">{{ activity.activityDate|date('Y-m-d') }}</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="border-top-light py-20">
+                            <h3 class="text-18 fw-500 mb-10">Description</h3>
+                            <div class="text-15 lh-16 text-dark-1">
+                                {% if activity.activityDescription %}
+                                    {{ activity.activityDescription|nl2br }}
+                                {% else %}
+                                    <p class="text-light-1">No description provided</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar Actions -->
+            <div class="col-xl-4">
+                <div class="px-30 py-30 rounded-4 border-light shadow-2">
+                    <div class="row y-gap-20">
+                        <div class="col-12">
+                            <h3 class="text-18 fw-500 mb-10">Actions</h3>
+                        </div>
+                        
+                        <div class="col-12">
+                            <a href="{{ path('app_publicator_edit_activity', {'id': activity.id}) }}" class="button -md -dark-1 bg-blue-1 text-white w-100 rounded-4">
+                                <i class="icon-edit text-16 mr-10"></i>
+                                Edit Activity
+                            </a>
+                        </div>
+                        
+                        <div class="col-12">
+                            <button type="button" class="button -md -outline-red-1 text-red-1 w-100 rounded-4 delete-activity" data-id="{{ activity.id }}">
+                                <i class="icon-trash text-16 mr-10"></i>
+                                Delete Activity
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity Images -->
+            <div class="col-12">
+                <div class="border-top-light pt-30">
+                    <h3 class="text-18 fw-500 mb-15">Activity Images ({{ activity.resources|length }})</h3>
+                    
+                    {% if activity.resources is empty %}
+                        <div class="py-20 px-20 rounded-4 bg-blue-1-05 text-center">
+                            <div class="text-15">No images available for this activity</div>
+                        </div>
+                    {% else %}
+                        <div class="row x-gap-20 y-gap-20">
+                            {% for resource in activity.resources %}
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="ratio ratio-1:1 rounded-4 border-light overflow-hidden">
+                                        <img src="{{ asset(resource.path) }}" alt="Activity Image" class="img-ratio object-cover">
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row justify-center">
+            <div class="col-auto">
+                <div class="text-18 fw-500 text-center mb-10">Activity Not Found</div>
+                <div class="text-15 text-light-1 text-center mb-30">The requested activity could not be found.</div>
+                <div class="d-flex justify-center">
+                    <a href="{{ path('app_publicator_activities') }}" class="button px-30 h-50 -dark-1 bg-blue-1 text-white">
+                        <i class="icon-arrow-left mr-10"></i>
+                        Back to Activities
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Delete activity with confirmation
+        const deleteButton = document.querySelector('.delete-activity');
+        if (deleteButton) {
+            deleteButton.addEventListener('click', function() {
+                const activityId = this.getAttribute('data-id');
+                if (confirm('Are you sure you want to delete this activity? This action cannot be undone.\n\nNote: Activities with associated tickets cannot be deleted.')) {
+                    window.location.href = '{{ path("app_publicator_activities") }}/delete/' + activityId;
+                }
+            });
+        }
+    });
+</script>
+<style>
+    /* Animation styles */
+    .hover-animation {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-animation:hover {
+        transform: translateY(-3px);
+    }
+    
+    /* Fade in animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    /* Image styling */
+    .img-ratio {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}

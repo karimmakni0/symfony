@@ -1,0 +1,184 @@
+{% extends 'PubBase.html.twig' %}
+
+{% block title %}Your Activities{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+    <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">Your Activities</h1>
+        <div class="text-15 text-light-1">Manage your travel activities</div>
+    </div>
+    <div class="col-auto">
+        <a href="{{ path('app_publicator_add_activity') }}" class="button h-50 px-24 -dark-1 bg-blue-1 text-white">
+            <i class="icon-plus mr-10"></i>
+            Add New Activity
+        </a>
+    </div>
+</div>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30 fade-in">
+            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-4">
+                <div class="row x-gap-10 y-gap-10 items-center">
+                    <div class="col-auto">
+                        <div class="d-flex items-center">
+                            <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
+                            <div class="fw-500">{{ message }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<div class="py-30 px-30 rounded-4 bg-white shadow-3">
+    {% if activities is empty %}
+        <div class="row justify-center">
+            <div class="col-auto">
+                <div class="text-18 fw-500 text-center mb-10">No Activities Found</div>
+                <div class="text-15 text-light-1 text-center mb-30">You haven't created any activities yet.</div>
+                <div class="d-flex justify-center">
+                    <a href="{{ path('app_publicator_add_activity') }}" class="button px-30 h-50 -dark-1 bg-blue-1 text-white">
+                        <i class="icon-plus mr-10"></i>
+                        Create Your First Activity
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table y-gap-40 text-15">
+                <thead class="bg-light-2">
+                    <tr>
+                        <th>Name</th>
+                        <th>Destination</th>
+                        <th>Genre</th>
+                        <th>Duration</th>
+                        <th>Price</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in activities %}
+                        <tr class="border-bottom-light fade-in">
+                            <td>
+                                <div class="fw-500 text-blue-1">{{ activity.activityName }}</div>
+                            </td>
+                            <td>{{ activity.activityDestination }}</td>
+                            <td>{{ activity.activityGenre }}</td>
+                            <td>{{ activity.activityDuration }}</td>
+                            <td>${{ activity.activityPrice }}</td>
+                            <td>{{ activity.activityDate ? activity.activityDate|date('Y-m-d') : 'N/A' }}</td>
+                            <td>
+                                <div class="row x-gap-10 y-gap-10">
+                                    <div class="col-auto">
+                                        <a href="{{ path('app_publicator_activity_detail', {'id': activity.id}) }}" class="button -sm -dark-1 bg-blue-1 text-white hover-animation">
+                                            <i class="icon-eye"></i>
+                                            View Details
+                                        </a>
+                                    </div>
+                                    <div class="col-auto">
+                                        <a href="{{ path('app_publicator_edit_activity', {'id': activity.id}) }}" class="button -sm -blue-1 text-blue-1 bg-blue-1-05 hover-animation">
+                                            <i class="icon-edit"></i>
+                                            Edit
+                                        </a>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="button -sm -red-1 text-red-1 bg-red-1-05 hover-animation delete-activity" data-id="{{ activity.id }}">
+                                            <i class="icon-trash"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Delete activity with confirmation
+    const deleteButtons = document.querySelectorAll('.delete-activity');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const activityId = this.getAttribute('data-id');
+            if (confirm('Are you sure you want to delete this activity? This action cannot be undone.')) {
+                window.location.href = '{{ path("app_publicator_activities") }}/delete/' + activityId;
+            }
+        });
+    });
+});
+</script>
+<style>
+    /* Animation styles */
+    .hover-animation {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-animation:hover {
+        transform: translateY(-3px);
+    }
+    
+    /* Fade in animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    /* Table styling */
+    .table th {
+        font-weight: 500;
+        color: var(--color-dark-1);
+        padding: 12px 15px;
+    }
+    
+    .table td {
+        padding: 15px;
+        vertical-align: middle;
+    }
+    
+    .border-bottom-light {
+        border-bottom: 1px solid #eee;
+    }
+    
+    .border-top-light {
+        border-top: 1px solid #eee;
+    }
+    
+    /* Button styling */
+    .button {
+        transition: all 0.3s ease;
+    }
+    
+    .button.-blue-1:hover {
+        background-color: #0073cc !important;
+    }
+    
+    .button.-red-1:hover {
+        background-color: #e74c3c !important;
+        color: white !important;
+    }
+    
+    .button.-green-1:hover {
+        background-color: #27ae60 !important;
+        color: white !important;
+    }
+</style>
+{% endblock %}

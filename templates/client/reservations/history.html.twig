@@ -1,0 +1,320 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Booking History{% endblock %}
+
+{% block body %}
+<section class="layout-pt-md layout-pb-lg">
+  <div class="container">
+    <div class="row y-gap-20 justify-between items-end pb-40 lg:pb-40 md:pb-40">
+      <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">My Booking History</h1>
+        <div class="text-15 text-light-1">View your past and upcoming reservations</div>
+      </div>
+    </div>
+
+    <div class="tabs -underline-2 js-tabs">
+      <div class="tabs__controls row x-gap-40 y-gap-10 lg:x-gap-20 js-tabs-controls">
+        <div class="col-auto">
+          <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">All Reservations</button>
+        </div>
+        <div class="col-auto">
+          <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button" data-tab-target=".-tab-item-2">Upcoming</button>
+        </div>
+        <div class="col-auto">
+          <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button" data-tab-target=".-tab-item-3">Past</button>
+        </div>
+      </div>
+
+      <div class="tabs__content pt-30 js-tabs-content">
+        <div class="tabs__pane -tab-item-1 is-tab-el-active">
+          {% if reservationData is empty %}
+            <div class="border-top-light pt-30">
+              <div class="alert alert-info">
+                <i class="icon-info-circle text-blue-1 mr-10"></i>
+                You don't have any reservations yet.
+              </div>
+            </div>
+          {% else %}
+            <div class="overflow-scroll scroll-bar-1">
+              <table class="table-3 -border-bottom col-12">
+                <thead class="bg-light-2">
+                  <tr>
+                    <th>Booking #</th>
+                    <th>Activity</th>
+                    <th>Date</th>
+                    <th>Participants</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in reservationData %}
+                    <tr>
+                      <td>{{ item.billet.numero }}</td>
+                      <td>
+                        <div class="d-flex items-center">
+                          {% if item.activity.resources is defined and item.activity.resources|length > 0 %}
+                            <img src="{{ asset(item.activity.resources|first.path) }}" alt="{{ item.activity.activityName }}" class="size-40 rounded-4 object-cover mr-10">
+                          {% else %}
+                            <div class="size-40 rounded-4 flex-center bg-blue-1-05 text-blue-1 mr-10">
+                              <i class="icon-ticket text-20"></i>
+                            </div>
+                          {% endif %}
+                          <div>
+                            <div class="text-14 lh-14 fw-500">{{ item.activity.activityName }}</div>
+                            <div class="text-12 lh-14 text-light-1">{{ item.activity.activityDestination }}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="text-14 lh-14">{{ item.reservation.dateAchat|date('Y-m-d') }}</div>
+                      </td>
+                      <td>
+                        <div class="text-14 lh-14 fw-500">{{ item.reservation.nombre }}</div>
+                      </td>
+                      <td>
+                        <div class="text-14 lh-14 fw-500">
+                          {{ item.reservation.prixTotal }} €
+                        </div>
+                        <div class="text-12 lh-14 text-light-1">
+                          ({{ item.reservation.prixUnite }} € / person)
+                        </div>
+                      </td>
+                      <td>
+                        {% if item.reservation.statuts == 'pending' %}
+                          <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-yellow-4 text-yellow-3">
+                            <i class="icon-clock text-10 mr-5"></i> Pending
+                          </div>
+                        {% elseif item.reservation.statuts == 'confirmed' %}
+                          <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-green-2 text-green-1">
+                            <i class="icon-check text-10 mr-5"></i> Confirmed
+                          </div>
+                        {% elseif item.reservation.statuts == 'cancelled' %}
+                          <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-red-3 text-red-2">
+                            <i class="icon-close text-10 mr-5"></i> Cancelled
+                          </div>
+                        {% else %}
+                          <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-blue-1-05 text-blue-1">
+                            {{ item.reservation.statuts }}
+                          </div>
+                        {% endif %}
+                      </td>
+                      <td>
+                        <div class="d-flex x-gap-5">
+                          {% if item.reservation.statuts != 'cancelled' %}
+                            <a href="{{ path('app_reservation_cancel', {'id': item.reservation.id}) }}" 
+                               onclick="return confirm('Are you sure you want to cancel this reservation?')"
+                               class="size-35 flex-center rounded-4 bg-red-3 text-white" 
+                               title="Cancel Reservation">
+                              <i class="icon-trash text-14"></i>
+                            </a>
+                          {% endif %}
+                          <a href="{{ path('app_client_activity_detail', {'id': item.activity.id}) }}" class="size-35 flex-center rounded-4 bg-blue-1 text-white" title="View Activity">
+                            <i class="icon-eye text-14"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="tabs__pane -tab-item-2">
+          {% set upcoming = false %}
+          {% for item in reservationData %}
+            {% if item.reservation.statuts != 'cancelled' %}
+              {% set upcoming = true %}
+              <div class="border-top-light pt-20 mt-20">
+                <div class="row x-gap-20 y-gap-30">
+                  <div class="col-md-auto">
+                    <div class="cardImage ratio ratio-1:1 w-200 md:w-1/1 rounded-4">
+                      <div class="cardImage__content">
+                        {% if item.activity.resources is defined and item.activity.resources|length > 0 %}
+                          <img src="{{ asset(item.activity.resources|first.path) }}" alt="{{ item.activity.activityName }}" class="rounded-4 object-cover">
+                        {% else %}
+                          <div class="rounded-4 flex-center bg-blue-1-05 text-blue-1 w-full h-full">
+                            <i class="icon-ticket text-60"></i>
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md">
+                    <div class="d-flex flex-column h-full justify-between">
+                      <div>
+                        <h3 class="text-18 lh-15 fw-500">{{ item.activity.activityName }}</h3>
+                        <div class="text-14 lh-15 mt-5">{{ item.activity.activityDestination }}</div>
+                        <div class="row x-gap-10 y-gap-10 items-center pt-10">
+                          <div class="col-auto">
+                            <div class="d-flex items-center">
+                              <div class="text-14 text-light-1">Booking Code: <span class="fw-500 text-dark-1">{{ item.billet.numero }}</span></div>
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <div class="d-flex items-center">
+                              <div class="text-14 text-light-1">Participants: <span class="fw-500 text-dark-1">{{ item.reservation.nombre }}</span></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row x-gap-10 y-gap-10 pt-15">
+                        <div class="col-auto">
+                          <div class="text-14 text-light-1">Date: <span class="fw-500 text-dark-1">{{ item.reservation.dateAchat|date('Y-m-d') }}</span></div>
+                        </div>
+                        <div class="col-auto">
+                          <div class="text-14 text-light-1">Total: <span class="fw-500 text-dark-1">{{ item.reservation.prixTotal }} €</span></div>
+                        </div>
+                        <div class="col-auto">
+                          <div class="text-14 text-light-1">Status: 
+                            {% if item.reservation.statuts == 'pending' %}
+                              <span class="fw-500 text-yellow-3">Pending</span>
+                            {% elseif item.reservation.statuts == 'confirmed' %}
+                              <span class="fw-500 text-green-1">Confirmed</span>
+                            {% else %}
+                              <span class="fw-500">{{ item.reservation.statuts }}</span>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-auto">
+                    <div class="d-flex items-center h-full">
+                      <div class="px-20 py-10 rounded-4 bg-green-1 text-white">
+                        <div class="d-flex items-center">
+                          <i class="icon-check text-14 mr-10"></i>
+                          <span class="fw-500 lh-15">Booking Confirmed</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+          
+          {% if not upcoming %}
+            <div class="border-top-light pt-30">
+              <div class="alert alert-info">
+                <i class="icon-info-circle text-blue-1 mr-10"></i>
+                You don't have any upcoming reservations.
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="tabs__pane -tab-item-3">
+          {% set past = false %}
+          {% for item in reservationData %}
+            {% if item.reservation.statuts == 'cancelled' %}
+              {% set past = true %}
+              <div class="border-top-light pt-20 mt-20">
+                <div class="row x-gap-20 y-gap-30">
+                  <div class="col-md-auto">
+                    <div class="cardImage ratio ratio-1:1 w-200 md:w-1/1 rounded-4">
+                      <div class="cardImage__content">
+                        {% if item.activity.resources is defined and item.activity.resources|length > 0 %}
+                          <img src="{{ asset(item.activity.resources|first.path) }}" alt="{{ item.activity.activityName }}" class="rounded-4 object-cover">
+                        {% else %}
+                          <div class="rounded-4 flex-center bg-blue-1-05 text-blue-1 w-full h-full">
+                            <i class="icon-ticket text-60"></i>
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md">
+                    <div class="d-flex flex-column h-full justify-between">
+                      <div>
+                        <h3 class="text-18 lh-15 fw-500">{{ item.activity.activityName }}</h3>
+                        <div class="text-14 lh-15 mt-5">{{ item.activity.activityDestination }}</div>
+                        <div class="row x-gap-10 y-gap-10 items-center pt-10">
+                          <div class="col-auto">
+                            <div class="d-flex items-center">
+                              <div class="text-14 text-light-1">Booking Code: <span class="fw-500 text-dark-1">{{ item.billet.numero }}</span></div>
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <div class="d-flex items-center">
+                              <div class="text-14 text-light-1">Participants: <span class="fw-500 text-dark-1">{{ item.reservation.nombre }}</span></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row x-gap-10 y-gap-10 pt-15">
+                        <div class="col-auto">
+                          <div class="text-14 text-light-1">Date: <span class="fw-500 text-dark-1">{{ item.reservation.dateAchat|date('Y-m-d') }}</span></div>
+                        </div>
+                        <div class="col-auto">
+                          <div class="text-14 text-light-1">Total: <span class="fw-500 text-dark-1">{{ item.reservation.prixTotal }} €</span></div>
+                        </div>
+                        <div class="col-auto">
+                          <div class="text-14 text-light-1">Status: <span class="fw-500 text-red-2">Cancelled</span></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-auto">
+                    <div class="d-flex items-center h-full">
+                      <div class="px-20 py-10 rounded-4 bg-red-3 text-white">
+                        <div class="d-flex items-center">
+                          <i class="icon-close text-14 mr-10"></i>
+                          <span class="fw-500 lh-15">Booking Cancelled</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+          
+          {% if not past %}
+            <div class="border-top-light pt-30">
+              <div class="alert alert-info">
+                <i class="icon-info-circle text-blue-1 mr-10"></i>
+                You don't have any past or cancelled reservations.
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Tab Navigation
+    const tabButtons = document.querySelectorAll('.js-tabs-button');
+    const tabContents = document.querySelectorAll('.tabs__pane');
+    
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove active class from all buttons and contents
+        tabButtons.forEach(btn => btn.classList.remove('is-tab-el-active'));
+        tabContents.forEach(content => content.classList.remove('is-tab-el-active'));
+        
+        // Add active class to clicked button
+        button.classList.add('is-tab-el-active');
+        
+        // Get target tab content and activate it
+        const target = button.getAttribute('data-tab-target');
+        document.querySelector(target).classList.add('is-tab-el-active');
+      });
+    });
+  });
+</script>
+{% endblock %}

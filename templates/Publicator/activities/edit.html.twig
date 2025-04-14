@@ -1,0 +1,348 @@
+{% extends 'PubBase.html.twig' %}
+
+{% block title %}Edit Activity{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+    <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">Edit Activity</h1>
+        <div class="text-15 text-light-1">Update your activity information</div>
+    </div>
+    <div class="col-auto">
+        <a href="{{ path('app_publicator_activities') }}" class="button h-50 px-24 -blue-1-05 text-blue-1 hover-animation">
+            <i class="icon-arrow-left mr-10"></i>
+            Back to Activities
+        </a>
+    </div>
+</div>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30 fade-in">
+            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-4">
+                <div class="row x-gap-10 y-gap-10 items-center">
+                    <div class="col-auto">
+                        <div class="d-flex items-center">
+                            <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
+                            <div class="fw-500">{{ message }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<div class="py-40 px-40 rounded-4 bg-white shadow-3 fade-in">
+    <div class="row justify-center mb-30">
+        <div class="col-auto">
+            <div class="text-22 fw-600">Edit Activity</div>
+            <div class="text-14 text-center text-light-1 mt-5">Update the details for "{{ activity.activityName }}"</div>
+        </div>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data" class="row y-gap-30 justify-center">
+        <div class="col-xl-9 col-lg-10">
+            <div class="row x-gap-20 y-gap-30">
+                <div class="col-12">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Activity Name <span class="text-danger">*</span></label>
+                    <div class="mt-10">
+                        <input type="text" name="activity_name" required value="{{ activity.activityName }}" class="form-control h-50 bg-white rounded-4 border-light">
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Description</label>
+                    <div class="mt-10">
+                        <textarea name="activity_description" rows="5" class="form-control bg-white rounded-4 border-light">{{ activity.activityDescription }}</textarea>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Destination <span class="text-danger">*</span></label>
+                    <div class="mt-10">
+                        <select name="activity_destination" required class="form-select h-50 bg-white rounded-4 border-light">
+                            <option value="">Select a destination</option>
+                            {% if destinations is empty %}
+                                <option value="" disabled>No destinations available - Please create a destination first</option>
+                            {% else %}
+                                {% for destination in destinations %}
+                                    <option value="{{ destination.name }}" {% if activity.activityDestination == destination.name %}selected{% endif %}>
+                                        {{ destination.name }} ({{ destination.location }})
+                                    </option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Genre</label>
+                    <div class="mt-10">
+                        <select name="activity_genre" class="form-select h-50 bg-white rounded-4 border-light">
+                            <option value="">Select a genre</option>
+                            <option value="Adventure" {% if activity.activityGenre == 'Adventure' %}selected{% endif %}>Adventure</option>
+                            <option value="Cultural" {% if activity.activityGenre == 'Cultural' %}selected{% endif %}>Cultural</option>
+                            <option value="Beach" {% if activity.activityGenre == 'Beach' %}selected{% endif %}>Beach</option>
+                            <option value="Nature" {% if activity.activityGenre == 'Nature' %}selected{% endif %}>Nature</option>
+                            <option value="Urban" {% if activity.activityGenre == 'Urban' %}selected{% endif %}>Urban</option>
+                            <option value="Food" {% if activity.activityGenre == 'Food' %}selected{% endif %}>Food & Cuisine</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Duration</label>
+                    <div class="mt-10">
+                        <input type="text" name="activity_duration" value="{{ activity.activityDuration }}" class="form-control h-50 bg-white rounded-4 border-light">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Price</label>
+                    <div class="mt-10">
+                        <input type="number" name="activity_price" step="0.01" min="0" value="{{ activity.activityPrice }}" class="form-control h-50 bg-white rounded-4 border-light">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Activity Date</label>
+                    <div class="mt-10">
+                        <input type="date" name="activity_date" value="{{ activity.activityDate ? activity.activityDate|date('Y-m-d') : '' }}" class="form-control h-50 bg-white rounded-4 border-light">
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Max Number of Participants</label>
+                    <div class="mt-10">
+                        <input type="number" name="activity_max_number" min="1" value="{{ activity.maxNumber }}" class="form-control h-50 bg-white rounded-4 border-light">
+                        <small class="text-light-1">Maximum number of participants allowed</small>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Current Images</label>
+                    
+                    {% if resources is empty %}
+                        <div class="py-15 px-20 rounded-4 text-center bg-light-2 border-light">
+                            <div class="text-14 text-light-1">No images available for this activity</div>
+                        </div>
+                    {% else %}
+                        <div class="row x-gap-15 y-gap-15 mt-10">
+                            {% for resource in resources %}
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="rounded-4 border-light p-10 h-100 d-flex flex-column">
+                                        <div class="w-100 h-100 flex-grow-1" style="min-height: 120px; max-height: 150px; overflow: hidden;">
+                                            <img src="{{ asset(resource.path) }}" alt="Image {{ loop.index }}" class="w-100 h-100 rounded-4" style="object-fit: cover;">
+                                        </div>
+                                        <div class="d-flex mt-10 pt-10 border-top-light justify-between">
+                                            <span class="text-14">Image {{ loop.index }}</span>
+                                            <div class="form-checkbox">
+                                                <input type="checkbox" id="delete_image_{{ resource.id }}" name="delete_images[]" value="{{ resource.id }}">
+                                                <div class="form-checkbox__mark">
+                                                    <div class="form-checkbox__icon icon-check"></div>
+                                                </div>
+                                                <label class="text-14 text-red-1" for="delete_image_{{ resource.id }}">Delete</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Add More Images</label>
+                    <div class="mt-10 rounded-4 px-30 py-30 border border-light bg-white">
+                        <div class="row y-gap-20">
+                            <div class="col-12">
+                                <div class="text-center">
+                                    <div class="size-60 flex-center bg-blue-1 rounded-full mx-auto mb-15">
+                                        <i class="icon-cloud-upload text-white text-24"></i>
+                                    </div>
+                                    <h4 class="text-18 fw-500 mb-5">Upload Additional Images</h4>
+                                    <p class="text-15 text-light-1">Select multiple images in PNG or JPG format</p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="file-upload-container">
+                                    <input type="file" name="activity_images[]" id="imageUpload" accept="image/*" multiple class="file-upload-input">
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div id="imagePreviewsContainer" class="row x-gap-15 y-gap-15 pt-15"></div>
+                                <div id="imageCountContainer" class="text-center mt-15 d-none">
+                                    <span class="badge bg-blue-1 text-white py-10 px-20 rounded-full text-14"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-center mt-40">
+                <button type="submit" class="button h-60 px-40 -dark-1 bg-blue-1 text-white hover-animation">
+                    <i class="icon-check text-16 mr-15"></i>
+                    <span class="fw-500">Update Activity</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageUpload = document.getElementById('imageUpload');
+        const previewsContainer = document.getElementById('imagePreviewsContainer');
+        const imageCountContainer = document.getElementById('imageCountContainer');
+        
+        imageUpload.addEventListener('change', function() {
+            // Clear previous previews
+            previewsContainer.innerHTML = '';
+            imageCountContainer.classList.add('d-none');
+            
+            if (this.files && this.files.length > 0) {
+                // Show selected count
+                const countBadge = imageCountContainer.querySelector('.badge');
+                countBadge.textContent = `${this.files.length} file(s) selected`;
+                imageCountContainer.classList.remove('d-none');
+                
+                // Create preview for each selected file
+                for (let i = 0; i < this.files.length; i++) {
+                    const file = this.files[i];
+                    
+                    if (file.type.match('image.*')) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            const previewCol = document.createElement('div');
+                            previewCol.className = 'col-md-3 col-sm-6 mb-15';
+                            
+                            const previewCard = document.createElement('div');
+                            previewCard.className = 'border rounded-4 p-10 h-100 d-flex flex-column';
+                            
+                            const previewImg = document.createElement('img');
+                            previewImg.src = e.target.result;
+                            previewImg.className = 'w-100 rounded-4';
+                            previewImg.style.height = '100px';
+                            previewImg.style.objectFit = 'cover';
+                            
+                            const imageName = document.createElement('div');
+                            imageName.className = 'text-14 mt-5 text-center text-truncate';
+                            imageName.textContent = file.name;
+                            
+                            previewCard.appendChild(previewImg);
+                            previewCard.appendChild(imageName);
+                            previewCol.appendChild(previewCard);
+                            previewsContainer.appendChild(previewCol);
+                        }
+                        
+                        reader.readAsDataURL(file);
+                    }
+                }
+            } else {
+                imageCountContainer.classList.add('d-none');
+            }
+        });
+    });
+</script>
+<style>
+    /* Animation styles */
+    .hover-animation {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-animation:hover {
+        transform: translateY(-3px);
+    }
+    
+    /* Fade in animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    /* Form styling */
+    .form-control,
+    .form-select {
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--color-blue-1) !important;
+        box-shadow: 0 0 0 3px rgba(5, 142, 199, 0.1);
+    }
+    
+    .border-light {
+        border: 1px solid #ddd;
+    }
+    
+    /* Button styling */
+    .button {
+        transition: all 0.3s ease;
+    }
+    
+    .button.-blue-1:hover {
+        background-color: #0073cc !important;
+    }
+    
+    /* File upload styling */
+    .file-upload-container {
+        position: relative;
+        text-align: center;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        transition: all 0.3s ease;
+    }
+    
+    .file-upload-container:hover {
+        border-color: var(--color-blue-1);
+        background-color: #f0f7fc;
+    }
+    
+    .file-upload-input {
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 15px;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    
+    .file-upload-input::file-selector-button {
+        padding: 10px 20px;
+        border-radius: 4px;
+        border: none;
+        background-color: var(--color-blue-1);
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+        margin-right: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .file-upload-input::file-selector-button:hover {
+        background-color: #0073cc;
+    }
+    
+    .border-top-light {
+        border-top: 1px solid #eee;
+    }
+</style>
+{% endblock %}

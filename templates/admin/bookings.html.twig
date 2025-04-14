@@ -1,0 +1,225 @@
+{% extends 'AdminBase.html.twig' %}
+
+{% block title %}Manage Bookings{% endblock %}
+
+{% block child_stylesheets %}
+<style>
+    .action-btn {
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-red {
+        background-color: #D32F2F !important; /* Darker red */
+    }
+    
+    .status-badge {
+        font-weight: 500;
+        padding: 4px 10px;
+        border-radius: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 80px;
+    }
+    
+    .status-pending {
+        background-color: #FFC107;
+        color: #212529;
+    }
+    
+    .status-confirmed {
+        background-color: #198754;
+        color: white;
+    }
+    
+    .status-cancelled {
+        background-color: #D32F2F;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-30">
+    <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">Manage Bookings</h1>
+        <div class="text-15 text-light-1">View and manage all reservation tickets</div>
+    </div>
+</div>
+
+<div class="py-30 px-30 rounded-4 bg-white shadow-3">
+    <div class="tabs -underline-2 js-tabs">
+        <div class="tabs__controls row x-gap-40 y-gap-10 lg:x-gap-20 js-tabs-controls">
+            <div class="col-auto">
+                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">All Bookings ({{ bookings|length }})</button>
+            </div>
+        </div>
+
+        <div class="tabs__content pt-30 js-tabs-content">
+            <div class="tabs__pane -tab-item-1 is-tab-el-active">
+                <div class="overflow-scroll scroll-bar-1">
+                    <table class="table-4 -border-bottom col-12">
+                        <thead class="bg-light-2">
+                            <tr>
+                                <th>ID</th>
+                                <th>Ticket #</th>
+                                <th>Activity</th>
+                                <th>User</th>
+                                <th>Places</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if bookings is empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">No bookings found</td>
+                                </tr>
+                            {% else %}
+                                {% for booking in bookings %}
+                                    {% if booking is not null %}
+                                    <tr>
+                                        <td>#{{ booking.id }}</td>
+                                        <td>
+                                            <div class="text-14 lh-14 fw-500">
+                                                {{ booking.numero }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if booking.activiteId is defined and booking.activiteId is not null %}
+                                                {% if activities[booking.activiteId] is defined %}
+                                                    {{ activities[booking.activiteId].activityName }}
+                                                {% else %}
+                                                    Activity #{{ booking.activiteId }}
+                                                {% endif %}
+                                            {% else %}
+                                                Unknown Activity
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if booking.id is defined and booking.id is not null and reservations[booking.id] is defined %}
+                                                {% set reservation = reservations[booking.id] %}
+                                                {% if reservation.user is defined and reservation.user is not null %}
+                                                    <div class="d-flex items-center">
+                                                        {% if reservation.user.image %}
+                                                            <img src="{{ asset(reservation.user.image) }}" alt="{{ reservation.user.name }}" class="size-40 rounded-full object-cover mr-10">
+                                                        {% else %}
+                                                            <div class="size-40 rounded-full flex-center bg-blue-1-05 text-blue-1 mr-10">
+                                                                <i class="icon-user text-16"></i>
+                                                            </div>
+                                                        {% endif %}
+                                                        <div>
+                                                            <div class="text-14 lh-14 fw-500">{{ reservation.user.name }} {{ reservation.user.lastname }}</div>
+                                                            <div class="text-12 lh-14 text-light-1">{{ reservation.user.email }}</div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    User Not Found
+                                                {% endif %}
+                                            {% else %}
+                                                No Reservation
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex items-center">
+                                                {% if booking.id is defined and booking.id is not null and reservations[booking.id] is defined %}
+                                                    {% set reservation = reservations[booking.id] %}
+                                                    <div class="text-14 lh-14 fw-500">
+                                                        <span class="text-blue-1">{{ reservation.nombre }}</span> / {{ booking.nb }} places
+                                                    </div>
+                                                {% else %}
+                                                    <div class="text-14 lh-14 fw-500">
+                                                        {{ booking.nb }} places
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if booking.id is defined and booking.id is not null and reservations[booking.id] is defined %}
+                                                {% set reservation = reservations[booking.id] %}
+                                                <div class="text-14 lh-14 fw-500">
+                                                    {{ reservation.prixTotal }} € <span class="text-12 text-light-1">({{ reservation.prixUnite }} € / unit)</span>
+                                                </div>
+                                            {% else %}
+                                                <div class="text-14 lh-14 fw-500">
+                                                    {{ booking.prix }} €
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if booking.id is defined and booking.id is not null and reservations[booking.id] is defined %}
+                                                {% set reservation = reservations[booking.id] %}
+                                                {% if reservation.statuts is defined %}
+                                                    {% if reservation.statuts == 'pending' %}
+                                                        <div class="status-badge status-pending">
+                                                            <i class="icon-clock text-10 mr-5"></i> Pending
+                                                        </div>
+                                                    {% elseif reservation.statuts == 'confirmed' %}
+                                                        <div class="status-badge status-confirmed">
+                                                            <i class="icon-check text-10 mr-5"></i> Confirmed
+                                                        </div>
+                                                    {% elseif reservation.statuts == 'cancelled' %}
+                                                        <div class="status-badge status-cancelled">
+                                                            <i class="icon-close text-10 mr-5"></i> Cancelled
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="status-badge" style="background-color: #6c757d; color: white;">
+                                                            <i class="icon-info text-10 mr-5"></i> {{ reservation.statuts|capitalize }}
+                                                        </div>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <div class="status-badge" style="background-color: #6c757d; color: white;">
+                                                        <i class="icon-info text-10 mr-5"></i> Not Set
+                                                    </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <div class="status-badge" style="background-color: #6c757d; color: white;">
+                                                    <i class="icon-info text-10 mr-5"></i> No Reservation
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="row x-gap-10 y-gap-10">
+                                                <div class="col-auto">
+                                                    <a href="{{ path('admin_delete_booking', {'id': booking.id}) }}" 
+                                                       onclick="return confirm('Are you sure you want to delete booking #{{ booking.id }}? This action cannot be undone.')" 
+                                                       class="action-btn flex-center size-35 rounded-4 btn-red text-white" 
+                                                       title="Delete Booking">
+                                                        <i class="icon-trash text-12"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add tooltips to action buttons
+        const actionButtons = document.querySelectorAll('.action-btn');
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+            actionButtons.forEach(button => {
+                new bootstrap.Tooltip(button);
+            });
+        }
+    });
+</script>
+{% endblock %}
