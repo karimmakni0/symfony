@@ -1,0 +1,201 @@
+{% extends 'PubBase.html.twig' %}
+
+{% block title %}Edit Destination{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+    <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">Edit Destination</h1>
+        <div class="text-15 text-light-1">Update your travel destination information</div>
+    </div>
+    <div class="col-auto">
+        <a href="{{ path('app_publicator_destinations') }}" class="button h-50 px-24 -blue-1-05 text-blue-1 hover-animation">
+            <i class="icon-arrow-left mr-10"></i>
+            Back to Destinations
+        </a>
+    </div>
+</div>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30 fade-in">
+            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-4">
+                <div class="row x-gap-10 y-gap-10 items-center">
+                    <div class="col-auto">
+                        <div class="d-flex items-center">
+                            <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
+                            <div class="fw-500">{{ message }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<div class="py-40 px-40 rounded-4 bg-white shadow-3 fade-in">
+    <div class="row justify-center mb-30">
+        <div class="col-auto">
+            <div class="text-22 fw-600">Edit Destination</div>
+            <div class="text-14 text-center text-light-1 mt-5">Update the details for "{{ destination.name }}"</div>
+        </div>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data" class="row y-gap-30 justify-center">
+        <div class="col-xl-9 col-lg-10">
+            <div class="row x-gap-20 y-gap-20">
+                <div class="col-12">
+                    <div class="form-input">
+                        <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Destination Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" required value="{{ destination.name }}" class="border-light">
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-input">
+                        <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Location <span class="text-danger">*</span></label>
+                        <input type="text" name="location" required value="{{ destination.location }}" class="border-light">
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-input">
+                        <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Description</label>
+                        <textarea name="description" rows="5" class="border-light">{{ destination.description }}</textarea>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="mt-20">
+                        <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Destination Image</label>
+                        <div class="mt-10 border-light rounded-4 px-20 py-20 bg-light-2">
+                            <div class="row x-gap-10 y-gap-10 justify-center">
+                                <div class="col-auto text-center mb-10">
+                                    <div id="imagePreviewContainer" class="{% if not destination.imagePath %}d-none{% endif %} mb-20">
+                                        {% if destination.imagePath %}
+                                            <img id="imagePreview" src="{{ asset(destination.imagePath) }}" alt="{{ destination.name }}" class="w-250 rounded-4 mb-10 mx-auto" style="max-height: 180px; object-fit: cover;">
+                                            <div class="text-14 fw-500 text-blue-1">Current Image</div>
+                                        {% else %}
+                                            <img id="imagePreview" class="w-250 rounded-4 mb-15 mx-auto" style="max-height: 180px; object-fit: cover;">
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="d-flex flex-column items-center">
+                                        <div class="size-50 flex-center bg-blue-1 rounded-full mb-10">
+                                            <i class="icon-cloud-upload text-white"></i>
+                                        </div>
+                                        <div class="text-14 fw-500 mb-5">Change Image</div>
+                                        <div class="text-14 text-light-1 mb-15">PNG or JPG format</div>
+                                    </div>
+                                    
+                                    <div class="form-file">
+                                        <input type="file" name="image" id="imageUpload" accept="image/*">
+                                        <div class="form-file__wrap">
+                                            <label for="imageUpload" class="button -md -blue-1 h-50 text-white">
+                                                <i class="icon-upload mr-10"></i>
+                                                Browse Files
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-center mt-30">
+                <button type="submit" class="button h-60 px-40 -dark-1 bg-blue-1 text-white hover-animation">
+                    <i class="icon-check text-16 mr-15"></i>
+                    <span class="fw-500">Update Destination</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        
+        imageUpload.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.classList.remove('d-none');
+                    
+                    // Update text to show this is a new image
+                    const imageLabel = imagePreviewContainer.querySelector('.text-14.fw-500');
+                    if (imageLabel) {
+                        imageLabel.textContent = 'New Image (Not Saved Yet)';
+                        imageLabel.classList.remove('text-blue-1');
+                        imageLabel.classList.add('text-green-2');
+                    } else {
+                        const newLabel = document.createElement('div');
+                        newLabel.className = 'text-14 fw-500 text-green-2';
+                        newLabel.textContent = 'New Image (Not Saved Yet)';
+                        imagePreviewContainer.appendChild(newLabel);
+                    }
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    });
+</script>
+<style>
+    /* Animation styles */
+    .hover-animation {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-animation:hover {
+        transform: translateY(-3px);
+    }
+    
+    /* Fade in animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    /* Form styling */
+    .form-input input,
+    .form-input textarea {
+        transition: all 0.3s ease;
+    }
+    
+    .form-input input:focus,
+    .form-input textarea:focus {
+        border-color: var(--color-blue-1) !important;
+        box-shadow: 0 0 0 3px rgba(5, 142, 199, 0.1);
+    }
+    
+    .border-light {
+        border: 1px solid #ddd;
+    }
+    
+    /* Button styling */
+    .button {
+        transition: all 0.3s ease;
+    }
+    
+    .button.-blue-1:hover {
+        background-color: #0073cc !important;
+    }
+</style>
+{% endblock %}

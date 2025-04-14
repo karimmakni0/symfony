@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Post: {{ post.title }}{% endblock %}
+
+{% block body %}
+<section class="layout-pt-md layout-pb-md">
+  <div class="container">
+    <div class="row justify-center">
+      <div class="col-xl-8 col-lg-10">
+        <div class="px-50 py-50 sm:px-20 sm:py-20 bg-white shadow-4 rounded-4">
+          <div class="row y-gap-20">
+            <div class="col-12">
+              <h1 class="text-22 fw-500">Edit Blog Post</h1>
+              <p class="mt-10">Update your post information</p>
+            </div>
+
+            <div class="col-12">
+              <form action="{{ path('app_blog_edit', {'id': post.id}) }}" method="post" enctype="multipart/form-data" class="row y-gap-20">
+                <div class="col-12">
+                  <div class="form-input">
+                    <input type="text" name="title" value="{{ post.title }}" required>
+                    <label class="lh-1 text-16 text-light-1">Title *</label>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-input">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Select Activity *</label>
+                    <select name="activityId" required class="form-select">
+                      <option value="">-- Select an Activity --</option>
+                      {% for activity in activities %}
+                        <option value="{{ activity.id }}" {% if activity.id == post.activityId %}selected{% endif %}>{{ activity.activityName }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-input">
+                    <textarea name="description" rows="8" required>{{ post.description }}</textarea>
+                    <label class="lh-1 text-16 text-light-1">Content *</label>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-input">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Current Image</label>
+                    {% if post.picture %}
+                      <div class="mb-10">
+                        <img src="{{ asset('uploads/posts/' ~ post.picture) }}" alt="{{ post.title }}" style="max-height: 150px; max-width: 100%;">
+                      </div>
+                    {% else %}
+                      <p class="text-15 mt-5">No image uploaded</p>
+                    {% endif %}
+                    
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10 mt-10">Change Image</label>
+                    <input type="file" name="picture" class="form-control py-10 px-15 bg-light-2 rounded-4">
+                    <small class="d-block mt-10 text-14 text-light-1">Recommended size: 800x600px, Max size: 2MB. Leave empty to keep current image.</small>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="row x-gap-20 y-gap-10 pt-15">
+                    <div class="col-auto">
+                      <button type="submit" class="button -md -dark-1 bg-blue-1 text-white">
+                        Update Post <i class="icon-arrow-right ml-10"></i>
+                      </button>
+                    </div>
+                    <div class="col-auto">
+                      <a href="{{ path('app_blog_details', {'id': post.id}) }}" class="button -md -blue-1 bg-blue-1-05 text-blue-1">
+                        Cancel
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

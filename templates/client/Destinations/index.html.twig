@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Travel Destinations{% endblock %}
+
+{% block body %}
+<section class="layout-pt-md layout-pb-md">
+    <div class="container">
+      <div class="row y-gap-20 justify-between items-end">
+        <div class="col-auto">
+          <div class="sectionTitle -md">
+            <h2 class="sectionTitle__title">Destinations</h2>
+            <p class="sectionTitle__text mt-5 sm:mt-0">Discover amazing travel destinations</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row y-gap-30 pt-40 sm:pt-20">
+        {% if destinations is defined and destinations|length > 0 %}
+          {% for destination in destinations %}
+            <div class="col-xl-3 col-lg-3 col-sm-6">
+              <div class="hotelsCard -type-1">
+                <div class="hotelsCard__image">
+                  <div class="cardImage ratio ratio-1:1">
+                    <div class="cardImage__content">
+                      {% if destination.imagePath %}
+                        <img class="rounded-4 col-12" src="{{ asset(destination.imagePath) }}" alt="{{ destination.name }}">
+                      {% else %}
+                        <img class="rounded-4 col-12" src="{{ asset('assets/img/hotels/1.png') }}" alt="image">
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="hotelsCard__content mt-10">
+                  <h4 class="hotelsCard__title text-dark-1 text-18 lh-16 fw-500">
+                    {{ destination.name }}
+                  </h4>
+
+                  <div class="d-flex items-center mt-5">
+                    <div class="text-14 text-light-1">{{ destination.location }}</div>
+                  </div>
+
+                  {% if destination.description %}
+                  <div class="mt-5">
+                    <div class="fw-500">
+                      {{ destination.description|striptags|length > 100 ? destination.description|striptags|slice(0, 100) ~ '...' : destination.description|striptags }}
+                    </div>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="col-12">
+            <div class="py-50 text-center">
+              <div class="text-18 fw-500">No destinations available at the moment.</div>
+              <div class="text-15 mt-10">Please check back later for exciting new destinations!</div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,472 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ activity.activityName }} - Activity Details{% endblock %}
+
+{% block body %}
+<br>
+<br>
+<br>
+
+<section class="pt-40">
+  <div class="container">
+    <div class="row y-gap-20">
+      <div class="col-12">
+        <div class="row justify-between items-end">
+          <div class="col-auto">
+            <h1 class="text-30 fw-600">{{ activity.activityName }}</h1>
+            <div class="row x-gap-20 y-gap-20 items-center pt-10">
+              <div class="col-auto">
+                <div class="d-flex items-center">
+                  <div class="d-flex x-gap-5 items-center">
+                    <i class="icon-star text-10 text-yellow-1"></i>
+                    <i class="icon-star text-10 text-yellow-1"></i>
+                    <i class="icon-star text-10 text-yellow-1"></i>
+                    <i class="icon-star text-10 text-yellow-1"></i>
+                    <i class="icon-star text-10 text-yellow-1"></i>
+                  </div>
+                  <div class="text-14 text-light-1 ml-10">4.8 (50 reviews)</div>
+                </div>
+              </div>
+
+              <div class="col-auto">
+                <div class="row x-gap-10 items-center">
+                  <div class="col-auto">
+                    <div class="d-flex x-gap-5 items-center">
+                      <i class="icon-location-2 text-16 text-light-1"></i>
+                      <div class="text-15 text-light-1">{{ activity.activityDestination }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-auto">
+            <div class="row x-gap-10 y-gap-10">
+              <div class="col-auto">
+                <button class="button px-15 py-10 -blue-1">
+                  <i class="icon-share mr-10"></i>
+                  Share
+                </button>
+              </div>
+
+              <div class="col-auto">
+                <button class="button px-15 py-10 -blue-1 bg-light-2">
+                  <i class="icon-heart mr-10"></i>
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Image Gallery -->
+      <div class="col-12">
+        <div class="relative d-flex justify-center overflow-hidden js-section-slider" data-slider-cols="base-1" data-nav-prev="js-img-prev" data-nav-next="js-img-next">
+          <div class="swiper-wrapper">
+            {% if activity.resources is empty %}
+              <div class="swiper-slide">
+                <div class="ratio ratio-64:45">
+                  <img src="{{ asset('assets/img/activities/default.jpg') }}" alt="{{ activity.activityName }}" class="img-ratio rounded-4">
+                </div>
+              </div>
+            {% else %}
+              {% for resource in activity.resources %}
+                <div class="swiper-slide">
+                  <div class="ratio ratio-64:45">
+                    <img src="{{ asset(resource.path) }}" alt="{{ activity.activityName }}" class="img-ratio rounded-4">
+                  </div>
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="absolute h-full col-11">
+            <button class="section-slider-nav -prev flex-center button -blue-1 bg-white shadow-1 size-40 rounded-full sm:d-none js-img-prev">
+              <i class="icon-arrow-left text-12"></i>
+            </button>
+            <button class="section-slider-nav -next flex-center button -blue-1 bg-white shadow-1 size-40 rounded-full sm:d-none js-img-next">
+              <i class="icon-arrow-right text-12"></i>
+            </button>
+          </div>
+
+          <!-- Image thumbnails -->
+          {% if activity.resources|length > 1 %}
+            <div class="container">
+              <div class="row justify-center pt-20">
+                <div class="col-xl-10">
+                  <div class="overflow-hidden js-slider-gallery">
+                    <div class="swiper-wrapper">
+                      {% for resource in activity.resources %}
+                        <div class="swiper-slide">
+                          <div class="ratio ratio-1:1 w-full h-full">
+                            <img src="{{ asset(resource.path) }}" alt="" class="img-ratio rounded-4">
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pt-40">
+  <div class="container">
+    <div class="row y-gap-30">
+      <div class="col-xl-8">
+        <div class="row y-gap-20">
+          <div class="col-12">
+            <h3 class="text-22 fw-500">About this activity</h3>
+            <p class="text-15 text-dark-1 mt-20">
+              {{ activity.activityDescription|raw }}
+            </p>
+          </div>
+
+          <div class="col-12">
+            <h5 class="text-16 fw-500">Activity Details</h5>
+            <div class="row y-gap-20 pt-15">
+              <div class="col-12">
+                <div class="row x-gap-20 y-gap-10 items-center">
+                  <div class="col-auto">
+                    <div class="d-flex items-center">
+                      <i class="icon-clock text-20 mr-10 text-blue-1"></i>
+                      <div class="text-15">Duration</div>
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <div class="text-15">{{ activity.activityDuration }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="row x-gap-20 y-gap-10 items-center">
+                  <div class="col-auto">
+                    <div class="d-flex items-center">
+                      <i class="icon-tag text-20 mr-10 text-blue-1"></i>
+                      <div class="text-15">Genre</div>
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <div class="text-15">{{ activity.activityGenre }}</div>
+                  </div>
+                </div>
+              </div>
+
+              {% if activity.activityDate %}
+              <div class="col-12">
+                <div class="row x-gap-20 y-gap-10 items-center">
+                  <div class="col-auto">
+                    <div class="d-flex items-center">
+                      <i class="icon-calendar text-20 mr-10 text-blue-1"></i>
+                      <div class="text-15">Date</div>
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <div class="text-15">{{ activity.activityDate|date('d M Y') }}</div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="col-xl-4">
+        <div class="bravo_single_book_wrap">
+          <div class="border-light rounded-4 px-30 py-30 bg-white shadow-4">
+            <div class="row y-gap-15 justify-between items-center">
+              <div class="col-auto">
+                <div class="text-14 text-light-1">
+                  From <span class="text-20 fw-500 text-dark-1 ml-5">TND {{ activity.activityPrice|number_format(2, '.', ',') }}</span>
+                </div>
+              </div>
+
+              <div class="col-auto">
+                <div class="d-flex items-center">
+                  <div class="d-flex x-gap-5 items-center">
+                    <i class="icon-star text-10 text-yellow-1"></i>
+                    <i class="icon-star text-10 text-yellow-1"></i>
+                    <i class="icon-star text-10 text-yellow-1"></i>
+                    <i class="icon-star text-10 text-yellow-1"></i>
+                    <i class="icon-star text-10 text-yellow-1"></i>
+                  </div>
+                  <div class="text-14 text-light-1 ml-10">4.8 (50 reviews)</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Availability Information -->
+            <div class="row y-gap-10 pt-10">
+              <div class="col-12">
+                <div class="d-flex items-center justify-between">
+                  <div class="text-14">Maximum capacity:</div>
+                  <div class="text-14 fw-500">{{ activity.maxNumber }}</div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="d-flex items-center justify-between">
+                  <div class="text-14">Booked tickets:</div>
+                  <div class="text-14 fw-500">{{ totalBookedTickets }}</div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="d-flex items-center justify-between">
+                  <div class="text-14 fw-500">Remaining tickets:</div>
+                  <div class="text-14 fw-500 {% if activity.maxNumber - totalBookedTickets <= 5 %}text-red-1{% endif %}">
+                    {{ activity.maxNumber - totalBookedTickets }}
+                  </div>
+                </div>
+              </div>
+              {% if activity.maxNumber - totalBookedTickets <= 5 and activity.maxNumber - totalBookedTickets > 0 %}
+                <div class="col-12">
+                  <div class="text-14 text-red-1">Only {{ activity.maxNumber - totalBookedTickets }} tickets left!</div>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="row y-gap-20 pt-20">
+              {% if activity.maxNumber - totalBookedTickets > 0 %}
+                <div class="col-12">
+                  <div class="py-10">
+                    <div class="text-15 fw-500 mb-10">Booking Summary:</div>
+                    <div class="d-flex justify-between">
+                      <div>Price per ticket:</div>
+                      <div class="fw-500">{{ activity.activityPrice ?? 0 }} TND</div>
+                    </div>
+                    <div class="d-flex justify-between mt-5">
+                      <div>Number of tickets:</div>
+                      <div class="fw-500" id="summaryTicketCount">1</div>
+                    </div>
+                    <div class="d-flex justify-between mt-5 border-top-light pt-10">
+                      <div class="text-16 fw-500">Total price:</div>
+                      <div class="text-16 fw-500" id="summaryTotalPrice">{{ activity.activityPrice ?? 0 }} TND</div>
+                    </div>
+                  </div>
+                  
+                  <!-- Participant selection controls -->  
+                  <div class="searchMenu-guests px-20 py-10 border-light rounded-4 mb-10">
+                    <div class="d-flex">
+                      <div class="flex-grow-1">
+                        <div class="text-15 fw-500">Number of participants</div>
+                      </div>
+
+                      <div class="flex-grow-0">
+                        <div class="searchMenu-guests__controller d-flex items-center">
+                          <button type="button" class="button -outline-blue-1 text-blue-1 size-38 rounded-4" id="decreaseParticipants">
+                            <i class="icon-minus text-12"></i>
+                          </button>
+                          <span class="text-15 mx-15" id="participantsCount">1</span>
+                          <button type="button" class="button -outline-blue-1 text-blue-1 size-38 rounded-4" id="increaseParticipants">
+                            <i class="icon-plus text-12"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {% if app.user %}
+                    <!-- User is logged in, show direct booking form -->
+                    <form method="POST" action="{{ path('app_create_reservation', {'id': activity.id}) }}" id="directBookingForm">
+                      <input type="hidden" name="participants" id="directParticipantsInput" value="1">
+                      <input type="hidden" name="_token" value="{{ csrf_token('book_activity_' ~ activity.id) }}">
+                      <button type="submit" class="button -dark-1 py-15 px-35 h-60 col-12 rounded-4 bg-blue-1 text-white" id="bookNowBtn">
+                        <i class="icon-booking mr-10"></i>
+                        Book Now
+                      </button>
+                    </form>
+                  {% else %}
+                    <!-- User is not logged in, show login redirect button -->
+                    <a href="{{ path('app_login') }}?redirect={{ path('app_client_activity_detail', {'id': activity.id}) }}" class="button -dark-1 py-15 px-35 h-60 col-12 rounded-4 bg-blue-1 text-white" style="text-align: center;">
+                      <i class="icon-booking mr-10"></i>
+                      Login to Book
+                    </a>
+                  {% endif %}
+                </div>
+              {% else %}
+                <div class="col-12">
+                  <div class="text-18 fw-500 text-center text-red-1 py-15">OUT OF STOCK</div>
+                  <button type="button" class="button -dark-1 py-15 px-35 h-60 col-12 rounded-4 bg-light-2 text-light-1" disabled>
+                    <i class="icon-close mr-10"></i>
+                    No Tickets Available
+                  </button>
+                </div>
+              {% endif %}
+
+              <div class="px-30">
+                <div class="text-14 text-light-1 mt-30">Not sure? You can cancel this reservation up to 24 hours in advance for a full refund.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container mt-40 mb-40">
+  <div class="border-top-light"></div>
+</div>
+
+<section>
+  <div class="container">
+    <div class="row y-gap-30 justify-between">
+      <div class="col-lg-4">
+        <h2 class="text-22 fw-500">Activity Location</h2>
+        <div class="mt-25">
+          <div class="text-15 fw-500">{{ activity.activityDestination }}</div>
+          <div class="text-15 mt-5">Tunisia</div>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="map-ratio rounded-4 overflow-hidden bg-blue-1-05 h-full">
+          <div class="px-30 py-30 text-center">
+            <div class="text-18 fw-500">Location map coming soon...</div>
+            <p class="text-14 mt-5">This activity takes place in {{ activity.activityDestination }}, Tunisia.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pt-40">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <h3 class="text-22 fw-500 mb-20">Similar Activities</h3>
+      </div>
+    </div>
+
+    <div class="row y-gap-30">
+      <div class="col-xl-12">
+        <div class="overflow-hidden js-section-slider" data-gap="30" data-slider-cols="xl-4 lg-3 md-2 sm-2 base-1">
+          <div class="swiper-wrapper">
+            {% for i in 1..4 %}
+              <div class="swiper-slide">
+                <div class="activityCard -type-1 rounded-4 hover-shadow-1">
+                  <div class="activityCard__image">
+                    <div class="cardImage ratio ratio-1:1">
+                      <div class="cardImage__content">
+                        <img class="rounded-4 col-12" src="{{ asset('assets/img/activities/1.png') }}" alt="image">
+                      </div>
+                      <div class="cardImage__wishlist">
+                        <button class="button -blue-1 bg-white size-30 rounded-full shadow-2">
+                          <i class="icon-heart text-12"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="activityCard__content mt-10">
+                    <div class="text-14 lh-14 text-light-1 mb-5">6+ hours</div>
+                    <h4 class="activityCard__title lh-16 fw-500 text-dark-1 text-18">
+                      <span>Similar Activity {{ i }}</span>
+                    </h4>
+                    <p class="text-light-1 text-14 lh-14 mt-5">Tunisia</p>
+                    <div class="row justify-between items-center pt-10">
+                      <div class="col-auto">
+                        <div class="d-flex items-center">
+                          <div class="d-flex x-gap-5 items-center">
+                            <i class="icon-star text-10 text-yellow-1"></i>
+                            <i class="icon-star text-10 text-yellow-1"></i>
+                            <i class="icon-star text-10 text-yellow-1"></i>
+                            <i class="icon-star text-10 text-yellow-1"></i>
+                            <i class="icon-star text-10 text-yellow-1"></i>
+                          </div>
+                          <div class="text-14 text-light-1 ml-10">4.8 (12)</div>
+                        </div>
+                      </div>
+                      <div class="col-auto">
+                        <div class="text-14 text-light-1">
+                          From <span class="text-16 fw-500 text-dark-1">$150</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+<!-- Add empty dummy elements to avoid JS errors -->
+<div class="js-form-dd" style="display:none;">
+  <div data-x-dd-click="empty"></div>
+  <div data-x-dd="empty" data-x-dd-toggle="active"></div>
+</div>
+
+<div id="activityData" 
+     data-max-number="{{ activity.maxNumber|default(0) }}" 
+     data-booked-tickets="{{ totalBookedTickets|default(0) }}"
+     data-price="{{ activity.activityPrice|default(0) }}"
+     style="display: none;"></div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Update participant count when +/- buttons are clicked
+    const participantsCount = document.getElementById('participantsCount');
+    const participantsInput = document.getElementById('directParticipantsInput');
+    
+    // Initialize the count based on existing selection if any
+    let count = parseInt(participantsCount.textContent) || 1;
+    participantsInput.value = count;
+    
+    // Increase participants
+    document.getElementById('increaseParticipants').addEventListener('click', function() {
+      count++;
+      participantsCount.textContent = count;
+      participantsInput.value = count;
+      console.log('Participants increased to: ' + count);
+    });
+    
+    // Decrease participants (minimum 1)
+    document.getElementById('decreaseParticipants').addEventListener('click', function() {
+      if (count > 1) {
+        count--;
+        participantsCount.textContent = count;
+        participantsInput.value = count;
+        console.log('Participants decreased to: ' + count);
+      }
+    });
+    
+    // Form submission handling with additional logging
+    const directBookingForm = document.getElementById('directBookingForm');
+    const bookNowBtn = document.getElementById('bookNowBtn');
+    
+    if (directBookingForm && bookNowBtn) {
+      directBookingForm.addEventListener('submit', function(e) {
+        // Don't prevent default - let the form submit naturally
+        console.log('Form submitting with ' + participantsInput.value + ' participants');
+        
+        // Log all form data
+        const formData = new FormData(directBookingForm);
+        const formValues = {};
+        for (const [key, value] of formData.entries()) {
+          formValues[key] = value;
+          console.log(`Form field: ${key} = ${value}`);
+        }
+        
+        // Let form submit normally
+        return true;
+      });
+    }
+  });
+</script>
+{% endblock %}
