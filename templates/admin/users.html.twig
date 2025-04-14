@@ -1,0 +1,334 @@
+{% extends 'AdminBase.html.twig' %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .action-btn {
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-blue {
+        background-color: #0B5ED7 !important; /* Darker blue */
+    }
+    
+    .btn-yellow {
+        background-color: #DB9A06 !important; /* Darker yellow */
+    }
+    
+    .btn-red {
+        background-color: #D32F2F !important; /* Darker red */
+    }
+    
+    .btn-green {
+        background-color: #198754 !important; /* Darker green */
+    }
+    
+    .status-badge {
+        font-weight: 500;
+        padding: 4px 10px;
+        border-radius: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 80px;
+    }
+    
+    .status-badge i {
+        margin-right: 4px;
+    }
+    
+    .status-active {
+        background-color: #198754;
+        color: white;
+    }
+    
+    .status-banned {
+        background-color: #D32F2F;
+        color: white;
+    }
+    
+    .custom-dropdown-menu {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+    
+    .custom-dropdown-menu a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+    
+    .custom-dropdown-menu a:hover {background-color: #f1f1f1}
+    
+    .custom-dropdown:hover .custom-dropdown-menu {
+        display: block;
+    }
+    
+    .custom-dropdown:hover .custom-dropdown-button {
+        background-color: #3e8e41;
+    }
+    
+    .role-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .role-dropdown-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        background-color: white;
+        min-width: 160px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        z-index: 1000;
+        border-radius: 8px;
+        padding: 8px;
+        margin-top: 5px;
+    }
+    
+    .role-dropdown-menu.show {
+        display: block;
+    }
+    
+    .dropdown-header {
+        font-weight: 600;
+        color: #495057;
+        padding: 8px 12px;
+        margin-bottom: 4px;
+    }
+    
+    .role-dropdown-item {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        clear: both;
+        font-weight: 400;
+        color: #212529;
+        text-align: inherit;
+        text-decoration: none;
+        white-space: nowrap;
+        background-color: transparent;
+        border: 0;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+    
+    .role-dropdown-item:hover, .role-dropdown-item:focus {
+        background-color: #f8f9fa;
+        text-decoration: none;
+    }
+    
+    .role-dropdown-item.active {
+        background-color: #e9ecef;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 5px 8px;
+        font-size: 12px;
+        font-weight: 500;
+        border-radius: 4px;
+    }
+
+    .custom-dropdown-menu {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-30">
+    <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">Manage Users</h1>
+        <div class="text-15 text-light-1">Manage all user accounts in the system</div>
+    </div>
+</div>
+
+<div class="py-30 px-30 rounded-4 bg-white shadow-3">
+    <div class="tabs -underline-2 js-tabs">
+        <div class="tabs__controls row x-gap-40 y-gap-10 lg:x-gap-20 js-tabs-controls">
+            <div class="col-auto">
+                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">All Users ({{ users|length }})</button>
+            </div>
+        </div>
+
+        <div class="tabs__content pt-30 js-tabs-content">
+            <div class="tabs__pane -tab-item-1 is-tab-el-active">
+                <div class="overflow-scroll scroll-bar-1">
+                    <table class="table-4 -border-bottom col-12">
+                        <thead class="bg-light-2">
+                            <tr>
+                                <th>ID</th>
+                                <th>Profile</th>
+                                <th>Email</th>
+                                <th>Full Name</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if users is empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No users found</td>
+                                </tr>
+                            {% else %}
+                                {% for user in users %}
+                                    <tr>
+                                        <td>#{{ user.id }}</td>
+                                        <td>
+                                            <div class="size-60">
+                                                {% if user.image %}
+                                                    <img src="{{ asset(user.image) }}" alt="{{ user.name }} {{ user.lastname }}" class="size-60 rounded-full object-cover">
+                                                {% else %}
+                                                    <div class="size-60 rounded-full flex-center bg-blue-1-05 text-blue-1">
+                                                        <i class="icon-user text-24"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.name }} {{ user.lastname }}</td>
+                                        <td>
+                                            <div class="rounded-100 py-4 px-10 text-center {% if user.role == 'Admin' %}bg-blue-1-05 text-blue-1{% elseif user.role == 'Publicitaire' %}bg-yellow-4 text-yellow-3{% else %}bg-green-1 text-green-2{% endif %}">
+                                                {{ user.role }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if user.isBanned %}
+                                                <div class="status-badge status-banned">
+                                                    <i class="icon-close text-10"></i> Banned
+                                                </div>
+                                            {% else %}
+                                                <div class="status-badge status-active">
+                                                    <i class="icon-check text-10"></i> Active
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="row x-gap-10 y-gap-10">
+                                                {% if user.isBanned %}
+                                                    <div class="col-auto">
+                                                        <a href="{{ path('admin_unban_user', {'id': user.id}) }}" 
+                                                           onclick="return confirm('Are you sure you want to unban {{ user.name }} {{ user.lastname }}?')" 
+                                                           class="action-btn flex-center size-35 rounded-4 btn-blue text-white" title="Unban User">
+                                                            <i class="icon-check text-12"></i>
+                                                        </a>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="col-auto">
+                                                        <a href="{{ path('admin_ban_user', {'id': user.id}) }}" 
+                                                           onclick="return confirm('Are you sure you want to ban {{ user.name }} {{ user.lastname }}? They will not be able to log in.')" 
+                                                           class="action-btn flex-center size-35 rounded-4 btn-yellow text-white" title="Ban User">
+                                                            <i class="icon-close text-12"></i>
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                <!-- Role selection -->
+                                                <div class="col-auto">
+                                                    <div class="dropdown role-dropdown">
+                                                        <button class="action-btn flex-center size-35 rounded-4 btn-green text-white" 
+                                                                type="button"
+                                                                data-user-id="{{ user.id }}"
+                                                                title="Change Role">
+                                                            <i class="icon-user text-12"></i>
+                                                        </button>
+                                                        <div class="role-dropdown-menu" id="roleDropdown{{ user.id }}">
+                                                            <div class="dropdown-header">Change Role</div>
+                                                            <a class="role-dropdown-item {% if user.role == 'Admin' %}active{% endif %}" 
+                                                               href="{{ path('admin_change_role_user', {'id': user.id, 'role': 'Admin'}) }}"
+                                                               onclick="return confirm('Change {{ user.name }} {{ user.lastname }} role to Admin?')">
+                                                               <span class="badge bg-blue-1">Admin</span>
+                                                            </a>
+                                                            <a class="role-dropdown-item {% if user.role == 'Publicitaire' %}active{% endif %}" 
+                                                               href="{{ path('admin_change_role_user', {'id': user.id, 'role': 'Publicitaire'}) }}"
+                                                               onclick="return confirm('Change {{ user.name }} {{ user.lastname }} role to Publicitaire?')">
+                                                               <span class="badge bg-yellow-4">Publicitaire</span>
+                                                            </a>
+                                                            <a class="role-dropdown-item {% if user.role == 'user' %}active{% endif %}" 
+                                                               href="{{ path('admin_change_role_user', {'id': user.id, 'role': 'user'}) }}"
+                                                               onclick="return confirm('Change {{ user.name }} {{ user.lastname }} role to regular user?')">
+                                                               <span class="badge bg-green-1">User</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-auto">
+                                                    <a href="{{ path('admin_delete_user', {'id': user.id}) }}" 
+                                                       onclick="return confirm('Are you sure you want to permanently delete {{ user.name }} {{ user.lastname }}? This will remove all data associated with this user and cannot be undone.')" 
+                                                       class="action-btn flex-center size-35 rounded-4 btn-red text-white" title="Delete User">
+                                                        <i class="icon-trash text-12"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Setup role dropdown toggles
+        const roleButtons = document.querySelectorAll('.role-dropdown button');
+        roleButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const userId = this.getAttribute('data-user-id');
+                const dropdown = document.getElementById('roleDropdown' + userId);
+                
+                // Close all other dropdowns first
+                document.querySelectorAll('.role-dropdown-menu.show').forEach(menu => {
+                    if (menu.id !== 'roleDropdown' + userId) {
+                        menu.classList.remove('show');
+                    }
+                });
+                
+                // Toggle current dropdown
+                dropdown.classList.toggle('show');
+            });
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.role-dropdown')) {
+                document.querySelectorAll('.role-dropdown-menu.show').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+        
+        // Add tooltips to action buttons
+        const actionButtons = document.querySelectorAll('.action-btn');
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+            actionButtons.forEach(button => {
+                new bootstrap.Tooltip(button);
+            });
+        }
+    });
+</script>
+{% endblock %}

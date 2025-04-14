@@ -1,0 +1,121 @@
+{% extends 'AdminBase.html.twig' %}
+
+{% block title %}Manage Activities{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-30">
+    <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">Manage Activities</h1>
+        <div class="text-15 text-light-1">View and manage all activities in the system</div>
+    </div>
+</div>
+
+<div class="py-30 px-30 rounded-4 bg-white shadow-3">
+    <div class="tabs -underline-2 js-tabs">
+        <div class="tabs__controls row x-gap-40 y-gap-10 lg:x-gap-20 js-tabs-controls">
+            <div class="col-auto">
+                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">All Activities ({{ activities|length }})</button>
+            </div>
+        </div>
+
+        <div class="tabs__content pt-30 js-tabs-content">
+            <div class="tabs__pane -tab-item-1 is-tab-el-active">
+                <div class="overflow-scroll scroll-bar-1">
+                    <table class="table-4 -border-bottom col-12">
+                        <thead class="bg-light-2">
+                            <tr>
+                                <th>ID</th>
+                                <th>Activity Name</th>
+                                <th>Destination</th>
+                                <th>Created By</th>
+                                <th>Duration</th>
+                                <th>Price</th>
+                                <th>Genre</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if activities is empty %}
+                                <tr>
+                                    <td colspan="9" class="text-center">No activities found</td>
+                                </tr>
+                            {% else %}
+                                {% for activity in activities %}
+                                    <tr>
+                                        <td>#{{ activity.id }}</td>
+                                        <td>
+                                            <div>
+                                                <div class="fw-500">{{ activity.activityName }}</div>
+                                                <div class="text-14 lh-15 text-light-1">
+                                                    {{ activity.activityDescription|length > 50 ? activity.activityDescription|slice(0, 50) ~ '...' : activity.activityDescription }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ activity.activityDestination }}</td>
+                                        <td>
+                                            {% if activity.user %}
+                                                <div>
+                                                    <div class="fw-500">{{ activity.user.username }}</div>
+                                                    <div class="text-14 lh-15 text-light-1">{{ activity.user.email }}</div>
+                                                </div>
+                                            {% else %}
+                                                <div class="text-14 text-light-1">Unknown User</div>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ activity.activityDuration }}</td>
+                                        <td class="fw-500">
+                                            {% if activity.activityPrice %}
+                                                ${{ activity.activityPrice }}
+                                            {% else %}
+                                                Free
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if activity.activityGenre %}
+                                                <div class="rounded-100 py-4 px-10 text-center {% if activity.activityGenre == 'Adventure' %}bg-yellow-4 text-yellow-3{% elseif activity.activityGenre == 'Cultural' %}bg-blue-1-05 text-blue-1{% elseif activity.activityGenre == 'Beach' %}bg-blue-2 text-blue-1{% else %}bg-green-1 text-green-2{% endif %}">
+                                                    {{ activity.activityGenre }}
+                                                </div>
+                                            {% else %}
+                                                <div class="rounded-100 py-4 px-10 text-center bg-light-2 text-light-1">
+                                                    Uncategorized
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if activity.activityDate %}
+                                                {{ activity.activityDate|date('d/m/Y') }}
+                                            {% else %}
+                                                Any date
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="row x-gap-10 y-gap-10">
+                                                <div class="col-auto">
+                                                    <a href="{{ path('admin_delete_activity', {'id': activity.id}) }}"
+                                                       onclick="return confirm('Are you sure you want to delete the activity: {{ activity.activityName }}? This action cannot be undone.')"
+                                                       class="flex-center size-35 rounded-4 bg-red-3 text-white">
+                                                        <i class="icon-trash text-12"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Activity management JavaScript
+    });
+</script>
+{% endblock %}
