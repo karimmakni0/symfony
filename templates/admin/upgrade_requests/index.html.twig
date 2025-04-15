@@ -1,0 +1,92 @@
+{% extends 'AdminBase.html.twig' %}
+
+{% block title %}Manage Upgrade Requests{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+  <div class="col-auto">
+    <h1 class="text-30 lh-14 fw-600">Upgrade Requests</h1>
+    <div class="text-15 text-light-1">Manage user requests to become Publicators</div>
+  </div>
+</div>
+
+<div class="py-30 px-30 rounded-4 bg-white shadow-3">
+  {% for message in app.flashes('success') %}
+    <div class="alert alert-success rounded-4 py-10 px-15 bg-green-1 text-green-2 mb-30">
+      {{ message }}
+    </div>
+  {% endfor %}
+  
+  {% for message in app.flashes('error') %}
+    <div class="alert alert-danger rounded-4 py-10 px-15 bg-red-3 text-red-2 mb-30">
+      {{ message }}
+    </div>
+  {% endfor %}
+  
+  <div class="tabs -underline-2 js-tabs">
+    <div class="tabs__content pt-30 js-tabs-content">
+      <div class="tabs__pane -tab-item-1 is-tab-el-active">
+        <div class="overflow-scroll scroll-bar-1">
+          <table class="table-3 -border-bottom col-12">
+            <thead class="bg-light-2">
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Email</th>
+                <th>Request Date</th>
+                <th>Status</th>
+                <th>Message</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if requests is empty %}
+                <tr>
+                  <td colspan="7" class="text-center">No upgrade requests found</td>
+                </tr>
+              {% else %}
+                {% for request in requests %}
+                  <tr>
+                    <td>{{ request.id }}</td>
+                    <td>{{ request.user.name }} {{ request.user.lastname }}</td>
+                    <td>{{ request.user.email }}</td>
+                    <td>{{ request.requestDate|date('M d, Y') }}</td>
+                    <td>
+                      {% if request.status == 'pending' or request.status == 'Pending' %}
+                        <span class="rounded-100 py-4 px-10 text-center text-14 fw-500 bg-yellow-4 text-yellow-3">Pending</span>
+                      {% elseif request.status == 'Approved' or request.status == 'approved' %}
+                        <span class="rounded-100 py-4 px-10 text-center text-14 fw-500 bg-blue-1-05 text-blue-1">Approved</span>
+                      {% elseif request.status == 'Rejected' or request.status == 'rejected' %}
+                        <span class="rounded-100 py-4 px-10 text-center text-14 fw-500 bg-red-3 text-red-2">Rejected</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <div class="text-truncate" style="max-width: 200px;">{{ request.message }}</div>
+                    </td>
+                    <td>
+                      {% if request.status == 'pending' or request.status == 'Pending' %}
+                        <div class="d-flex x-gap-10">
+                          <a href="{{ path('admin_upgrade_requests_approve', {'id': request.id}) }}" class="btn btn-sm py-5 px-15 -dark-1 bg-success-1 text-white">
+                            <i class="icon-check text-13 mr-5"></i> Approve
+                          </a>
+                          <a href="{{ path('admin_upgrade_requests_reject', {'id': request.id}) }}" class="btn btn-sm py-5 px-15 -dark-1 bg-red-1 text-white">
+                            <i class="icon-close text-13 mr-5"></i> Reject
+                          </a>
+                        </div>
+                      {% else %}
+                        <div class="fw-500 text-14 text-light-1">
+                          Processed on: {{ request.processedDate|date('M d, Y') }}
+                        </div>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

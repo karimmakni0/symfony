@@ -1,0 +1,267 @@
+{% extends 'PubBase.html.twig' %}
+
+{% block title %}Publicator Dashboard{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+    <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">Dashboard</h1>
+        <div class="text-15 text-light-1">Welcome to GoTrip Publicator Dashboard</div>
+    </div>
+    <div class="col-auto">
+    </div>
+</div>
+
+<div class="row y-gap-30">
+    <div class="col-xl-4 col-md-6">
+        <div class="py-30 px-30 rounded-4 bg-white shadow-3">
+            <div class="row y-gap-20 justify-between items-center">
+                <div class="col-auto">
+                    <div class="fw-500 lh-14">My Activities</div>
+                    <div class="text-26 lh-16 fw-600 mt-5">{{ activitiesCount|default(0) }}</div>
+                    <div class="text-15 lh-14 text-light-1 mt-5">Total activities</div>
+                </div>
+                <div class="col-auto">
+                    <img src="{{ asset('assets/img/dashboard/icons/2.svg') }}" alt="icon">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="py-30 px-30 rounded-4 bg-white shadow-3">
+            <div class="row y-gap-20 justify-between items-center">
+                <div class="col-auto">
+                    <div class="fw-500 lh-14">Bookings</div>
+                    <div class="text-26 lh-16 fw-600 mt-5">{{ billetsCount|default(0) }}</div>
+                    <div class="text-15 lh-14 text-light-1 mt-5">Total bookings</div>
+                </div>
+                <div class="col-auto">
+                    <img src="{{ asset('assets/img/dashboard/icons/3.svg') }}" alt="icon">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="py-30 px-30 rounded-4 bg-white shadow-3">
+            <div class="row y-gap-20 justify-between items-center">
+                <div class="col-auto">
+                    <div class="fw-500 lh-14">Revenue</div>
+                    <div class="text-26 lh-16 fw-600 mt-5">${{ revenue|default(0) }}</div>
+                    <div class="text-15 lh-14 text-light-1 mt-5">Total revenue</div>
+                </div>
+                <div class="col-auto">
+                    <img src="{{ asset('assets/img/dashboard/icons/4.svg') }}" alt="icon">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row y-gap-30 pt-20">
+    <div class="col-xl-7 col-md-6">
+        <div class="py-30 px-30 rounded-4 bg-white shadow-3">
+            <div class="d-flex justify-between items-center">
+                <h2 class="text-18 lh-1 fw-500">
+                    Booking Statistics
+                </h2>
+                <div class="dropdown js-dropdown js-category-active">
+                    <div class="dropdown__button d-flex items-center bg-white border-light rounded-100 px-15 py-10 text-14 lh-12" data-el-toggle=".js-category-toggle" data-el-toggle-active=".js-category-active">
+                        <span class="js-dropdown-title">This Week</span>
+                        <i class="icon icon-chevron-sm-down text-7 ml-10"></i>
+                    </div>
+                    <div class="toggle-element -dropdown js-click-dropdown js-category-toggle">
+                        <div class="text-14 y-gap-15 js-dropdown-list">
+                            <div><a href="#" class="d-block js-dropdown-link">This Week</a></div>
+                            <div><a href="#" class="d-block js-dropdown-link">This Month</a></div>
+                            <div><a href="#" class="d-block js-dropdown-link">This Year</a></div>
+                            <div><a href="#" class="d-block js-dropdown-link">All Time</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pt-30">
+                <canvas id="lineChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-5 col-md-6">
+        <div class="py-30 px-30 rounded-4 bg-white shadow-3">
+            <div class="d-flex justify-between items-center">
+                <h2 class="text-18 lh-1 fw-500">
+                    Recent Bookings
+                </h2>
+                <div class="">
+                    <a href="{{ path('app_publicator') }}" class="text-14 text-blue-1 fw-500 underline">View All</a>
+                </div>
+            </div>
+            {# <div class="overflow-scroll scroll-bar-1 pt-30">
+                <table class="table-2 col-12">
+                    <thead class="">
+                        <tr>
+                            <th>ID</th>
+                            <th>Activity</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if recentBookings is empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No bookings available</td>
+                            </tr>
+                        {% else %}
+                            {% for booking in recentBookings %}
+                                <tr>
+                                    <td>#{{ booking.id }}</td>
+                                    <td>
+                                        {% if booking.activity %}
+                                            {{ booking.activity.activityName }}
+                                        {% else %}
+                                            Unknown Activity
+                                        {% endif %}
+                                    </td>
+                                    <td class="fw-500">
+                                        {% if booking.price %}
+                                            ${{ booking.price }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if booking.status == 'pending' %}
+                                            <div class="rounded-100 py-4 text-center col-12 text-14 fw-500 bg-yellow-4 text-yellow-3">Pending</div>
+                                        {% elseif booking.status == 'confirmed' %}
+                                            <div class="rounded-100 py-4 text-center col-12 text-14 fw-500 bg-blue-1-05 text-blue-1">Confirmed</div>
+                                        {% elseif booking.status == 'cancelled' %}
+                                            <div class="rounded-100 py-4 text-center col-12 text-14 fw-500 bg-red-3 text-red-2">Cancelled</div>
+                                        {% else %}
+                                            <div class="rounded-100 py-4 text-center col-12 text-14 fw-500 bg-light-2 text-light-1">{{ booking.status|capitalize }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if booking.createdAt %}
+                                            {{ booking.createdAt|date('d/m/Y') }}<br>{{ booking.createdAt|date('H:i') }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div> #}
+        </div>
+    </div>
+</div>
+
+<div class="row y-gap-30 pt-20">
+    <div class="col-12">
+        <div class="py-30 px-30 rounded-4 bg-white shadow-3">
+            <div class="d-flex justify-between items-center">
+                <h2 class="text-18 lh-1 fw-500">
+                    My Recent Activities
+                </h2>
+                <div class="">
+                    <a href="{{ path('app_publicator') }}" class="text-14 text-blue-1 fw-500 underline">View All Activities</a>
+                </div>
+            </div>
+            <div class="overflow-scroll scroll-bar-1 pt-30">
+                <table class="table-2 col-12">
+                    <thead class="">
+                        <tr>
+                            <th>Activity</th>
+                            <th>Genre</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if myActivities is empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">No activities available</td>
+                            </tr>
+                        {% else %}
+                            {% for activity in myActivities %}
+                                <tr>
+                                    <td>{{ activity.activityName }}</td>
+                                    <td>{{ activity.activityGenre }}</td>
+                                    <td class="fw-500">${{ activity.activityPrice }}</td>
+                                    <td>
+                                        <div class="rounded-100 py-4 text-center col-12 text-14 fw-500 bg-blue-1-05 text-blue-1">Active</div>
+                                    </td>
+                                    <td>
+                                        {% if activity.createdAt %}
+                                            {{ activity.createdAt|date('d/m/Y') }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="row x-gap-10 y-gap-10 items-center">
+                                            <div class="col-auto">
+                                                <button class="flex-center bg-light-2 rounded-4 size-35">
+                                                    <i class="icon-edit text-16 text-light-1"></i>
+                                                </button>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button class="flex-center bg-light-2 rounded-4 size-35">
+                                                    <i class="icon-trash-2 text-16 text-light-1"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('lineChart')) {
+            const ctx = document.getElementById('lineChart');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Bookings',
+                        data: [12, 19, 30, 21, 25, 30, 31, 29, 33, 39, 42, 44],
+                        backgroundColor: 'rgba(53, 84, 209, 0.1)',
+                        borderColor: '#3554D1',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

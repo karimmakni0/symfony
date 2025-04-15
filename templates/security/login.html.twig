@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log In{% endblock %}
+
+{% block body %}
+<section class="layout-pt-lg layout-pb-lg bg-blue-2">
+  <div class="container">
+    <div class="row justify-center">
+      <div class="col-xl-6 col-lg-7 col-md-9">
+        <div class="px-50 py-50 sm:px-20 sm:py-20 bg-white shadow-4 rounded-4">
+          <div class="row y-gap-20">
+            <div class="col-12 text-center">
+              <h1 class="text-30 fw-600">Welcome Back</h1>
+              <p class="mt-10">Don't have an account yet? <a href="{{ path('app_register') }}" class="text-blue-1 fw-500">Sign up for free</a></p>
+            </div>
+
+            {% if error %}
+                <div class="col-12">
+                    <div class="alert alert-danger rounded-4 py-10 px-15 bg-red-3 text-red-2">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if custom_error %}
+                <div class="col-12">
+                    <div class="alert alert-danger rounded-4 py-10 px-15 bg-red-3 text-red-2">
+                        {{ custom_error }}
+                    </div>
+                </div>
+            {% endif %}
+
+            <form action="{{ path('app_login') }}" method="post" class="row y-gap-20">
+                <div class="col-12">
+                    <div class="form-input">
+                        <input type="email" name="email" value="{{ last_username }}" class="has-value" placeholder=" " required>
+                        <label class="lh-1 text-14 text-light-1">Email</label>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-input">
+                        <input type="password" name="password" class="has-value" placeholder=" " required>
+                        <label class="lh-1 text-14 text-light-1">Password</label>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="d-flex items-center justify-between">
+                        <div class="form-checkbox">
+                            <input type="checkbox" name="_remember_me" id="remember_me">
+                            <div class="form-checkbox__mark">
+                                <div class="form-checkbox__icon icon-check"></div>
+                            </div>
+                            <div class="text-15 lh-11 text-light-1 ml-10">Remember me</div>
+                        </div>
+
+                        <a href="#" class="text-14 text-blue-1 fw-500">Forgot password?</a>
+                    </div>
+                </div>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <div class="col-12 d-flex justify-center mt-15">
+                    <button type="submit" class="button py-20 -dark-1 bg-blue-1 text-white w-100" style="max-width: 80%; min-width: 300px;">
+                        <span class="fw-500 text-16">Sign In</span>
+                        <div class="icon-arrow-top-right ml-15"></div>
+                    </button>
+                </div>
+            </form>
+
+            <div class="row y-gap-20 pt-30">
+                <div class="col-12">
+                    <div class="text-center">or sign in with</div>
+
+                    <button class="button col-12 -outline-red-1 text-red-1 py-15 rounded-8 mt-15" style="max-width: 80%; min-width: 300px; margin: 15px auto 0;">
+                        <i class="icon-google text-15 mr-10"></i>
+                        <span class="fw-500">Google</span>
+                    </button>
+
+                </div>
+
+                <div class="col-12">
+                    <div class="text-center px-30">By creating an account, you agree to our Terms of Service and Privacy Statement.</div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

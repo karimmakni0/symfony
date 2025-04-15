@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Become Publicator{% endblock %}
+
+{% block body %}
+<section class="layout-pt-md layout-pb-lg">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-xl-7 col-lg-9">
+        <div class="py-30 px-30 rounded-4 bg-white shadow-3">
+          <div class="d-flex justify-between items-center">
+            <h1 class="text-22 fw-500">{% if hasExistingRequest %}Your Request Status{% else %}Become a Publicator{% endif %}</h1>
+          </div>
+          
+          {% for message in app.flashes('success') %}
+              <div class="alert alert-success rounded-4 py-10 px-15 bg-green-1 text-green-2 mt-25">
+                  {{ message }}
+              </div>
+          {% endfor %}
+          
+          {% for message in app.flashes('error') %}
+              <div class="alert alert-danger rounded-4 py-10 px-15 bg-red-3 text-red-2 mt-25">
+                  {{ message }}
+              </div>
+          {% endfor %}
+          
+          <div class="border-top-light mt-30 mb-20"></div>
+          
+          {% if hasExistingRequest %}
+            <div class="row y-gap-20">
+              <div class="col-12">
+                <div class="text-15">Request Status: <span class="fw-500">{{ requestStatus }}</span></div>
+                <div class="mt-10">
+                  {% if requestStatus == 'Pending' %}
+                    <div class="d-flex items-center text-yellow-3">
+                      <i class="icon-clock text-16 mr-10"></i>
+                      <div class="text-14">Your request is being reviewed. We'll notify you once it's processed.</div>
+                    </div>
+                  {% elseif requestStatus == 'Approved' %}
+                    <div class="d-flex items-center text-green-2">
+                      <i class="icon-check text-16 mr-10"></i>
+                      <div class="text-14">Congratulations! Your request has been approved. You are now a Publicator.</div>
+                    </div>
+                  {% elseif requestStatus == 'Rejected' %}
+                    <div class="d-flex items-center text-red-2">
+                      <i class="icon-close text-16 mr-10"></i>
+                      <div class="text-14">Your request was not approved. Please contact support for more information.</div>
+                    </div>
+                  {% endif %}
+                </div>
+                
+                <div class="mt-20">
+                  <div class="text-15 mb-10">Request Details:</div>
+                  <div class="bg-blue-1-05 rounded-4 px-20 py-20">
+                    <div class="text-14 lh-15">{{ request.message }}</div>
+                    <div class="text-14 text-light-1 mt-10">Submitted on: {{ request.requestDate|date('M d, Y') }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <form action="{{ path('app_client_upgrade_request') }}" method="post">
+              <div class="row y-gap-20">
+                <div class="col-12">
+                  <div class="form-input">
+                    <textarea name="message" rows="5" required></textarea>
+                    <label class="lh-1 text-16 text-light-1">Tell us why you want to become a Publicator</label>
+                  </div>
+                </div>
+                
+                <div class="col-12">
+                  <div class="row x-gap-10 y-gap-10">
+                    <div class="col-auto">
+                      <button type="submit" class="button h-50 px-24 -dark-1 bg-blue-1 text-white">
+                        Submit Request <div class="icon-arrow-top-right ml-15"></div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

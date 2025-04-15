@@ -1,0 +1,308 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Payment Reservation - {{ activity.activityName }}{% endblock %}
+
+{% block body %}
+<br>
+<br>
+<br>
+
+<section class="pt-40 pb-40">
+  <div class="container">
+    <!-- Flash Messages -->
+    {% for label, messages in app.flashes %}
+      {% for message in messages %}
+        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-20">
+          <div class="px-20 py-15 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} rounded-4">
+            <div class="row x-gap-10 y-gap-10 items-center">
+              <div class="col-auto">
+                <div class="d-flex items-center">
+                  <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
+                  <div class="fw-500 text-white">{{ message }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endfor %}
+    
+    <div class="row y-gap-30">
+      <div class="col-12">
+        <div class="d-flex items-center">
+          <i class="icon-booking mr-10 text-20 text-blue-1"></i>
+          <h1 class="text-24 fw-500">Complete Your Reservation</h1>
+        </div>
+      </div>
+
+      <!-- Reservation Details -->
+      <div class="col-xl-8">
+        <div class="bg-white rounded-4 px-30 py-30 shadow-3">
+          <h3 class="text-22 fw-500 mb-30">Activity Information</h3>
+          
+          <div class="row y-gap-20">
+            <!-- Activity Details -->
+            <div class="col-12">
+              <div class="row y-gap-20">
+                <div class="col-md-auto">
+                  <div class="activity-image-container">
+                    {% if activity.resources is not empty %}
+                      {% for resource in activity.resources %}
+                        {% if loop.first %}
+                          <img src="{{ asset(resource.path) }}" alt="{{ activity.activityName }}" class="activity-image rounded-4">
+                        {% endif %}
+                      {% endfor %}
+                    {% else %}
+                      <div class="activity-image-placeholder rounded-4 d-flex justify-center items-center">
+                        <div class="text-blue-1 text-40">{{ activity.activityName|slice(0, 1)|upper }}</div>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                
+                <div class="col">
+                  <div class="row x-gap-10 y-gap-10 items-center">
+                    <div class="col-auto">
+                      <div class="d-flex items-center">
+                        <div class="d-flex x-gap-5 items-center">
+                          <i class="icon-star text-10 text-yellow-1"></i>
+                          <i class="icon-star text-10 text-yellow-1"></i>
+                          <i class="icon-star text-10 text-yellow-1"></i>
+                          <i class="icon-star text-10 text-yellow-1"></i>
+                          <i class="icon-star text-10 text-yellow-1"></i>
+                        </div>
+                        <div class="text-14 text-light-1 ml-10">4.8 (50 reviews)</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <h3 class="text-18 fw-500 mt-5 md:mt-10">{{ activity.activityName }}</h3>
+                  <div class="row x-gap-10 y-gap-10 items-center pt-5">
+                    <div class="col-auto">
+                      <div class="d-flex items-center">
+                        <i class="icon-location-2 text-16 text-light-1 mr-5"></i>
+                        <div class="text-15 text-light-1">{{ activity.activityDestination }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="row y-gap-20 justify-between pt-10">
+                    <div class="col-auto">
+                      <div class="d-flex items-center">
+                        <i class="icon-calendar text-16 text-light-1 mr-5"></i>
+                        <div class="text-15 text-light-1">
+                          {% if activity.activityDate %}
+                            {{ activity.activityDate|date('d M Y') }}
+                          {% else %}
+                            Date not specified
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-auto">
+                      <div class="d-flex items-center">
+                        <i class="icon-clock text-16 text-light-1 mr-5"></i>
+                        <div class="text-15 text-light-1">{{ activity.activityDuration ? activity.activityDuration : 'Duration not specified' }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-12 border-top-light mt-20 pt-20">
+              <div class="row y-gap-20">
+                <div class="col-12">
+                  <h4 class="text-16 fw-500">Booking Summary</h4>
+                </div>
+                
+                <div class="col-12">
+                  <div class="row y-gap-10 justify-between">
+                    <div class="col-auto">
+                      <div class="text-15">Price per participant:</div>
+                    </div>
+                    <div class="col-auto">
+                      <div class="text-15">{{ activity.activityPrice }} TND</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-12">
+                  <div class="row y-gap-10 justify-between">
+                    <div class="col-auto">
+                      <div class="text-15">Number of participants:</div>
+                    </div>
+                    <div class="col-auto">
+                      <div class="text-15">{{ participants }}</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-12">
+                  <div class="row y-gap-10 justify-between border-top-light pt-10">
+                    <div class="col-auto">
+                      <div class="text-15 fw-500">Total amount:</div>
+                    </div>
+                    <div class="col-auto">
+                      <div class="text-18 fw-500 text-blue-1">{{ totalPrice }} TND</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Payment Form -->
+      <div class="col-xl-4">
+        <div class="bg-white rounded-4 px-30 py-30 shadow-3">
+          <h3 class="text-22 fw-500 mb-30">Payment Details</h3>
+          
+          <form method="POST" action="" id="paymentForm">
+            <div class="row y-gap-20">
+              <div class="col-12">
+                <div class="form-input">
+                  <input type="text" name="card_name" required>
+                  <label class="lh-1 text-16 text-light-1">Cardholder Name</label>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="form-input">
+                  <input type="text" name="card_number" required maxlength="19" id="cardNumber">
+                  <label class="lh-1 text-16 text-light-1">Card Number</label>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="form-input">
+                  <input type="text" name="expiry_date" required placeholder="MM/YY" maxlength="5" id="expiryDate">
+                  <label class="lh-1 text-16 text-light-1">Expiry Date</label>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="form-input">
+                  <input type="text" name="cvv" required maxlength="3" id="cvvCode">
+                  <label class="lh-1 text-16 text-light-1">CVV Code</label>
+                </div>
+              </div>
+              
+              <div class="col-12 mt-20">
+                <div class="row y-gap-20 items-center justify-between">
+                  <div class="col-auto">
+                    <div class="text-14">We accept:</div>
+                  </div>
+                  <div class="col-auto">
+                    <div class="d-flex x-gap-20 items-center">
+                      <div><i class="icon-mastercard text-24"></i></div>
+                      <div><i class="icon-visa text-24"></i></div>
+                      <div><i class="icon-paypal text-24"></i></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12 mt-20">
+                <button type="submit" name="payment_submit" value="1" class="button -md -dark-1 bg-blue-1 text-white w-100">
+                  Complete Reservation <i class="icon-arrow-right ml-10"></i>
+                </button>
+              </div>
+              
+              <div class="col-12 mt-20">
+                <div class="text-14 text-center text-light-1">
+                  By clicking "Complete Reservation" you agree to our <a href="#" class="text-blue-1">terms & conditions</a>.
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Format card number with spaces
+    const cardNumberInput = document.getElementById('cardNumber');
+    if (cardNumberInput) {
+      cardNumberInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\s+/g, '');
+        value = value.replace(/\D/g, '');
+        
+        let formattedValue = '';
+        for (let i = 0; i < value.length; i++) {
+          if (i > 0 && i % 4 === 0) {
+            formattedValue += ' ';
+          }
+          formattedValue += value[i];
+        }
+        
+        e.target.value = formattedValue;
+      });
+    }
+    
+    // Format expiry date MM/YY
+    const expiryDateInput = document.getElementById('expiryDate');
+    if (expiryDateInput) {
+      expiryDateInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.length > 2) {
+          value = value.substring(0, 2) + '/' + value.substring(2, 4);
+        }
+        
+        e.target.value = value;
+      });
+    }
+    
+    // Ensure CVV is numeric
+    const cvvInput = document.getElementById('cvvCode');
+    if (cvvInput) {
+      cvvInput.addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '');
+      });
+    }
+  });
+</script>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+  .activity-image-container {
+    width: 220px;
+    height: 160px;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  
+  .activity-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .activity-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-blue-1-05);
+  }
+  
+  .form-input input:focus + label {
+    color: var(--color-blue-1);
+  }
+  
+  @media (max-width: 767px) {
+    .activity-image-container {
+      width: 100%;
+      height: 200px;
+    }
+  }
+</style>
+{% endblock %}

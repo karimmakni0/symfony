@@ -1,0 +1,159 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Blog{% endblock %}
+
+{% block body %}
+<section data-anim-wrap class="layout-pt-md layout-pb-lg">
+    <div class="container">
+      <div data-anim-child="slide-up delay-1" class="row justify-center text-center">
+        <div class="col-auto">
+          <div class="sectionTitle -md">
+            <h2 class="sectionTitle__title">Travel articles</h2>
+            <p class="sectionTitle__text mt-5 sm:mt-0">Share your experiences with our amazing activities</p>
+            
+            <div class="mt-20">
+              <a href="{{ path('app_blog_add') }}" class="button -md -blue-1 bg-blue-1 text-white">
+                Create New Post <i class="icon-plus ml-10"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div data-anim-child="slide-up delay-2" class="tabs -pills-3 pt-30 js-tabs">
+        {% for label, messages in app.flashes %}
+          {% for message in messages %}
+            <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-20">
+              <div class="px-20 py-15 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} rounded-4">
+                <h5 class="text-white fw-500">{{ message }}</h5>
+              </div>
+            </div>
+          {% endfor %}
+        {% endfor %}
+        
+        <div class="row justify-between mb-20 items-center">
+          <div class="col-auto">
+            <div class="tabs__controls row x-gap-10 js-tabs-controls">
+              <div class="col-auto">
+                <a href="{{ path('app_blog_index') }}" class="tabs__button text-14 fw-500 px-20 py-10 rounded-4 bg-light-2 {% if not selectedActivityId and not myBlogsOnly %}is-tab-el-active{% endif %}">
+                  All Posts
+                </a>
+              </div>
+
+              {% if activities is defined and activities|length > 0 %}
+                {% for activity in activities %}
+                  <div class="col-auto">
+                    <a href="{{ path('app_blog_index') }}?activityId={{ activity.id }}" class="tabs__button text-14 fw-500 px-20 py-10 rounded-4 bg-light-2 {% if selectedActivityId == activity.id %}is-tab-el-active{% endif %}">
+                      {{ activity.activityName }}
+                    </a>
+                  </div>
+                {% endfor %}
+              {% endif %}
+              
+              {% if app.user %}
+                <div class="col-auto">
+                  <a href="{{ path('app_blog_index') }}?myBlogs=1" class="tabs__button text-14 fw-500 px-20 py-10 rounded-4 {% if myBlogsOnly %}bg-blue-1 text-white{% else %}bg-light-2{% endif %}">
+                    <i class="icon-user mr-5"></i> My Blogs
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          {% if selectedActivityId or myBlogsOnly %}
+            <div class="col-auto">
+              <a href="{{ path('app_blog_index') }}" class="text-14 fw-500 text-blue-1">
+                <i class="icon-close mr-5"></i> Clear filters
+              </a>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="tabs__content pt-30 js-tabs-content">
+          <div class="is-tab-el-active">
+            <div class="row y-gap-30">
+              {% if posts is defined and posts|length > 0 %}
+                {% for post in posts %}
+                  <div class="col-lg-4 col-sm-6">
+                    <a href="{{ path('app_blog_details', {'id': post.id}) }}" class="blogCard -type-1 d-block">
+                      <div class="blogCard__image">
+                        <div class="ratio ratio-4:3 rounded-8">
+                          {% if post.picture %}
+                            <img class="img-ratio js-lazy" src="{{ asset('uploads/posts/' ~ post.picture) }}" alt="{{ post.title }}">
+                          {% else %}
+                            <img class="img-ratio js-lazy" src="{{ asset('assets/img/blog/placeholder.png') }}" alt="No Image">
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <div class="pt-20">
+                        <h4 class="text-dark-1 text-18 fw-500">{{ post.title }}</h4>
+                        <div class="text-light-1 text-15 lh-14 mt-5">{{ post.date|date('M d, Y') }}</div>
+                        <div class="text-light-1 text-15 lh-14 mt-5">
+                          <span class="d-flex items-center">
+                            <i class="icon-user text-16 mr-5"></i>
+                            {% if users[post.userId] is defined %}
+                              {{ users[post.userId].Name }} {{ users[post.userId].lastName }}
+                            {% else %}
+                              Unknown Author
+                            {% endif %}
+                            {% if currentUserId and post.userId == currentUserId %}
+                              <span class="badge bg-blue-1 text-white ml-10 py-5 px-15 rounded-full text-10">Your post</span>
+                            {% endif %}
+                          </span>
+                        </div>
+                        <div class="text-light-1 text-15 lh-14 mt-5">
+                          <span class="d-flex items-center">
+                            <i class="icon-tag text-16 mr-5"></i>
+                            {% if activitiesById[post.activityId] is defined %}
+                              {{ activitiesById[post.activityId].activityName }}
+                            {% else %}
+                              Unknown Activity
+                            {% endif %}
+                          </span>
+                        </div>
+                        
+                        <div class="mt-15">
+                          <p class="text-15 lh-16 text-light-1 line-clamp-2">{{ post.description|striptags|slice(0, 100) }}{% if post.description|length > 100 %}...{% endif %}</p>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="col-12 text-center">
+                  <div class="py-50 px-20 rounded-4 bg-light-2">
+                    <i class="icon-info-circle text-40 text-blue-1"></i>
+                    <h3 class="text-22 fw-500 mt-20">
+                      {% if myBlogsOnly %}
+                        You haven't created any blog posts yet
+                      {% elseif selectedActivityId %}
+                        No posts available for this activity
+                      {% else %}
+                        No posts available yet
+                      {% endif %}
+                    </h3>
+                    <p class="mt-10">
+                      {% if myBlogsOnly %}
+                        Share your first experience with our community
+                      {% elseif selectedActivityId %}
+                        Be the first to write about this activity
+                      {% else %}
+                        Be the first to share your experience!
+                      {% endif %}
+                    </p>
+                    <div class="mt-20">
+                      <a href="{{ path('app_blog_add') }}" class="button -md -blue-1 bg-blue-1 text-white">
+                        Create a Post <i class="icon-plus ml-10"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create New Blog Post{% endblock %}
+
+{% block body %}
+<section class="layout-pt-md layout-pb-md">
+  <div class="container">
+    <div class="row justify-center">
+      <div class="col-xl-8 col-lg-10">
+        <div class="px-50 py-50 sm:px-20 sm:py-20 bg-white shadow-4 rounded-4">
+          <div class="row y-gap-20">
+            <div class="col-12">
+              <h1 class="text-22 fw-500">Create New Blog Post</h1>
+              <p class="mt-10">Share your thoughts and experiences about our activities</p>
+            </div>
+
+            <div class="col-12">
+              {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                  <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-20">
+                    <div class="px-20 py-15 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} rounded-4">
+                      <h5 class="text-white fw-500">{{ message }}</h5>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% endfor %}
+            </div>
+
+            <div class="col-12">
+              {{ form_start(form, {'attr': {'class': 'row y-gap-20', 'enctype': 'multipart/form-data'}}) }}
+                <div class="col-12">
+                  <div class="form-input">
+                    {{ form_widget(form.title) }}
+                    {{ form_label(form.title, 'Title *', {'label_attr': {'class': 'lh-1 text-16 text-light-1'}}) }}
+                    <div class="text-danger mt-5">
+                      {{ form_errors(form.title) }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-input">
+                    {{ form_label(form.activityId, 'Select Activity *', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
+                    {{ form_widget(form.activityId, {'attr': {'class': 'form-select'}}) }}
+                    <div class="text-danger mt-5">
+                      {{ form_errors(form.activityId) }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-input">
+                    {{ form_widget(form.description) }}
+                    {{ form_label(form.description, 'Content *', {'label_attr': {'class': 'lh-1 text-16 text-light-1'}}) }}
+                    <div class="text-danger mt-5">
+                      {{ form_errors(form.description) }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="form-input">
+                    {{ form_label(form.picture, 'Image', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
+                    {{ form_widget(form.picture, {'attr': {'class': 'form-control py-10 px-15 bg-light-2 rounded-4'}}) }}
+                    <small class="d-block mt-10 text-14 text-light-1">Recommended size: 800x600px, Max size: 2MB</small>
+                    <div class="text-danger mt-5">
+                      {{ form_errors(form.picture) }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="row x-gap-20 y-gap-10 pt-15">
+                    <div class="col-auto">
+                      <button type="submit" class="button -md -dark-1 bg-blue-1 text-white">
+                        Publish Post <i class="icon-arrow-right ml-10"></i>
+                      </button>
+                    </div>
+                    <div class="col-auto">
+                      <a href="{{ path('app_blog_index') }}" class="button -md -blue-1 bg-blue-1-05 text-blue-1">
+                        Cancel
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {{ form_end(form) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% block javascripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Preview uploaded image
+    const imageInput = document.querySelector('input[type="file"]');
+    
+    if (imageInput) {
+      imageInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            // Create image preview container if it doesn't exist
+            let previewContainer = document.getElementById('image-preview');
+            
+            if (!previewContainer) {
+              previewContainer = document.createElement('div');
+              previewContainer.id = 'image-preview';
+              previewContainer.className = 'mt-15 p-10 border rounded-4';
+              this.parentElement.appendChild(previewContainer);
+            } else {
+              previewContainer.innerHTML = '';
+            }
+            
+            // Create image element
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'img-fluid rounded-4';
+            img.style.maxHeight = '200px';
+            previewContainer.appendChild(img);
+            
+            // Add file name
+            const fileName = document.createElement('div');
+            fileName.className = 'mt-10 text-14 text-light-1';
+            fileName.textContent = this.files[0].name;
+            previewContainer.appendChild(fileName);
+          }.bind(this);
+          
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}
+{% endblock %}
