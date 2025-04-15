@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class HomeController extends AbstractController
 {
     /**
-     * @Route("/", name="app_home")
+     * @Route("/", name="app_home")        
      */
     public function index(ActivitiesRepository $activitiesRepository, DestinationsRepository $destinationsRepository): Response
     {
@@ -24,7 +24,7 @@ class HomeController extends AbstractController
 
         // Get latest destinations
         $destinations = $destinationsRepository->findBy(
-            [], // No criteria
+            [], // No criteria    
             ['created_at' => 'DESC'], // Order by creation date descending (newest first)
             5 // Limit to 5 destinations
         );
