@@ -1,0 +1,413 @@
+{% extends 'AdminBase.html.twig' %}
+
+{% block title %}Reservations Management{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="row">
+        <div class="col-md-6 col-sm-12">
+            <div class="title">
+                <h4>Reservations Management</h4>
+            </div>
+            <nav aria-label="breadcrumb" role="navigation">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ path('app_admin') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Reservations</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{% if label == 'success' %}success{% else %}danger{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<div class="card-box mb-30">
+    <div class="pd-20">
+        <h4 class="text-blue h4">All Reservations</h4>
+        <p class="mb-0">Manage all reservations in the system</p>
+    </div>
+    <div class="pb-20">
+        <div class="tab">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active text-blue" data-toggle="tab" href="#all" role="tab" aria-selected="true">All Reservations</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-blue" data-toggle="tab" href="#confirmed" role="tab" aria-selected="false">Confirmed</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-blue" data-toggle="tab" href="#completed" role="tab" aria-selected="false">Completed</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-blue" data-toggle="tab" href="#cancelled" role="tab" aria-selected="false">Cancelled</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="all" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Activity</th>
+                                    <th scope="col">Customer</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Tickets</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if reservations is empty %}
+                                    <tr>
+                                        <td colspan="8" class="text-center">No reservations found</td>
+                                    </tr>
+                                {% else %}
+                                    {% for reservation in reservations %}
+                                        {% set billet = reservation.billet %}
+                                        {% set activityId = billet.activiteId %}
+                                        {% set activity = activities[activityId] %}
+                                        <tr>
+                                            <td>REV-{{ reservation.id }}</td>
+                                            <td>{{ activity.activityName }}</td>
+                                            <td>{{ reservation.user.name }} {{ reservation.user.lastname }}</td>
+                                            <td>{{ reservation.dateAchat }}</td>
+                                            <td>{{ reservation.nombre }}</td>
+                                            <td>${{ reservation.prixTotal }}</td>
+                                            <td>
+                                                <span class="badge badge-pill 
+                                                    {% if reservation.statuts == 'Confirmed' %}badge-primary
+                                                    {% elseif reservation.statuts == 'Cancelled' %}badge-danger
+                                                    {% elseif reservation.statuts == 'Completed' %}badge-success
+                                                    {% else %}badge-warning{% endif %}">
+                                                    {{ reservation.statuts }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                                                        <i class="dw dw-more"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#viewModal{{ reservation.id }}">
+                                                            <i class="dw dw-eye"></i> View
+                                                        </a>
+                                                        {% if reservation.statuts == 'Confirmed' %}
+                                                            <a class="dropdown-item" href="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Completed'}) }}" onclick="return confirm('Mark this reservation as completed?')">
+                                                                <i class="dw dw-check"></i> Mark as Completed
+                                                            </a>
+                                                            <a class="dropdown-item" href="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Cancelled'}) }}" onclick="return confirm('Are you sure you want to cancel this reservation?')">
+                                                                <i class="dw dw-delete-3"></i> Cancel
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- View Modal -->
+                                        <div class="modal fade" id="viewModal{{ reservation.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalCenterTitle">Reservation Details</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <h5 class="mb-3">Reservation Information</h5>
+                                                        <div class="row">
+                                                            <div class="col-md-6 mb-2">
+                                                                <strong>Reservation ID:</strong>
+                                                            </div>
+                                                            <div class="col-md-6 mb-2">
+                                                                REV-{{ reservation.id }}
+                                                            </div>
+                                                            
+                                                            <div class="col-md-6 mb-2">
+                                                                <strong>Activity:</strong>
+                                                            </div>
+                                                            <div class="col-md-6 mb-2">
+                                                                {{ activity.activityName }}
+                                                            </div>
+                                                            
+                                                            <div class="col-md-6 mb-2">
+                                                                <strong>Purchase Date:</strong>
+                                                            </div>
+                                                            <div class="col-md-6 mb-2">
+                                                                {{ reservation.dateAchat }}
+                                                            </div>
+                                                            
+                                                            <div class="col-md-6 mb-2">
+                                                                <strong>Number of Tickets:</strong>
+                                                            </div>
+                                                            <div class="col-md-6 mb-2">
+                                                                {{ reservation.nombre }}
+                                                            </div>
+                                                            
+                                                            <div class="col-md-6 mb-2">
+                                                                <strong>Price per Ticket:</strong>
+                                                            </div>
+                                                            <div class="col-md-6 mb-2">
+                                                                ${{ reservation.prixUnite }}
+                                                            </div>
+                                                            
+                                                            <div class="col-md-6 mb-2">
+                                                                <strong>Total Price:</strong>
+                                                            </div>
+                                                            <div class="col-md-6 mb-2">
+                                                                ${{ reservation.prixTotal }}
+                                                            </div>
+                                                            
+                                                            <div class="col-md-6 mb-2">
+                                                                <strong>Status:</strong>
+                                                            </div>
+                                                            <div class="col-md-6 mb-2">
+                                                                <span class="badge badge-pill 
+                                                                    {% if reservation.statuts == 'Confirmed' %}badge-primary
+                                                                    {% elseif reservation.statuts == 'Cancelled' %}badge-danger
+                                                                    {% elseif reservation.statuts == 'Completed' %}badge-success
+                                                                    {% else %}badge-warning{% endif %}">
+                                                                    {{ reservation.statuts }}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <hr>
+                                                        
+                                                        <h5 class="mb-3">Customer Information</h5>
+                                                        <div class="row">
+                                                            <div class="col-md-6 mb-2">
+                                                                <strong>Name:</strong>
+                                                            </div>
+                                                            <div class="col-md-6 mb-2">
+                                                                {{ reservation.user.name }} {{ reservation.user.lastname }}
+                                                            </div>
+                                                            
+                                                            <div class="col-md-6 mb-2">
+                                                                <strong>Email:</strong>
+                                                            </div>
+                                                            <div class="col-md-6 mb-2">
+                                                                {{ reservation.user.email }}
+                                                            </div>
+                                                            
+                                                            <div class="col-md-6 mb-2">
+                                                                <strong>Phone:</strong>
+                                                            </div>
+                                                            <div class="col-md-6 mb-2">
+                                                                {{ reservation.user.phone|default('Not provided') }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        {% if reservation.statuts == 'Confirmed' %}
+                                                            <a href="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Completed'}) }}" class="btn btn-success">Mark as Completed</a>
+                                                            <a href="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Cancelled'}) }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this reservation?')">Cancel Reservation</a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="confirmed" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Activity</th>
+                                    <th scope="col">Customer</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Tickets</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set confirmedFound = false %}
+                                {% for reservation in reservations %}
+                                    {% if reservation.statuts == 'Confirmed' %}
+                                        {% set confirmedFound = true %}
+                                        {% set billet = reservation.billet %}
+                                        {% set activityId = billet.activiteId %}
+                                        {% set activity = activities[activityId] %}
+                                        <tr>
+                                            <td>REV-{{ reservation.id }}</td>
+                                            <td>{{ activity.activityName }}</td>
+                                            <td>{{ reservation.user.name }} {{ reservation.user.lastname }}</td>
+                                            <td>{{ reservation.dateAchat }}</td>
+                                            <td>{{ reservation.nombre }}</td>
+                                            <td>${{ reservation.prixTotal }}</td>
+                                            <td>
+                                                <span class="badge badge-pill badge-primary">{{ reservation.statuts }}</span>
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                                                        <i class="dw dw-more"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#viewModal{{ reservation.id }}">
+                                                            <i class="dw dw-eye"></i> View
+                                                        </a>
+                                                        <a class="dropdown-item" href="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Completed'}) }}" onclick="return confirm('Mark this reservation as completed?')">
+                                                            <i class="dw dw-check"></i> Mark as Completed
+                                                        </a>
+                                                        <a class="dropdown-item" href="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Cancelled'}) }}" onclick="return confirm('Are you sure you want to cancel this reservation?')">
+                                                            <i class="dw dw-delete-3"></i> Cancel
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if not confirmedFound %}
+                                    <tr>
+                                        <td colspan="8" class="text-center">No confirmed reservations found</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="completed" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Activity</th>
+                                    <th scope="col">Customer</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Tickets</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set completedFound = false %}
+                                {% for reservation in reservations %}
+                                    {% if reservation.statuts == 'Completed' %}
+                                        {% set completedFound = true %}
+                                        {% set billet = reservation.billet %}
+                                        {% set activityId = billet.activiteId %}
+                                        {% set activity = activities[activityId] %}
+                                        <tr>
+                                            <td>REV-{{ reservation.id }}</td>
+                                            <td>{{ activity.activityName }}</td>
+                                            <td>{{ reservation.user.name }} {{ reservation.user.lastname }}</td>
+                                            <td>{{ reservation.dateAchat }}</td>
+                                            <td>{{ reservation.nombre }}</td>
+                                            <td>${{ reservation.prixTotal }}</td>
+                                            <td>
+                                                <span class="badge badge-pill badge-success">{{ reservation.statuts }}</span>
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                                                        <i class="dw dw-more"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#viewModal{{ reservation.id }}">
+                                                            <i class="dw dw-eye"></i> View
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if not completedFound %}
+                                    <tr>
+                                        <td colspan="8" class="text-center">No completed reservations found</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="cancelled" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Activity</th>
+                                    <th scope="col">Customer</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Tickets</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set cancelledFound = false %}
+                                {% for reservation in reservations %}
+                                    {% if reservation.statuts == 'Cancelled' %}
+                                        {% set cancelledFound = true %}
+                                        {% set billet = reservation.billet %}
+                                        {% set activityId = billet.activiteId %}
+                                        {% set activity = activities[activityId] %}
+                                        <tr>
+                                            <td>REV-{{ reservation.id }}</td>
+                                            <td>{{ activity.activityName }}</td>
+                                            <td>{{ reservation.user.name }} {{ reservation.user.lastname }}</td>
+                                            <td>{{ reservation.dateAchat }}</td>
+                                            <td>{{ reservation.nombre }}</td>
+                                            <td>${{ reservation.prixTotal }}</td>
+                                            <td>
+                                                <span class="badge badge-pill badge-danger">{{ reservation.statuts }}</span>
+                                            </td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <a class="btn btn-link font-24 p-0 line-height-1 no-arrow dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                                                        <i class="dw dw-more"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+                                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#viewModal{{ reservation.id }}">
+                                                            <i class="dw dw-eye"></i> View
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if not cancelledFound %}
+                                    <tr>
+                                        <td colspan="8" class="text-center">No cancelled reservations found</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

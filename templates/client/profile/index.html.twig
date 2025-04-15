@@ -1,0 +1,197 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block body %}
+<section class="layout-pt-md layout-pb-lg">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <h1 class="text-30 fw-600 mb-30">My Profile</h1>
+        
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success rounded-4 py-10 px-15 bg-green-1 text-green-2 mb-30">
+                {{ message }}
+            </div>
+        {% endfor %}
+        
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger rounded-4 py-10 px-15 bg-red-3 text-red-2 mb-30">
+                {{ message }}
+            </div>
+        {% endfor %}
+        
+        <div class="py-30 px-30 rounded-4 bg-white shadow-3">
+          <div class="tabs -underline-2 js-tabs">
+            <div class="tabs__controls row x-gap-40 y-gap-10 lg:x-gap-20 js-tabs-controls">
+              <div class="col-auto">
+                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">Personal Information</button>
+              </div>
+
+              <div class="col-auto">
+                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button" data-tab-target=".-tab-item-2">Change Password</button>
+              </div>
+            </div>
+
+            <div class="tabs__content pt-30 js-tabs-content">
+              <!-- Personal Information Tab -->
+              <div class="tabs__pane -tab-item-1 is-tab-el-active">
+                <form action="{{ path('app_client_profile_update_personal') }}" method="post" enctype="multipart/form-data">
+                  <div class="row y-gap-30 items-center">
+                    <div class="col-auto">
+                      <div class="d-flex ratio ratio-1:1 w-200">
+                        {% if user.image %}
+                          <img src="{{ asset('assets/img/UserPictures/' ~ user.image) }}" alt="User profile" class="img-ratio rounded-4">
+                        {% else %}
+                          <img src="{{ asset('assets/img/avatars/3.png') }}" alt="Default profile" class="img-ratio rounded-4">
+                        {% endif %}
+
+                        <div class="d-flex justify-end px-10 py-10 h-100 w-1/1 absolute">
+                          <div class="size-40 bg-white rounded-4">
+                            <i class="icon-trash text-16"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-auto">
+                      <h4 class="text-16 fw-500">Your avatar</h4>
+                      <div class="text-14 mt-5">PNG or JPG no bigger than 800px wide and tall.</div>
+
+                      <div class="d-inline-block mt-15">
+                        <button type="button" class="button h-50 px-24 -dark-1 bg-blue-1 text-white">
+                          <i class="icon-upload-file text-20 mr-10"></i>
+                          Browse
+                        </button>
+                        <input type="file" name="avatar" id="avatar" class="d-none">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="border-top-light mt-30 mb-30"></div>
+
+                  <div class="col-xl-9">
+                    <div class="row x-gap-20 y-gap-20">
+                      <div class="col-md-6">
+                        <div class="form-input">
+                          <input type="text" name="name" value="{{ user.name }}" required>
+                          <label class="lh-1 text-16 text-light-1">First Name</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="form-input">
+                          <input type="text" name="lastname" value="{{ user.lastname }}" required>
+                          <label class="lh-1 text-16 text-light-1">Last Name</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="form-input">
+                          <input type="email" name="email" value="{{ user.email }}" required>
+                          <label class="lh-1 text-16 text-light-1">Email</label>
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <div class="form-input">
+                          <input type="text" name="phone" value="{{ user.phone }}">
+                          <label class="lh-1 text-16 text-light-1">Phone Number</label>
+                        </div>
+                      </div>
+
+                      <div class="col-12">
+                        <div class="form-input">
+                          <input type="date" name="birthday" value="{% if user.birthday %}{{ user.birthday|date('Y-m-d') }}{% endif %}">
+                          <label class="lh-1 text-16 text-light-1">Birthday</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="d-inline-block pt-30">
+                    <button type="submit" class="button h-50 px-24 -dark-1 bg-blue-1 text-white">
+                      Save Changes <div class="icon-arrow-top-right ml-15"></div>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Change Password Tab -->
+              <div class="tabs__pane -tab-item-2">
+                <form action="{{ path('app_client_profile_change_password') }}" method="post">
+                  <div class="col-xl-9">
+                    <div class="row x-gap-20 y-gap-20">
+                      <div class="col-12">
+                        <div class="form-input">
+                          <input type="password" name="current_password" required>
+                          <label class="lh-1 text-16 text-light-1">Current Password</label>
+                        </div>
+                      </div>
+
+                      <div class="col-12">
+                        <div class="form-input">
+                          <input type="password" name="new_password" required>
+                          <label class="lh-1 text-16 text-light-1">New Password</label>
+                        </div>
+                      </div>
+
+                      <div class="col-12">
+                        <div class="form-input">
+                          <input type="password" name="new_password_confirmation" required>
+                          <label class="lh-1 text-16 text-light-1">Confirm New Password</label>
+                        </div>
+                      </div>
+
+                      <div class="col-12">
+                        <div class="row x-gap-10 y-gap-10">
+                          <div class="col-auto">
+                            <button type="submit" class="button h-50 px-24 -dark-1 bg-blue-1 text-white">
+                              Update Password <div class="icon-arrow-top-right ml-15"></div>
+                            </button>
+                          </div>
+
+                          <div class="col-auto">
+                            <button type="reset" class="button h-50 px-24 -blue-1 bg-blue-1-05 text-blue-1">Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle file upload button
+    const browseButton = document.querySelector('.button.-dark-1.bg-blue-1');
+    const fileInput = document.getElementById('avatar');
+    
+    if (browseButton && fileInput) {
+      browseButton.addEventListener('click', function() {
+        fileInput.click();
+      });
+    }
+    
+    // Submit form when file is selected
+    if (fileInput) {
+      fileInput.addEventListener('change', function() {
+        if (this.files && this.files.length) {
+          const filename = this.files[0].name;
+          // Show the file name or preview if needed
+          // Can add code here to display the selected file name
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

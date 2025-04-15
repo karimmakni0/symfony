@@ -1,0 +1,532 @@
+{% extends 'PubBase.html.twig' %}
+
+{% block title %}Booking History{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+    <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">Booking History</h1>
+        <div class="text-15 text-light-1">Manage reservations for your activities</div>
+    </div>
+</div>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30 fade-in">
+            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-4">
+                <div class="row x-gap-10 y-gap-10 items-center">
+                    <div class="col-auto">
+                        <div class="d-flex items-center">
+                            <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
+                            <div class="fw-500">{{ message }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<div class="py-30 px-30 rounded-4 bg-white shadow-3">
+    {% if reservations is empty %}
+        <div class="row justify-center">
+            <div class="col-auto">
+                <div class="text-18 fw-500 text-center mb-10">No Reservations Found</div>
+                <div class="text-15 text-light-1 text-center">You don't have any reservations for your activities yet.</div>
+            </div>
+        </div>
+    {% else %}
+        <div class="tabs -underline-2 js-tabs">
+            <div class="tabs__controls row x-gap-40 y-gap-10 lg:x-gap-20 js-tabs-controls">
+                <div class="col-auto">
+                    <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">
+                        All Reservations
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button" data-tab-target=".-tab-item-2">
+                        Confirmed
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button" data-tab-target=".-tab-item-3">
+                        Cancelled
+                    </button>
+                </div>
+            </div>
+            <div class="tabs__content pt-30 js-tabs-content">
+                <div class="tabs__pane -tab-item-1 is-tab-el-active">
+                    <div class="overflow-x-auto responsive-table-container">
+                        <table class="table y-gap-40 text-15">
+                            <thead class="bg-light-2">
+                                <tr>
+                                    <th>Reservation #</th>
+                                    <th>Activity</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Tickets</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reservation in reservations %}
+                                    {% set billet = reservation.billet %}
+                                    {% set activityId = billet.activiteId %}
+                                    {% set activity = activities[activityId] %}
+                                    <tr class="border-bottom-light fade-in reservation-row" data-id="{{ reservation.id }}">
+                                        <td>
+                                            <div class="text-blue-1 fw-500">REV-{{ reservation.id }}</div>
+                                            <div class="text-14 text-light-1">{{ billet.numero }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-500 text-14">{{ activity.activityName }}</div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-500">{{ reservation.user.name }} {{ reservation.user.lastname }}</div>
+                                            <div class="text-14 text-light-1">{{ reservation.user.email }}</div>
+                                        </td>
+                                        <td>{{ reservation.dateAchat|date('Y-m-d') }}</td>
+                                        <td>
+                                            <div class="fw-500">{{ reservation.nombre }}</div>
+                                            <div class="text-14 text-light-1">$ {{ reservation.prixUnite }} each</div>
+                                        </td>
+                                        <td>$ {{ reservation.prixTotal }}</td>
+                                        <td>
+                                            <div class="rounded-100 py-4 px-15 text-center text-14 fw-500 
+                                                {% if reservation.statuts|lower == 'confirmed' %}bg-blue-1-05 text-blue-1
+                                                {% elseif reservation.statuts|lower == 'cancelled' %}bg-red-3 text-red-2
+                                                {% elseif reservation.statuts|lower == 'completed' %}bg-green-1 text-white
+                                                {% elseif reservation.statuts|lower == 'rejected' %}bg-red-3 text-red-2
+                                                {% else %}bg-yellow-4 text-yellow-3{% endif %}">
+                                                {{ reservation.statuts }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-column gap-2">
+                                                {% if reservation.statuts|lower == 'pending' %}
+                                                    <form action="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Confirmed'}) }}" method="post" class="mb-2">
+                                                        <button type="submit" class="button -sm py-10 px-15 -blue-1 bg-blue-1-05 text-blue-1 hover-animation w-100">
+                                                            <i class="icon-check mr-5"></i> Accept
+                                                        </button>
+                                                    </form>
+                                                    <form action="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Rejected'}) }}" method="post">
+                                                        <button type="submit" class="button -sm py-10 px-15 -red-1 bg-red-3 text-red-2 hover-animation w-100">
+                                                            <i class="icon-close mr-5"></i> Reject
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                                <button type="button" class="button -sm py-10 px-15 -dark-1 bg-light-2 hover-animation toggle-details"
+                                                        data-id="{{ reservation.id }}">
+                                                    <i class="icon-list text-15 mr-5"></i> Details
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="reservation-details-{{ reservation.id }}" style="display: none;">
+                                        <td colspan="8" class="p-0">
+                                            <div class="bg-light-2 p-20 rounded-4 mt-10 mb-10">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <h5 class="text-16 fw-500 mb-15">Customer Details</h5>
+                                                        <div class="mb-5"><strong>Name:</strong> {{ reservation.user.name }} {{ reservation.user.lastname }}</div>
+                                                        <div class="mb-5"><strong>Email:</strong> {{ reservation.user.email }}</div>
+                                                        <div class="mb-5"><strong>Phone:</strong> {{ reservation.user.phone|default('Not provided') }}</div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <h5 class="text-16 fw-500 mb-15">Ticket Details</h5>
+                                                        <div class="mb-5"><strong>Ticket Number:</strong> {{ billet.numero }}</div>
+                                                        <div class="mb-5"><strong>Activity:</strong> {{ activity.activityName }}</div>
+                                                        <div class="mb-5"><strong>Date Purchased:</strong> {{ reservation.dateAchat|date('Y-m-d H:i') }}</div>
+                                                        <div class="mb-5"><strong>Price Per Ticket:</strong> $ {{ reservation.prixUnite }}</div>
+                                                        <div class="mb-5"><strong>Total Price:</strong> $ {{ reservation.prixTotal }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tabs__pane -tab-item-2">
+                    <div class="overflow-x-auto responsive-table-container">
+                        <table class="table y-gap-40 text-15">
+                            <thead class="bg-light-2">
+                                <tr>
+                                    <th>Reservation #</th>
+                                    <th>Activity</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Tickets</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set confirmedFound = false %}
+                                {% for reservation in reservations %}
+                                    {% if reservation.statuts|lower == 'confirmed' or reservation.statuts|lower == 'pending' %}
+                                        {% set confirmedFound = true %}
+                                        {% set billet = reservation.billet %}
+                                        {% set activityId = billet.activiteId %}
+                                        {% set activity = activities[activityId] %}
+                                        <tr class="border-bottom-light fade-in reservation-row" data-id="{{ reservation.id }}">
+                                            <td>
+                                                <div class="text-blue-1 fw-500">REV-{{ reservation.id }}</div>
+                                                <div class="text-14 text-light-1">{{ billet.numero }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="fw-500 text-14">{{ activity.activityName }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="fw-500">{{ reservation.user.name }} {{ reservation.user.lastname }}</div>
+                                                <div class="text-14 text-light-1">{{ reservation.user.email }}</div>
+                                            </td>
+                                            <td>{{ reservation.dateAchat|date('Y-m-d') }}</td>
+                                            <td>
+                                                <div class="fw-500">{{ reservation.nombre }}</div>
+                                                <div class="text-14 text-light-1">$ {{ reservation.prixUnite }} each</div>
+                                            </td>
+                                            <td>$ {{ reservation.prixTotal }}</td>
+                                            <td>
+                                                <div class="rounded-100 py-4 px-15 text-center text-14 fw-500 
+                                                    {% if reservation.statuts|lower == 'confirmed' %}bg-blue-1-05 text-blue-1
+                                                    {% elseif reservation.statuts|lower == 'cancelled' %}bg-red-3 text-red-2
+                                                    {% elseif reservation.statuts|lower == 'completed' %}bg-green-1 text-white
+                                                    {% elseif reservation.statuts|lower == 'rejected' %}bg-red-3 text-red-2
+                                                    {% else %}bg-yellow-4 text-yellow-3{% endif %}">
+                                                    {{ reservation.statuts }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-column gap-2">
+                                                    {% if reservation.statuts|lower == 'pending' %}
+                                                        <form action="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Confirmed'}) }}" method="post" class="mb-2">
+                                                            <button type="submit" class="button -sm py-10 px-15 -blue-1 bg-blue-1-05 text-blue-1 hover-animation w-100">
+                                                                <i class="icon-check mr-5"></i> Accept
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Rejected'}) }}" method="post">
+                                                            <button type="submit" class="button -sm py-10 px-15 -red-1 bg-red-3 text-red-2 hover-animation w-100">
+                                                                <i class="icon-close mr-5"></i> Reject
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                    {% if reservation.statuts|lower == 'confirmed' %}
+                                                        <form action="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Completed'}) }}" method="post" class="mb-2">
+                                                            <button type="submit" class="button -sm py-10 px-15 -blue-1 bg-blue-1-05 text-blue-1 hover-animation w-100">
+                                                                <i class="icon-check mr-5"></i> Mark Completed
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Cancelled'}) }}" method="post">
+                                                            <button type="submit" class="button -sm py-10 px-15 -red-1 bg-red-3 text-red-2 hover-animation w-100"
+                                                                   onclick="return confirm('Are you sure you want to cancel this reservation?')">
+                                                                <i class="icon-cancel mr-5"></i> Cancel
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                    <button type="button" class="button -sm py-10 px-15 -dark-1 bg-light-2 hover-animation toggle-details"
+                                                            data-id="{{ reservation.id }}">
+                                                        <i class="icon-list text-15 mr-5"></i> Details
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="reservation-details-{{ reservation.id }}" style="display: none;">
+                                            <td colspan="8" class="p-0">
+                                                <div class="bg-light-2 p-20 rounded-4 mt-10 mb-10">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <h5 class="text-16 fw-500 mb-15">Customer Details</h5>
+                                                            <div class="mb-5"><strong>Name:</strong> {{ reservation.user.name }} {{ reservation.user.lastname }}</div>
+                                                            <div class="mb-5"><strong>Email:</strong> {{ reservation.user.email }}</div>
+                                                            <div class="mb-5"><strong>Phone:</strong> {{ reservation.user.phone|default('Not provided') }}</div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h5 class="text-16 fw-500 mb-15">Ticket Details</h5>
+                                                            <div class="mb-5"><strong>Ticket Number:</strong> {{ billet.numero }}</div>
+                                                            <div class="mb-5"><strong>Activity:</strong> {{ activity.activityName }}</div>
+                                                            <div class="mb-5"><strong>Date Purchased:</strong> {{ reservation.dateAchat|date('Y-m-d H:i') }}</div>
+                                                            <div class="mb-5"><strong>Price Per Ticket:</strong> $ {{ reservation.prixUnite }}</div>
+                                                            <div class="mb-5"><strong>Total Price:</strong> $ {{ reservation.prixTotal }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if not confirmedFound %}
+                                    <tr>
+                                        <td colspan="8" class="text-center py-20">No confirmed reservations found</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tabs__pane -tab-item-3">
+                    <div class="overflow-x-auto responsive-table-container">
+                        <table class="table y-gap-40 text-15">
+                            <thead class="bg-light-2">
+                                <tr>
+                                    <th>Reservation #</th>
+                                    <th>Activity</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Tickets</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set cancelledFound = false %}
+                                {% for reservation in reservations %}
+                                    {% if reservation.statuts == 'Cancelled' %}
+                                        {% set cancelledFound = true %}
+                                        {% set billet = reservation.billet %}
+                                        {% set activityId = billet.activiteId %}
+                                        {% set activity = activities[activityId] %}
+                                        <tr class="border-bottom-light fade-in reservation-row" data-id="{{ reservation.id }}">
+                                            <td>
+                                                <div class="text-blue-1 fw-500">REV-{{ reservation.id }}</div>
+                                                <div class="text-14 text-light-1">{{ billet.numero }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="fw-500 text-14">{{ activity.activityName }}</div>
+                                            </td>
+                                            <td>
+                                                <div class="fw-500">{{ reservation.user.name }} {{ reservation.user.lastname }}</div>
+                                                <div class="text-14 text-light-1">{{ reservation.user.email }}</div>
+                                            </td>
+                                            <td>{{ reservation.dateAchat|date('Y-m-d') }}</td>
+                                            <td>
+                                                <div class="fw-500">{{ reservation.nombre }}</div>
+                                                <div class="text-14 text-light-1">$ {{ reservation.prixUnite }} each</div>
+                                            </td>
+                                            <td>$ {{ reservation.prixTotal }}</td>
+                                            <td>
+                                                <div class="rounded-100 py-4 px-15 text-center text-14 fw-500 
+                                                    {% if reservation.statuts|lower == 'confirmed' %}bg-blue-1-05 text-blue-1
+                                                    {% elseif reservation.statuts|lower == 'cancelled' %}bg-red-3 text-red-2
+                                                    {% elseif reservation.statuts|lower == 'completed' %}bg-green-1 text-white
+                                                    {% elseif reservation.statuts|lower == 'rejected' %}bg-red-3 text-red-2
+                                                    {% else %}bg-yellow-4 text-yellow-3{% endif %}">
+                                                    {{ reservation.statuts }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-column gap-2">
+                                                    {% if reservation.statuts|lower == 'pending' %}
+                                                        <form action="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Confirmed'}) }}" method="post" class="mb-2">
+                                                            <button type="submit" class="button -sm py-10 px-15 -blue-1 bg-blue-1-05 text-blue-1 hover-animation w-100">
+                                                                <i class="icon-check mr-5"></i> Accept
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ path('app_reservation_update_status', {'id': reservation.id, 'status': 'Rejected'}) }}" method="post">
+                                                            <button type="submit" class="button -sm py-10 px-15 -red-1 bg-red-3 text-red-2 hover-animation w-100">
+                                                                <i class="icon-close mr-5"></i> Reject
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                    <button type="button" class="button -sm py-10 px-15 -dark-1 bg-light-2 hover-animation toggle-details"
+                                                            data-id="{{ reservation.id }}">
+                                                        <i class="icon-list text-15 mr-5"></i> Details
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="reservation-details-{{ reservation.id }}" style="display: none;">
+                                            <td colspan="8" class="p-0">
+                                                <div class="bg-light-2 p-20 rounded-4 mt-10 mb-10">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <h5 class="text-16 fw-500 mb-15">Customer Details</h5>
+                                                            <div class="mb-5"><strong>Name:</strong> {{ reservation.user.name }} {{ reservation.user.lastname }}</div>
+                                                            <div class="mb-5"><strong>Email:</strong> {{ reservation.user.email }}</div>
+                                                            <div class="mb-5"><strong>Phone:</strong> {{ reservation.user.phone|default('Not provided') }}</div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h5 class="text-16 fw-500 mb-15">Ticket Details</h5>
+                                                            <div class="mb-5"><strong>Ticket Number:</strong> {{ billet.numero }}</div>
+                                                            <div class="mb-5"><strong>Activity:</strong> {{ activity.activityName }}</div>
+                                                            <div class="mb-5"><strong>Date Purchased:</strong> {{ reservation.dateAchat|date('Y-m-d H:i') }}</div>
+                                                            <div class="mb-5"><strong>Price Per Ticket:</strong> $ {{ reservation.prixUnite }}</div>
+                                                            <div class="mb-5"><strong>Total Price:</strong> $ {{ reservation.prixTotal }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if not cancelledFound %}
+                                    <tr>
+                                        <td colspan="8" class="text-center py-20">No cancelled reservations found</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle toggle details button
+    const toggleDetailsButtons = document.querySelectorAll('.toggle-details');
+    toggleDetailsButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const detailsRow = document.querySelector(`.reservation-details-${id}`);
+            detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
+        });
+    });
+
+    // Enhanced status button handling with confirmation dialog for cancel actions
+    document.addEventListener('click', function(event) {
+        // Find the closest status button ancestor of the clicked element
+        const statusButton = event.target.closest('.status-button');
+        if (!statusButton) return; // Not a status button click
+        
+        event.preventDefault();
+        
+        const id = statusButton.getAttribute('data-id');
+        const status = statusButton.getAttribute('data-status');
+        
+        // Add confirmation for cancellations
+        if (status === 'Cancelled' && !confirm('Are you sure you want to cancel this reservation?')) {
+            return; // User clicked Cancel in the confirm dialog
+        }
+        
+        updateStatus(id, status, statusButton);
+    });
+
+    function updateStatus(id, status, button) {
+        // Get the row that contains the button
+        const row = button.closest('tr');
+        const statusCell = row.querySelector('td:nth-child(6)');
+        const statusDiv = statusCell.querySelector('div');
+        
+        // Show loading indication
+        button.innerHTML = '<i class="icon-refresh mr-5 fa-spin"></i> Processing...';
+        button.disabled = true;
+        
+        // Send direct form request instead of AJAX for simplicity
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `{{ path('app_reservation_update_status', {'id': '_ID_', 'status': '_STATUS_'}) }}`.replace('_ID_', id).replace('_STATUS_', status);
+        document.body.appendChild(form);
+        form.submit();
+    }
+});
+</script>
+<style>
+    /* Animation styles */
+    .hover-animation {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-animation:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Fade in animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    /* Table styling */
+    .table th {
+        font-weight: 500;
+        color: var(--color-dark-1);
+        padding: 12px 15px;
+    }
+    
+    .table td {
+        padding: 15px;
+        vertical-align: middle;
+    }
+    
+    .border-bottom-light {
+        border-bottom: 1px solid #eee;
+    }
+    
+    .border-top-light {
+        border-top: 1px solid #eee;
+    }
+    
+    /* Button styling */
+    .button {
+        cursor: pointer;
+        border-radius: 4px;
+        border: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .button.-blue-1:hover {
+        background-color: #0084FF !important;
+        color: white !important;
+    }
+    
+    .button.-red-1:hover {
+        background-color: #FF5A5A !important;
+        color: white !important;
+    }
+    
+    .button.-dark-1:hover {
+        background-color: #333 !important;
+        color: white !important;
+    }
+    
+    .gap-2 {
+        gap: 8px;
+    }
+    
+    /* Improved details section */
+    .reservation-details {
+        background-color: rgba(245, 247, 250, 0.5);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    /* Responsive table container */
+    .responsive-table-container {
+        overflow-x: auto;
+    }
+    
+    /* Update buttons in Cancelled tab to be stacked vertically */
+    .tabs__pane.-tab-item-3 .button {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
