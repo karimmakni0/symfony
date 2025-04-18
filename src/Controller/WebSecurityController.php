@@ -12,12 +12,36 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class WebSecurityController extends AbstractController
 {
     #[Route('/login', name: 'app_login')]
-    public function login(Request $request, AuthenticationUtils $authenticationUtils, UsersRepository $usersRepository, UserPasswordHasherInterface $passwordHasher): Response
+    public function login(Request $request, AuthenticationUtils $authenticationUtils, UsersRepository $usersRepository, UserPasswordHasherInterface $passwordHasher, SessionInterface $session): Response
     {
+        // Check if 2FA is verified
+        if ($session->has('2fa_verified') && $session->get('2fa_verified') === true) {
+            $userId = $session->get('2fa_user_id');
+            $user = $usersRepository->find($userId);
+            
+            if ($user) {
+                // Clear session
+                $session->remove('2fa_verified');
+                $session->remove('2fa_user_id');
+                
+                // Login successful, redirect based on role
+                $role = $user->getRole();
+                
+                if ($role === 'admin') {
+                    return $this->redirectToRoute('admin_dashboard');
+                } elseif ($role === 'Publicitaire') {
+                    return $this->redirectToRoute('app_publicator');
+                } else {
+                    return $this->redirectToRoute('app_home');
+                }
+            }
+        }
+        
         // If user is already logged in, redirect to appropriate dashboard
         if ($this->getUser()) {
             return $this->redirectToRoute('login_check');
@@ -45,8 +69,17 @@ class WebSecurityController extends AbstractController
                 if (!$isPasswordValid) {
                     $customError = 'Wrong password. Please try again.';
                 } else {
-                    // Login successful, manually authenticate the user
-                    // Check role and redirect
+                    // Check if 2FA is enabled for this user
+                    if ($user->isTotpAuthenticationEnabled()) {
+                        // Store user ID in session for 2FA verification
+                        $session->set('totp_user_id', $user->getId());
+                        
+                        // Redirect to 2FA verification page
+                        return $this->redirectToRoute('app_totp_verify_page');
+                    }
+                    
+                    // No 2FA, login successful
+                    // Redirect based on role
                     $role = $user->getRole();
                     
                     if ($role === 'admin') {
@@ -71,9 +104,32 @@ class WebSecurityController extends AbstractController
     }
 
     #[Route('/login_check', name: 'login_check')]
-    public function loginCheck()
+    public function loginCheck(SessionInterface $session)
     {
-        // Get current user
+        // Check if coming from 2FA verification
+        if ($session->has('2fa_verified') && $session->get('2fa_verified') === true) {
+            $userId = $session->get('2fa_user_id');
+            $user = $this->getDoctrine()->getRepository(Users::class)->find($userId);
+            
+            if ($user) {
+                // Clear session
+                $session->remove('2fa_verified');
+                $session->remove('2fa_user_id');
+                
+                // Login successful, redirect based on role
+                $role = $user->getRole();
+                
+                if ($role === 'admin') {
+                    return $this->redirectToRoute('admin_dashboard');
+                } elseif ($role === 'Publicitaire') {
+                    return $this->redirectToRoute('app_publicator');
+                } else {
+                    return $this->redirectToRoute('app_home');
+                }
+            }
+        }
+        
+        // Regular login check
         $user = $this->getUser();
 
         if (!$user) {

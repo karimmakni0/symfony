@@ -7,10 +7,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
+use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface;
 
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
 #[ORM\Table(name: "users")]
-class Users implements UserInterface, PasswordAuthenticatedUserInterface
+class Users implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -59,6 +61,12 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: "boolean", options: ["default" => false])]
     private $isBanned = false;
+    
+    #[ORM\Column(length: 255, nullable: true)]
+    private $totpSecret;
+    
+    #[ORM\Column(type: "boolean", options: ["default" => false])]
+    private $totpEnabled = false;
 
     public function __construct()
     {
@@ -261,5 +269,96 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
+    }
+    
+    /**
+     * Get TOTP authentication secret
+     */
+    public function getTotpSecret(): ?string
+    {
+        return $this->totpSecret;
+    }
+
+    /**
+     * Set TOTP authentication secret
+     */
+    public function setTotpSecret(?string $totpSecret): self
+    {
+        $this->totpSecret = $totpSecret;
+        return $this;
+    }
+    
+    /**
+     * Check if TOTP authentication is enabled
+     */
+    public function isTotpEnabled(): bool
+    {
+        return $this->totpEnabled;
+    }
+
+    /**
+     * Enable/disable TOTP authentication
+     */
+    public function setTotpEnabled(bool $totpEnabled): self
+    {
+        $this->totpEnabled = $totpEnabled;
+        return $this;
+    }
+    
+    /**
+     * Required for the TwoFactorInterface
+     */
+    public function isTotpAuthenticationEnabled(): bool
+    {
+        return $this->totpEnabled && null !== $this->totpSecret;
+    }
+
+    /**
+     * Required for the TwoFactorInterface
+     */
+    public function getTotpAuthenticationUsername(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Required for the TwoFactorInterface
+     */
+    public function getTotpAuthenticationConfiguration(): TotpConfigurationInterface
+    {
+        // You can customize these settings
+        return new class($this->totpSecret) implements TotpConfigurationInterface {
+            private $secret;
+
+            public function __construct(string $secret)
+            {
+                $this->secret = $secret;
+            }
+
+            public function getSecret(): string
+            {
+                return $this->secret;
+            }
+
+            public function getWindow(): int
+            {
+                return 1; // Allow 30 seconds before and after
+            }
+
+            public function getCodeLength(): int
+            {
+                return 6;
+            }
+
+            public function getAlgorithm(): int
+            {
+                return TotpConfigurationInterface::ALGORITHM_SHA1;
+            }
+
+            public function getPeriod(): int
+            {
+                return 30; // 30-second validity period
+            }
+        };
     }
 }

@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Verify Two-Factor Authentication{% endblock %}
+
+{% block body %}
+<section class="layout-pt-lg layout-pb-lg bg-blue-2">
+  <div class="container">
+    <div class="row justify-center">
+      <div class="col-xl-6 col-lg-7 col-md-9">
+        <div class="px-50 py-50 sm:px-20 sm:py-20 bg-white shadow-4 rounded-4">
+          <div class="row y-gap-20">
+            <div class="col-12 text-center">
+              <h1 class="text-30 fw-600">Two-Factor Authentication</h1>
+              <p class="mt-10">Enter the verification code from your authenticator app</p>
+            </div>
+
+            {% if error %}
+                <div class="col-12">
+                    <div class="alert alert-danger rounded-4 py-10 px-15 bg-red-3 text-red-2">
+                        {{ error }}
+                    </div>
+                </div>
+            {% endif %}
+
+            <form action="{{ path('app_totp_verify') }}" method="post" class="row y-gap-20">
+                <div class="col-12">
+                    <div class="form-input">
+                        <input type="text" name="totp_code" class="has-value text-center" placeholder=" " required autofocus>
+                        <label class="lh-1 text-14 text-light-1">6-Digit Code</label>
+                    </div>
+                </div>
+
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <div class="col-12 d-flex justify-center mt-15">
+                    <button type="submit" class="button py-20 -dark-1 bg-blue-1 text-white w-100" style="max-width: 80%; min-width: 300px;">
+                        <span class="fw-500 text-16">Verify</span>
+                        <div class="icon-arrow-top-right ml-15"></div>
+                    </button>
+                </div>
+            </form>
+
+            <div class="col-12 text-center mt-20">
+                <p>Open your Google Authenticator app and enter the 6-digit code shown</p>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
