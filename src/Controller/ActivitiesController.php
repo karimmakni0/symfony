@@ -464,74 +464,37 @@ class ActivitiesController extends AbstractController
                             'user' => $user
                         ]);
                     }
-                    
                     try {
                         // Begin transaction
                         $this->entityManager->beginTransaction();
-                        
-                        // 1. Create the billet (ticket)
+                        // Always create a new Billet for each reservation
                         $billet = new Billet();
                         $billet->setActiviteId($activity->getId());
                         $billet->setPrix($unitPrice);
                         $billet->setNb($participants);
                         $billet->setNumero('TICKET-' . uniqid());
-                        
-                        // Save billet to database and get its ID
                         $this->entityManager->persist($billet);
-                        $this->entityManager->flush();
-                        
-                        // Get a fresh instance of the billet to ensure we have the correct ID
-                        $billetId = $billet->getId();
-                        if (!$billetId) {
-                            throw new \Exception("Failed to generate a valid billet ID");
-                        }
-                        
-                        // Get a fresh user instance
-                        $freshUser = $this->entityManager->getRepository(Users::class)->find($user->getId());
-                        if (!$freshUser) {
-                            throw new \Exception("User not found");
-                        }
-                        
-                        // Refresh the entity manager to ensure clean state
-                        $this->entityManager->clear();
-                        
-                        // Get fresh instances after clearing
-                        $billet = $this->entityManager->getRepository(Billet::class)->find($billetId);
-                        
-                        // 2. Create the reservation using Doctrine entities
+                        $this->entityManager->flush(); // ensures billet gets a unique auto-incremented id
+                        // Always create a new Reservation for each booking
                         $reservation = new Reservation();
-                        $reservation->setUser($freshUser);
+                        $reservation->setUser($user); // must be the managed User entity
                         $reservation->setBillet($billet);
                         $reservation->setDateAchat(date('Y-m-d H:i:s'));
                         $reservation->setNombre($participants);
                         $reservation->setPrixTotal($totalPrice);
                         $reservation->setPrixUnite($unitPrice);
-                        $reservation->setStatuts('confirmed'); // Set as confirmed since payment was processed
-                        
-                        // Save reservation to database
+                        $reservation->setStatuts('confirmed');
                         $this->entityManager->persist($reservation);
-                        $this->entityManager->flush();
-                        
-                        // Success message
+                        $this->entityManager->flush(); // ensures reservation gets a unique auto-incremented id
                         $this->addFlash('success', 'Your reservation was successful! Ticket number: ' . $billet->getNumero());
-                        
-                        // Commit transaction
                         $this->entityManager->commit();
-                        
-                        // Redirect to booking history page instead of activities
                         return $this->redirectToRoute('app_user_reservation_history');
                     } catch (\Exception $e) {
-                        // Roll back the transaction on error
                         if ($this->entityManager->getConnection()->isTransactionActive()) {
                             $this->entityManager->rollback();
                         }
-                        
-                        // Log the error
                         error_log('Reservation error: ' . $e->getMessage());
-                        
-                        // Show the detailed error message for debugging
                         $this->addFlash('error', 'Error: ' . $e->getMessage());
-                        
                         return $this->render('client/Activities/passReservation.html.twig', [
                             'activity' => $activity,
                             'participants' => $participants,
@@ -540,10 +503,7 @@ class ActivitiesController extends AbstractController
                         ]);
                     }
                 } catch (\Exception $e) {
-                    // Log the error
                     error_log('Payment error: ' . $e->getMessage());
-                    
-                    // Show the actual error message for debugging
                     $this->addFlash('error', 'Error: ' . $e->getMessage());
                 }
             }
