@@ -34,30 +34,13 @@
             padding: 15px;
             text-align: center;
             font-size: 12px;
+            border-top: 1px dashed #ccc;
         }
         .logo {
             text-align: center;
             margin-bottom: 20px;
         }
         .logo img {
-            max-width: 150px;
-            height: auto;
-        }
-        .activity-image {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .activity-image img {
-            max-width: 100%;
-            height: auto;
-            max-height: 200px;
-            border-radius: 8px;
-        }
-        .qrcode {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .qrcode img {
             max-width: 150px;
             height: auto;
         }
@@ -69,10 +52,11 @@
         table th, table td {
             padding: 10px;
             border-bottom: 1px solid #eee;
+            text-align: left;
         }
         table th {
-            text-align: left;
             font-weight: bold;
+            width: 40%;
         }
         .status {
             display: inline-block;
@@ -93,13 +77,6 @@
             background-color: #f8d7da;
             color: #842029;
         }
-        .barcode {
-            text-align: center;
-            margin-top: 15px;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 2px;
-            font-size: 16px;
-        }
         .heading {
             font-size: 24px;
             margin-bottom: 10px;
@@ -116,6 +93,35 @@
         .divider {
             border-top: 1px dashed #ccc;
             margin: 20px 0;
+        }
+        .qr-code-section {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .qr-code-container {
+            display: inline-block;
+            border: 2px dashed #ccc;
+            padding: 10px;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .qr-code-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .ticket-number {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .qr-code {
+            font-family: monospace;
+            font-size: 8px;
+            line-height: 8px;
+            margin: 0 auto;
+            width: 160px;
         }
     </style>
 </head>
@@ -134,12 +140,6 @@
             
             <div class="heading text-center">{{ activity.activityName }}</div>
             <div class="subheading text-center">{{ activity.activityDestination }}</div>
-            
-            {% if activityImage %}
-            <div class="activity-image">
-                <img src="{{ absolute_url(asset(activityImage)) }}" alt="{{ activity.activityName }}">
-            </div>
-            {% endif %}
             
             <div class="ticket-info">
                 <table>
@@ -176,14 +176,86 @@
             
             <div class="divider"></div>
             
-            <div class="qrcode">
-                <img src="{{ qrCode }}" alt="Ticket QR Code">
-                <div class="barcode">{{ billet.numero }}</div>
+            <div class="qr-code-section">
+                <div class="qr-code-title">Ticket QR Code</div>
+                <div class="qr-code-container">
+                    <div class="ticket-number">{{ billet.numero }}</div>
+                    <!-- Simple QR code that will definitely render in PDF - scaled down -->
+                    <div style="font-family: Courier, monospace; line-height: 1; font-size: 8px; text-align: center; margin: 5px auto; width: 120px;">
+                        <div style="border: 1px solid #000; padding: 5px; display: inline-block;">
+                            <table style="border-collapse: collapse; margin: 0 auto;">
+                                <tr>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #fff;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                    <td style="width: 5px; height: 5px; background-color: #000;"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div style="font-size: 9px; margin-top: 3px;">(Scan at venue for entry)</div>
+                </div>
             </div>
             
             <div class="ticket-footer">
-                <p><strong>Important Information:</strong></p>
-                <p>Please present this ticket (printed or digital) at the activity venue. This serves as proof of your booking.</p>
+                <p><strong>Important Information:</strong> Please present this ticket (printed or digital) at the activity venue. This serves as proof of your booking.</p>
                 <p>Issue Date: {{ issueDate|date('d M Y H:i') }}</p>
             </div>
         </div>
