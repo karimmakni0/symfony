@@ -59,8 +59,63 @@ class ActivitiesController extends AbstractController
         // Get all activities to display to clients with their resources
         $activities = $this->activitiesRepository->findAllWithResources();
         
+        // Get unique destinations for the filter dropdown
+        $destinations = $this->activitiesRepository->findAllDestinations();
+        
+        // Get activity types with counts
+        $activityTypes = $this->activitiesRepository->findActivityTypesWithCount();
+        
+        // Get durations with counts
+        $durations = $this->activitiesRepository->findDurationsWithCount();
+        
         return $this->render('client/Activities/index.html.twig', [
-            'activities' => $activities
+            'activities' => $activities,
+            'destinations' => $destinations,
+            'activityTypes' => $activityTypes,
+            'durations' => $durations
+        ]);
+    }
+    
+    #[Route('/activities/filter', name: 'app_activities_filter')]
+    public function filterActivities(Request $request): Response
+    {
+        // Get filter parameters from request
+        $destination = $request->query->get('destination');
+        $startDate = $request->query->get('startDate');
+        $endDate = $request->query->get('endDate');
+        $minPrice = $request->query->get('minPrice') ? (float)$request->query->get('minPrice') : null;
+        $maxPrice = $request->query->get('maxPrice') ? (float)$request->query->get('maxPrice') : null;
+        $activityTypes = $request->query->all('activityType');
+        $durations = $request->query->all('duration');
+        
+        // Get filtered activities
+        $activities = $this->activitiesRepository->findByFilters(
+            $destination,
+            $startDate,
+            $endDate,
+            $minPrice,
+            $maxPrice,
+            $activityTypes,
+            $durations
+        );
+        
+        // Get filter options for the sidebar
+        $destinations = $this->activitiesRepository->findAllDestinations();
+        $activityTypesWithCount = $this->activitiesRepository->findActivityTypesWithCount();
+        $durationsWithCount = $this->activitiesRepository->findDurationsWithCount();
+        
+        return $this->render('client/Activities/index.html.twig', [
+            'activities' => $activities,
+            'destinations' => $destinations,
+            'activityTypes' => array_keys($activityTypesWithCount),
+            'activityTypesWithCount' => $activityTypesWithCount,
+            'durations' => array_keys($durationsWithCount),
+            'durationsWithCount' => $durationsWithCount,
+            'minPrice' => $minPrice,
+            'maxPrice' => $maxPrice,
+            'selectedDestination' => $destination,
+            'startDate' => $startDate,
+            'endDate' => $endDate
         ]);
     }
     
