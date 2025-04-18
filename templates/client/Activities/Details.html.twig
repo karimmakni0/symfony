@@ -3,323 +3,283 @@
 {% block title %}{{ activity.activityName }} - Activity Details{% endblock %}
 
 {% block body %}
-<div class="hero-section pt-5 pb-0">
-  <div class="container-fluid p-0">
-    {% if activity.resources is not empty %}
-      <div id="activityHeroCarousel" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-indicators">
-          {% for resource in activity.resources %}
-            <button type="button" data-bs-target="#activityHeroCarousel" data-bs-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active"{% endif %} aria-label="Slide {{ loop.index }}"></button>
-          {% endfor %}
-        </div>
-        <div class="carousel-inner">
-          {% for resource in activity.resources %}
-            <div class="carousel-item {% if loop.first %}active{% endif %}">
-              <img src="{{ asset(resource.path) }}" class="d-block w-100" style="height:450px; object-fit:cover;" alt="{{ activity.activityName }}">
-              <div class="carousel-caption d-none d-md-block">
-                <h5>{{ activity.activityName }}</h5>
-                <p>{{ activity.activityDestination }}</p>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-        {% if activity.resources|length > 1 %}
-          <button class="carousel-control-prev" type="button" data-bs-target="#activityHeroCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#activityHeroCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
-        {% endif %}
-      </div>
-    {% else %}
-      <div class="hero-image">
-        <img src="{{ asset('assets/img/activities/default.jpg') }}" class="d-block w-100" style="height:450px; object-fit:cover;" alt="{{ activity.activityName }}">
-      </div>
-    {% endif %}
-  </div>
-</div>
-
-<div class="container mt-n5">
-  <div class="row">
-    <div class="col-12">
-      <div class="card shadow-lg border-0 rounded-4 p-4 mb-4 bg-white position-relative" style="z-index: 10;">
-        <div class="row">
-          <div class="col-12 col-lg-9">
-            <h1 class="text-primary mb-3">{{ activity.activityName }}</h1>
-            <div class="d-flex flex-wrap align-items-center mb-3">
-              <span class="badge bg-primary me-2 mb-2">{{ activity.activityType ?? 'Activity' }}</span>
-              <span class="badge bg-info me-2 mb-2"><i class="fa fa-map-marker-alt me-1"></i> {{ activity.activityDestination }}</span>
-              <span class="badge bg-success me-2 mb-2"><i class="fa fa-clock me-1"></i> {{ activity.activityDuration ?? 'Flexible' }}</span>
-              <span class="badge bg-warning me-2 mb-2"><i class="fa fa-users me-1"></i> {{ activity.maxNumber - totalBookedTickets }} spots left</span>
-            </div>
-            <div class="mb-3">
-              <div class="d-flex align-items-center">
-                <div class="me-2">
-                  <i class="fa fa-star text-warning"></i>
-                  <i class="fa fa-star text-warning"></i>
-                  <i class="fa fa-star text-warning"></i>
-                  <i class="fa fa-star text-warning"></i>
-                  <i class="fa fa-star-half-alt text-warning"></i>
-                </div>
-                <span class="small text-muted">(4.8) · 50 reviews</span>
-              </div>
-            </div>
-            <p class="lead">{{ activity.activityDescription|striptags|slice(0, 200) ~ '...' }}</p>
-          </div>
-          <div class="col-12 col-lg-3 d-flex flex-column justify-content-center">
-            <div class="text-center text-lg-end mb-3 mb-lg-0">
-              <div class="h5 text-muted">From</div>
-              <div class="h2 text-primary">{{ activity.activityPrice }} TND</div>
-              <div class="text-muted">per person</div>
-            </div>
-          </div>
+<div class="hero-section pt-5">
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h1 class="display-5 fw-bold text-primary">{{ activity.activityName }}</h1>
+        <div class="d-flex flex-wrap align-items-center mb-3">
+          <span class="badge bg-primary me-2 mb-2">{{ activity.activityType ?? 'Activity' }}</span>
+          <span class="badge bg-info me-2 mb-2"><i class="fa fa-map-marker-alt me-1"></i> {{ activity.activityDestination }}</span>
+          <span class="badge bg-success me-2 mb-2"><i class="fa fa-clock me-1"></i> {{ activity.activityDuration ?? 'Flexible' }}</span>
+          <span class="badge bg-warning me-2 mb-2"><i class="fa fa-users me-1"></i> {{ activity.maxNumber - totalBookedTickets }} spots left</span>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="container py-5">
-  <div class="row g-4">
-    <div class="col-lg-8">
-      <!-- About section -->
-      <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
-        <h3 class="text-primary mb-4 border-bottom pb-2">About This Activity</h3>
-        <div class="activity-description">
-          {{ activity.activityDescription|raw }}
-        </div>
-      </div>
-      
-      <!-- Details section -->
-      <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
-        <h3 class="text-primary mb-4 border-bottom pb-2">Activity Details</h3>
-        <div class="row">
-          <div class="col-md-6">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                <div>
-                  <i class="fa fa-calendar text-primary me-2"></i>
-                  <strong>Date:</strong>
+    <!-- Horizontal Image Gallery -->
+    <div class="row mb-5">
+      <div class="col-12">
+        <div class="gallery-container rounded-4 shadow-sm">
+          <div class="row g-0">
+            {% if activity.resources is not empty %}
+              {% set featured_image = activity.resources|first %}
+              <div class="col-md-8">
+                <div class="main-image-container">
+                  <img src="{{ asset(featured_image.path) }}" alt="{{ activity.activityName }}">
                 </div>
-                <span>{{ activity.activityDate|date('d M Y') }}</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                <div>
-                  <i class="fa fa-clock text-primary me-2"></i>
-                  <strong>Duration:</strong>
-                </div>
-                <span>{{ activity.activityDuration ?? 'N/A' }}</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                <div>
-                  <i class="fa fa-tag text-primary me-2"></i>
-                  <strong>Type:</strong>
-                </div>
-                <span>{{ activity.activityType ?? 'General' }}</span>
-              </li>
-            </ul>
-          </div>
-          <div class="col-md-6">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                <div>
-                  <i class="fa fa-map-marker-alt text-primary me-2"></i>
-                  <strong>Location:</strong>
-                </div>
-                <span>{{ activity.activityDestination }}</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                <div>
-                  <i class="fa fa-users text-primary me-2"></i>
-                  <strong>Group Size:</strong>
-                </div>
-                <span>Up to {{ activity.maxNumber }} people</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                <div>
-                  <i class="fa fa-language text-primary me-2"></i>
-                  <strong>Languages:</strong>
-                </div>
-                <span>English, Arabic, French</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Availability section -->
-      <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
-        <h3 class="text-primary mb-4 border-bottom pb-2">Availability Information</h3>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="progress mb-3" style="height: 25px;">
-              {% set percentBooked = activity.maxNumber > 0 ? (totalBookedTickets / activity.maxNumber) * 100 : 0 %}
-              <div class="progress-bar bg-success" role="progressbar" 
-                  {% if percentBooked > 0 %}
-                  style="width: {{ percentBooked }}%"
-                  {% else %}
-                  style="width: 0%"
-                  {% endif %}
-                  aria-valuenow="{{ totalBookedTickets }}" 
-                  aria-valuemin="0" 
-                  aria-valuemax="{{ activity.maxNumber }}">
-                <span>{{ totalBookedTickets }} / {{ activity.maxNumber }}</span>
               </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="d-flex justify-content-between">
-              <span><strong>Maximum capacity:</strong></span>
-              <span>{{ activity.maxNumber }}</span>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span><strong>Booked tickets:</strong></span>
-              <span>{{ totalBookedTickets }}</span>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span><strong>Remaining tickets:</strong></span>
-              <span class="{% if activity.maxNumber - totalBookedTickets <= 5 %}text-danger fw-bold{% else %}text-success{% endif %}">
-                {{ activity.maxNumber - totalBookedTickets }}
-              </span>
-            </div>
-            {% if activity.maxNumber - totalBookedTickets <= 5 and activity.maxNumber - totalBookedTickets > 0 %}
-              <div class="alert alert-warning mt-3">
-                <i class="fa fa-exclamation-triangle me-2"></i> Only {{ activity.maxNumber - totalBookedTickets }} tickets left!
+              <div class="col-md-4">
+                <div class="thumbnails-container">
+                  {% for i in 1..3 %}
+                    {% if activity.resources[i] is defined %}
+                      <div class="thumbnail-item">
+                        <img src="{{ asset(activity.resources[i].path) }}" alt="{{ activity.activityName }}">
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                  
+                  {% if activity.resources|length > 4 %}
+                    <div class="thumbnail-item">
+                      <div class="more-overlay">
+                        <img src="{{ asset(activity.resources[4 < activity.resources|length ? 4 : activity.resources|length - 1].path) }}" alt="{{ activity.activityName }}">
+                        <div class="more-text">
+                          <a href="#imageGalleryModal" data-bs-toggle="modal" class="text-white fw-bold">
+                            +{{ activity.resources|length - 4 }} more
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% else %}
+              <div class="col-12">
+                <div class="main-image-container">
+                  <img src="{{ asset('assets/img/activities/default.jpg') }}" alt="{{ activity.activityName }}">
+                </div>
               </div>
             {% endif %}
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Full Image Gallery Modal -->
+   
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <!-- Activity Summary -->
+        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
+          <div class="row mb-3">
+            <div class="col-md-7">
+              <div class="h4 text-primary mb-3">About this activity</div>
+              <p>{{ activity.activityDescription|striptags|slice(0, 200) }}{% if activity.activityDescription|length > 200 %}...{% endif %}</p>
+            </div>
+            <div class="col-md-5">
+              <div class="text-center">
+                <div class="display-6 text-primary mb-2">{{ activity.activityPrice|number_format(2) }} TND</div>
+                <span class="d-block small text-muted">per person</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Key Details -->
+          <div class="row text-center g-3">
+            {% if activity.activityDestination %}
+            <div class="col-6 col-md-3">
+              <div class="border rounded-3 p-3 h-100">
+                <i class="fa fa-map-marker-alt text-primary mb-2 fs-4"></i>
+                <h6 class="mb-1">Location</h6>
+                <small class="text-muted">{{ activity.activityDestination }}</small>
+              </div>
+            </div>
+            {% endif %}
+            
+            {% if activity.activityDuration %}
+            <div class="col-6 col-md-3">
+              <div class="border rounded-3 p-3 h-100">
+                <i class="fa fa-clock text-primary mb-2 fs-4"></i>
+                <h6 class="mb-1">Duration</h6>
+                <small class="text-muted">{{ activity.activityDuration }}</small>
+              </div>
+            </div>
+            {% endif %}
+            
+            <div class="col-6 col-md-3">
+              <div class="border rounded-3 p-3 h-100">
+                <i class="fa fa-users text-primary mb-2 fs-4"></i>
+                <h6 class="mb-1">Group Size</h6>
+                <small class="text-muted">{{ activity.maxNumber }} max</small>
+              </div>
+            </div>
+            
+            <div class="col-6 col-md-3">
+              <div class="border rounded-3 p-3 h-100">
+                <i class="fa fa-tag text-primary mb-2 fs-4"></i>
+                <h6 class="mb-1">Category</h6>
+                <small class="text-muted">{{ activity.activityType|default('Activity') }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Activity Description -->
+        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
+          <h3 class="text-primary mb-4 border-bottom pb-2">Activity Description</h3>
+          <div class="activity-description">
+            {{ activity.activityDescription|raw }}
+          </div>
+        </div>
+        
+        <!-- Availability section -->
+        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
+          <h3 class="text-primary mb-4 border-bottom pb-2">Availability Information</h3>
+          <div class="row">
+            <div class="col-md-7">
+              <div class="progress mb-3" style="height: 25px;">
+                {% set percentBooked = activity.maxNumber > 0 ? (totalBookedTickets / activity.maxNumber) * 100 : 0 %}
+                <div class="progress-bar bg-success" role="progressbar" 
+                     data-percent="{{ percentBooked }}"
+                     aria-valuenow="{{ totalBookedTickets }}" aria-valuemin="0" aria-valuemax="{{ activity.maxNumber }}">
+                  <span>{{ totalBookedTickets }} / {{ activity.maxNumber }}</span>
+                </div>
+              </div>
+              
+              <div class="mt-4">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="me-3" style="width:20px; height:20px; background-color: #0d6efd; border-radius:50%;"></div>
+                  <span>Available Spots - {{ activity.maxNumber - totalBookedTickets }}</span>
+                </div>
+                <div class="d-flex align-items-center">
+                  <div class="me-3" style="width:20px; height:20px; background-color: #198754; border-radius:50%;"></div>
+                  <span>Booked Spots - {{ totalBookedTickets }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <div class="card h-100 p-3 border-primary">
+                <div class="card-body text-center">
+                  <h5 class="card-title text-primary">Spots</h5>
+                  <div class="display-4 mb-3">{{ activity.maxNumber - totalBookedTickets }}</div>
+                  <p class="mb-0">spots remaining out of {{ activity.maxNumber }}</p>
+                  {% if activity.maxNumber - totalBookedTickets <= 5 and activity.maxNumber - totalBookedTickets > 0 %}
+                    <div class="alert alert-warning mt-3 mb-0">
+                      <i class="fa fa-exclamation-triangle me-2"></i> Only {{ activity.maxNumber - totalBookedTickets }} spots left!
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Location section -->
+        {% if activity.activityDestination %}
+        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
+          <h3 class="text-primary mb-4 border-bottom pb-2">Location</h3>
+          <div class="ratio ratio-16x9">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25864.76992860789!2d10.17991905!3d36.79177545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd337f5e7ef543%3A0xd671924e714a0275!2z2KrZiNmG2LPYjCDYqtmI2YbYsw!5e0!3m2!1sar!2stn!4v1682169865368!5m2!1sar!2stn" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </div>
+        {% endif %}
+      </div>
       
-      <!-- Location section -->
-      {% if activity.activityDestination %}
-      <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
-        <h3 class="text-primary mb-4 border-bottom pb-2">Location</h3>
-        <div class="ratio ratio-16x9">
-          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25864.76992860789!2d10.17991905!3d36.79177545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd337f5e7ef543%3A0xd671924e714a0275!2z2KrZiNmG2LPYjCDYqtmI2YbYsw!5e0!3m2!1sar!2stn!4v1682169865368!5m2!1sar!2stn" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div class="col-lg-4">
+        <!-- Booking card -->
+        <div class="card shadow-lg border-0 rounded-4 p-0 mb-4 bg-white sticky-top" style="top: 100px;">
+          <div class="card-header bg-primary text-white p-3 text-center rounded-top-4">
+            <h3 class="mb-0 fs-5">Book this activity</h3>
+          </div>
+          <div class="card-body p-4">
+            <div class="p-3 bg-light rounded mb-4">
+              <div class="d-flex justify-content-between mb-2">
+                <span>Price per person:</span>
+                <span class="fw-bold">{{ activity.activityPrice|number_format(2) }} TND</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Number of participants:</span>
+                <span id="summaryTicketCount">1</span>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between mb-0">
+                <span class="fw-bold">Total price:</span>
+                <span class="fw-bold text-primary fs-5" id="summaryTotalPrice">{{ activity.activityPrice|number_format(2) }} TND</span>
+              </div>
+            </div>
+            
+            <form action="{{ path('app_payment_reservation', {'id': activity.id}) }}" method="post">
+              <div class="form-group mb-3">
+                <label class="form-label">Select number of participants:</label>
+                <div class="input-group">
+                  <button type="button" class="btn btn-outline-primary" id="decreaseParticipants">
+                    <i class="fa fa-minus"></i>
+                  </button>
+                  <input type="number" name="participants" id="directParticipantsInput" class="form-control text-center" value="1" min="1" max="{{ activity.maxNumber - totalBookedTickets }}">
+                  <button type="button" class="btn btn-outline-primary" id="increaseParticipants">
+                    <i class="fa fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <input type="hidden" name="totalPrice" id="hiddenTotalPrice" value="{{ activity.activityPrice|number_format(2) }}">
+              
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="fa fa-shopping-cart me-2"></i> Book Now
+                </button>
+              </div>
+            </form>
+            
+            <div class="mt-3">
+              <div class="d-flex align-items-center mb-2">
+                <i class="fa fa-lock text-success me-2"></i>
+                <span class="small">Secure payment process</span>
+              </div>
+              <div class="d-flex align-items-center">
+                <i class="fa fa-calendar-check text-primary me-2"></i>
+                <span class="small">Free cancellation up to 24 hours before</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      {% endif %}
     </div>
     
-    <div class="col-lg-4">
-      <!-- Booking card -->
-      <div class="card shadow-lg border-0 rounded-4 p-4 mb-4 bg-white sticky-top" style="top: 100px;">
-        <h3 class="text-primary mb-4 border-bottom pb-2">Book this activity</h3>
-        
-        <div class="p-3 bg-light rounded mb-4">
-          <div class="d-flex justify-content-between mb-2">
-            <span>Price per person:</span>
-            <span class="fw-bold">{{ activity.activityPrice|number_format(2) }} TND</span>
-          </div>
-          <div class="d-flex justify-content-between mb-2">
-            <span>Number of participants:</span>
-            <span id="summaryTicketCount">1</span>
-          </div>
-          <hr>
-          <div class="d-flex justify-content-between mb-0">
-            <span class="fw-bold">Total price:</span>
-            <span class="fw-bold text-primary fs-5" id="summaryTotalPrice">{{ activity.activityPrice|number_format(2) }} TND</span>
-          </div>
-        </div>
-        
-        <form action="{{ path('app_payment_reservation', {'id': activity.id}) }}" method="post">
-          <div class="form-group mb-3">
-            <label class="form-label">Select number of participants:</label>
-            <div class="input-group">
-              <button type="button" class="btn btn-outline-primary" id="decreaseParticipants">
-                <i class="fa fa-minus"></i>
-              </button>
-              <input type="number" name="participants" id="directParticipantsInput" class="form-control text-center" value="1" min="1" max="{{ activity.maxNumber - totalBookedTickets }}">
-              <button type="button" class="btn btn-outline-primary" id="increaseParticipants">
-                <i class="fa fa-plus"></i>
-              </button>
+    <!-- Similar Activities Section -->
+    {% if similarActivities is defined and similarActivities|length > 0 %}
+    <div class="row mt-5">
+      <div class="col-12">
+        <h3 class="text-primary mb-4">Similar Activities You Might Like</h3>
+        <div class="row g-4">
+          {% for similar in similarActivities %}
+            <div class="col-md-4 col-lg-3">
+              <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="similar-img-container">
+                  {% if similar.resources is not empty %}
+                    <img src="{{ asset(similar.resources|first.path) }}" alt="{{ similar.activityName }}" class="card-img-top">
+                  {% else %}
+                    <div class="d-flex align-items-center justify-content-center h-100 bg-light">
+                      <span class="text-muted">No image</span>
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">{{ similar.activityName }}</h5>
+                  <p class="card-text text-truncate">{{ similar.activityDescription|striptags }}</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-primary fw-bold">{{ similar.activityPrice|number_format(2) }} TND</span>
+                    <a href="{{ path('app_activities_details', {'id': similar.id}) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          
-          <input type="hidden" name="totalPrice" id="hiddenTotalPrice" value="{{ activity.activityPrice|number_format(2) }}">
-          
-          <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary btn-lg">
-              <i class="fa fa-shopping-cart me-2"></i> Book Now
-            </button>
-          </div>
-        </form>
-        
-        <div class="mt-3 text-center">
-          <div class="d-flex align-items-center justify-content-center mb-2">
-            <i class="fa fa-lock text-success me-2"></i>
-            <span class="small">Secure payment process</span>
-          </div>
-          <div class="d-flex align-items-center justify-content-center">
-            <i class="fa fa-calendar-check text-primary me-2"></i>
-            <span class="small">Free cancellation up to 24 hours before</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Owner card -->
-      <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
-        <h3 class="text-primary mb-4 border-bottom pb-2">Activity Provider</h3>
-        <div class="text-center mb-3">
-          <div style="width: 80px; height: 80px; margin: 0 auto; background-color: #0d2857; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; font-weight: bold;">
-            T
-          </div>
-        </div>
-        <h5 class="text-center mb-3">TuniHire</h5>
-        <div class="d-flex justify-content-center mb-3">
-          <div class="me-2">
-            <i class="fa fa-star text-warning"></i>
-            <i class="fa fa-star text-warning"></i>
-            <i class="fa fa-star text-warning"></i>
-            <i class="fa fa-star text-warning"></i>
-            <i class="fa fa-star text-warning"></i>
-          </div>
-          <span class="small text-muted">(4.9) · 120 reviews</span>
-        </div>
-        <div class="d-grid gap-2">
-          <button class="btn btn-outline-primary">
-            <i class="fa fa-envelope me-2"></i> Contact Provider
-          </button>
+          {% endfor %}
         </div>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- Similar Activities Section -->
-<div class="container mb-5">
-  <h2 class="text-primary mb-4">Similar Activities</h2>
-  <div class="row g-4">
-    <!-- Example similar activities - these should be dynamically generated -->
-    {% for i in 1..4 %}
-      <div class="col-md-6 col-lg-3">
-        <div class="card h-100 shadow-sm border-0 rounded-4 position-relative">
-          <div class="position-absolute top-0 end-0 m-2">
-            <span class="badge bg-primary">Trending</span>
-          </div>
-          {% if activity.resources is not empty and activity.resources[0] is defined %}
-            <img src="{{ asset(activity.resources[0].path) }}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="Similar Activity">
-          {% else %}
-            <img src="{{ asset('assets/img/activities/default.jpg') }}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="Similar Activity">
-          {% endif %}
-          <div class="card-body">
-            <h5 class="card-title">Similar Activity {{ i }}</h5>
-            <p class="card-text text-muted small">{{ activity.activityDestination }}</p>
-            <div class="d-flex justify-content-between align-items-center mt-3">
-              <div class="me-2">
-                <i class="fa fa-star text-warning"></i>
-                <span class="small text-muted">4.7 (15)</span>
-              </div>
-              <div class="text-primary fw-bold">{{ activity.activityPrice }} TND</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
+    {% endif %}
   </div>
 </div>
 
@@ -370,6 +330,15 @@
     }
   });
 </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const progressBar = document.querySelector('.progress-bar');
+    const percentBooked = progressBar.getAttribute('data-percent');
+    progressBar.style.width = `${percentBooked}%`;
+  });
+</script>
+
 {% endblock %}
 
 {% block stylesheets %}
@@ -378,8 +347,86 @@
   /* Activity details page custom styles */
   .hero-section {
     margin-top: 80px;
+    background-color: #f8f9fa;
   }
   
+  /* Gallery Styles */
+  .gallery-container {
+    overflow: hidden;
+  }
+  
+  .main-image-container {
+    height: 400px;
+    overflow: hidden;
+  }
+  
+  .main-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .thumbnails-container {
+    display: flex;
+    flex-direction: column;
+    height: 400px;
+  }
+  
+  .thumbnail-item {
+    height: 25%;
+    overflow: hidden;
+  }
+  
+  .thumbnail-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .more-overlay {
+    position: relative;
+  }
+  
+  .more-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Similar Activities */
+  .similar-img-container {
+    height: 180px;
+    overflow: hidden;
+  }
+  
+  .similar-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Provider */
+  .provider-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    background-color: #0d2857;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+  }
+  
+  /* Description */
   .activity-description {
     line-height: 1.8;
   }
@@ -400,10 +447,36 @@
     font-weight: 500;
   }
   
+  /* Responsive Adjustments */
   @media (max-width: 767px) {
     .sticky-top {
       position: relative !important;
       top: 0 !important;
+    }
+    
+    .main-image-container, 
+    .main-image-container img {
+      height: 250px;
+    }
+    
+    .thumbnails-container {
+      height: auto;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    
+    .thumbnail-item {
+      width: 50%;
+      height: 100px;
+    }
+    
+    .thumbnail-item img {
+      height: 100%;
+    }
+    
+    .carousel-item img {
+      height: 300px;
+      object-fit: contain;
     }
   }
 </style>
