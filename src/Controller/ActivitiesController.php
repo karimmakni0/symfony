@@ -424,8 +424,14 @@ class ActivitiesController extends AbstractController
             throw $this->createNotFoundException('Activity not found');
         }
         
-        // Get participants count from form
+        // Get participants and totalPrice from request (POST)
         $participants = $request->request->getInt('participants', 1);
+        $totalPrice = $request->request->get('totalPrice');
+        
+        // Calculate unit price from activity (for safety)
+        $unitPrice = $activity->getActivityPrice();
+        // Optionally, recalculate totalPrice to prevent tampering
+        $totalPrice = $participants * $unitPrice;
         
         // Validate participants count
         $totalBookedTickets = $this->billetRepository->getTotalBookedTicketsForActivity($id);
@@ -435,10 +441,6 @@ class ActivitiesController extends AbstractController
             $this->addFlash('error', 'Invalid number of participants');
             return $this->redirectToRoute('app_client_activity_detail', ['id' => $id]);
         }
-        
-        // Calculate total price
-        $unitPrice = $activity->getActivityPrice();
-        $totalPrice = $participants * $unitPrice;
         
         // Process form submission for credit card payment
         if ($request->isMethod('POST') && $request->request->has('payment_submit')) {

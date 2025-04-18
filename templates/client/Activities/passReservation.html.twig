@@ -160,61 +160,30 @@
         <div class="bg-white rounded-4 px-30 py-30 shadow-3">
           <h3 class="text-22 fw-500 mb-30">Payment Details</h3>
           
-          <form method="POST" action="" id="paymentForm">
+          <form method="post" action="" id="paymentForm">
+            <input type="hidden" name="participants" value="{{ participants }}">
+            <input type="hidden" name="totalPrice" value="{{ totalPrice }}">
             <div class="row y-gap-20">
               <div class="col-12">
-                <div class="form-input">
-                  <input type="text" name="card_name" required>
-                  <label class="lh-1 text-16 text-light-1">Cardholder Name</label>
-                </div>
+                <label class="lh-1 text-16 text-light-1">Name on Card</label>
+                <input type="text" name="card_name" required>
               </div>
-              
               <div class="col-12">
-                <div class="form-input">
-                  <input type="text" name="card_number" required maxlength="19" id="cardNumber">
-                  <label class="lh-1 text-16 text-light-1">Card Number</label>
-                </div>
+                <label class="lh-1 text-16 text-light-1">Card Number</label>
+                <input type="text" name="card_number" required maxlength="19" id="cardNumber">
               </div>
-              
               <div class="col-md-6">
-                <div class="form-input">
-                  <input type="text" name="expiry_date" required placeholder="MM/YY" maxlength="5" id="expiryDate">
-                  <label class="lh-1 text-16 text-light-1">Expiry Date</label>
-                </div>
+                <label class="lh-1 text-16 text-light-1">Expiry Date</label>
+                <input type="text" name="expiry_date" required placeholder="MM/YY" maxlength="5" id="expiryDate">
               </div>
-              
               <div class="col-md-6">
-                <div class="form-input">
-                  <input type="text" name="cvv" required maxlength="3" id="cvvCode">
-                  <label class="lh-1 text-16 text-light-1">CVV Code</label>
-                </div>
+                <label class="lh-1 text-16 text-light-1">CVV Code</label>
+                <input type="text" name="cvv" required maxlength="3" id="cvvCode">
               </div>
-              
-              <div class="col-12 mt-20">
-                <div class="row y-gap-20 items-center justify-between">
-                  <div class="col-auto">
-                    <div class="text-14">We accept:</div>
-                  </div>
-                  <div class="col-auto">
-                    <div class="d-flex x-gap-20 items-center">
-                      <div><i class="icon-mastercard text-24"></i></div>
-                      <div><i class="icon-visa text-24"></i></div>
-                      <div><i class="icon-paypal text-24"></i></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
               <div class="col-12 mt-20">
                 <button type="submit" name="payment_submit" value="1" class="button -md -dark-1 bg-blue-1 text-white w-100">
                   Complete Reservation <i class="icon-arrow-right ml-10"></i>
                 </button>
-              </div>
-              
-              <div class="col-12 mt-20">
-                <div class="text-14 text-center text-light-1">
-                  By clicking "Complete Reservation" you agree to our <a href="#" class="text-blue-1">terms & conditions</a>.
-                </div>
               </div>
             </div>
           </form>

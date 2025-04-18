@@ -44,13 +44,13 @@
 
   <main>
     {% block header %}
-    <header data-add-bg="bg-dark-1" class="header js-header" data-x="header" data-x-toggle="is-menu-opened">
+    <header data-add-bg="bg-dark-1" class="header js-header" style="background-color: #0d2857 !important;" data-x="header" data-x-toggle="is-menu-opened">
       <div data-anim="fade" class="header__container container">
         <div class="row justify-between items-center">
 
           <div class="col-auto">
             <div class="d-flex items-center">
-              <a href="{{ path('app_home') }}" class="header-logo mr-20" data-x="header-logo" data-x-toggle="is-logo-dark">
+              <a href="{{ path('app_home') }}" class="header-logo mr-20 text-white" data-x="header-logo" data-x-toggle="is-logo-dark">
                 <img src="{{ asset('assets/img/general/logo-light.svg') }}" alt="logo icon">
                 <img src="{{ asset('assets/img/general/logo-dark.svg') }}" alt="logo icon">
               </a>
@@ -71,51 +71,51 @@
                     <ul class="menu__nav text-white -is-active">
 
                       <li>
-                        <a href="{{ path('app_home') }}">
+                        <a href="{{ path('app_home') }}" class="text-white">
                           Home
                         </a>
                       </li>
                       <li>
-                        <a href="{{ path('app_destinations') }}">
+                        <a href="{{ path('app_destinations') }}" class="text-white">
                           Destinations
                         </a>
                       </li>
                       <li>
-                        <a href="{{ path('app_blog_index') }}">
+                        <a href="{{ path('app_blog_index') }}" class="text-white">
                           Blog
                         </a>
                       </li>
                       <li class="menu-item-has-children">
-                        <a data-barba href="#">
+                        <a data-barba href="#" class="text-white">
                           <span class="mr-10">Activities</span>
                           <i class="icon icon-chevron-sm-down"></i>
                         </a>
                         <ul class="subnav">
                           <li class="subnav__backBtn js-nav-list-back">
-                            <a href="#"><i class="icon icon-chevron-sm-down"></i>Activities</a>
+                            <a href="#" class="text-white"><i class="icon icon-chevron-sm-down"></i>Activities</a>
                           </li>
-                          <li><a href="{{ path('app_activities') }}">Activities List</a></li>
-                          <li><a href="#">Activities Map</a></li>
+                          <li><a href="{{ path('app_activities') }}" class="text-white">Activities List</a></li>
+                          <li><a href="#" class="text-white">Activities Map</a></li>
                         </ul>
                       </li>
                      
                       <li class="menu-item-has-children">
-                        <a data-barba href="#">
+                        <a data-barba href="#" class="text-white">
                           <span class="mr-10">About</span>
                           <i class="icon icon-chevron-sm-down"></i>
                         </a>
                         <ul class="subnav">
                           <li class="subnav__backBtn js-nav-list-back">
-                            <a href="#"><i class="icon icon-chevron-sm-down"></i> About</a>
+                            <a href="#" class="text-white"><i class="icon icon-chevron-sm-down"></i> About</a>
                           </li>
-                          <li><a href="#">About Us</a></li>
-                          <li><a href="#">Help center</a></li>
-                          <li><a href="#">Terms & Conditions</a></li>
+                          <li><a href="#" class="text-white">About Us</a></li>
+                          <li><a href="#" class="text-white">Help center</a></li>
+                          <li><a href="#" class="text-white">Terms & Conditions</a></li>
                         </ul>
 
                       </li>
                       <li>
-                        <a href="#">Contact</a>
+                        <a href="#" class="text-white">Contact</a>
                       </li>
                     </ul>
                   </div>
