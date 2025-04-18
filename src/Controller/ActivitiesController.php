@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Stripe;
 
 class ActivitiesController extends AbstractController
 {
@@ -450,65 +451,97 @@ class ActivitiesController extends AbstractController
             if (empty($cardNumber) || empty($cardName) || empty($expiryDate) || empty($cvv)) {
                 $this->addFlash('error', 'Please fill in all payment details');
             } else {
-                // Create a new billet and reservation
                 try {
-                    // Begin transaction
-                    $this->entityManager->beginTransaction();
+                    // Process payment with Stripe
+                    $paymentProcessed = $this->processStripePayment($cardNumber, $cardName, $expiryDate, $cvv, $totalPrice);
                     
-                    // 1. Create the billet (ticket) with explicit billetId
-                    $billet = new Billet();
-                    $billet->setActiviteId($activity->getId());
-                    $billet->setPrix($unitPrice);
-                    $billet->setNb($participants);
-                    $billet->setNumero('TICKET-' . uniqid());
-                    
-                    // Save billet to database
-                    $this->entityManager->persist($billet);
-                    $this->entityManager->flush(); // This generates the billet ID
-                    
-                    // Get the ID of the newly created billet
-                    $billetId = $billet->getId();
-                    
-                    if (!$billetId) {
-                        throw new \Exception('Failed to generate Billet ID');
+                    if (!$paymentProcessed) {
+                        $this->addFlash('error', 'Payment processing failed. Please try again.');
+                        return $this->render('client/Activities/passReservation.html.twig', [
+                            'activity' => $activity,
+                            'participants' => $participants,
+                            'totalPrice' => $totalPrice,
+                            'user' => $user
+                        ]);
                     }
                     
-                    // 2. Create the reservation using raw SQL to avoid ORM issues with primary keys
-                    $userId = $user->getId();
-                    $dateAchat = date('Y-m-d H:i:s');
-                    $statut = 'pending';
-                    
-                    $conn = $this->entityManager->getConnection();
-                    $sql = "INSERT INTO reservation (dateAchat, userId, billetId, nombre, prixTotal, prixUnite, statuts) 
-                           VALUES (:dateAchat, :userId, :billetId, :nombre, :prixTotal, :prixUnite, :statuts)";
-                    
-                    $stmt = $conn->prepare($sql);
-                    $stmt->executeQuery([
-                        'dateAchat' => $dateAchat,
-                        'userId' => $userId,
-                        'billetId' => $billetId,
-                        'nombre' => $participants,
-                        'prixTotal' => $totalPrice,
-                        'prixUnite' => $unitPrice,
-                        'statuts' => $statut
-                    ]);
-                    
-                    // Success message
-                    $this->addFlash('success', 'Your reservation was successful! Ticket number: ' . $billet->getNumero());
-                    
-                    // Commit transaction
-                    $this->entityManager->commit();
-                    
-                    // Redirect to confirmation page or back to activities
-                    return $this->redirectToRoute('app_activities');
+                    try {
+                        // Begin transaction
+                        $this->entityManager->beginTransaction();
+                        
+                        // 1. Create the billet (ticket)
+                        $billet = new Billet();
+                        $billet->setActiviteId($activity->getId());
+                        $billet->setPrix($unitPrice);
+                        $billet->setNb($participants);
+                        $billet->setNumero('TICKET-' . uniqid());
+                        
+                        // Save billet to database and get its ID
+                        $this->entityManager->persist($billet);
+                        $this->entityManager->flush();
+                        
+                        // Get a fresh instance of the billet to ensure we have the correct ID
+                        $billetId = $billet->getId();
+                        if (!$billetId) {
+                            throw new \Exception("Failed to generate a valid billet ID");
+                        }
+                        
+                        // Get a fresh user instance
+                        $freshUser = $this->entityManager->getRepository(Users::class)->find($user->getId());
+                        if (!$freshUser) {
+                            throw new \Exception("User not found");
+                        }
+                        
+                        // Refresh the entity manager to ensure clean state
+                        $this->entityManager->clear();
+                        
+                        // Get fresh instances after clearing
+                        $billet = $this->entityManager->getRepository(Billet::class)->find($billetId);
+                        
+                        // 2. Create the reservation using Doctrine entities
+                        $reservation = new Reservation();
+                        $reservation->setUser($freshUser);
+                        $reservation->setBillet($billet);
+                        $reservation->setDateAchat(date('Y-m-d H:i:s'));
+                        $reservation->setNombre($participants);
+                        $reservation->setPrixTotal($totalPrice);
+                        $reservation->setPrixUnite($unitPrice);
+                        $reservation->setStatuts('confirmed'); // Set as confirmed since payment was processed
+                        
+                        // Save reservation to database
+                        $this->entityManager->persist($reservation);
+                        $this->entityManager->flush();
+                        
+                        // Success message
+                        $this->addFlash('success', 'Your reservation was successful! Ticket number: ' . $billet->getNumero());
+                        
+                        // Commit transaction
+                        $this->entityManager->commit();
+                        
+                        // Redirect to booking history page instead of activities
+                        return $this->redirectToRoute('app_user_reservation_history');
+                    } catch (\Exception $e) {
+                        // Roll back the transaction on error
+                        if ($this->entityManager->getConnection()->isTransactionActive()) {
+                            $this->entityManager->rollback();
+                        }
+                        
+                        // Log the error
+                        error_log('Reservation error: ' . $e->getMessage());
+                        
+                        // Show the detailed error message for debugging
+                        $this->addFlash('error', 'Error: ' . $e->getMessage());
+                        
+                        return $this->render('client/Activities/passReservation.html.twig', [
+                            'activity' => $activity,
+                            'participants' => $participants,
+                            'totalPrice' => $totalPrice,
+                            'user' => $user
+                        ]);
+                    }
                 } catch (\Exception $e) {
-                    // Roll back the transaction on error
-                    if ($this->entityManager->getConnection()->isTransactionActive()) {
-                        $this->entityManager->rollback();
-                    }
-                    
                     // Log the error
-                    error_log('Reservation error: ' . $e->getMessage());
+                    error_log('Payment error: ' . $e->getMessage());
                     
                     // Show the actual error message for debugging
                     $this->addFlash('error', 'Error: ' . $e->getMessage());
@@ -522,5 +555,40 @@ class ActivitiesController extends AbstractController
             'totalPrice' => $totalPrice,
             'user' => $user
         ]);
+    }
+
+    /**
+     * Process payment with Stripe
+     */
+    private function processStripePayment($cardNumber, $cardName, $expiryDate, $cvv, $amount)
+    {
+        try {
+            // Set your secret key directly 
+            Stripe\Stripe::setApiKey('sk_test_51QWkPJDv0oob45G0dizhQzmMeUY6LcdW8POzhvJ6jJ0Mv9Do9GS2WC7XAq3ZDufBCaJuGRbaYl7NrtoyJxpgdx5d00FIR9nfuJ');
+            
+            // For testing purposes, we'll use a test token
+            // In production, you would generate tokens client-side using Stripe.js
+            $testToken = 'tok_visa'; // This represents a successful Visa card payment
+            
+            // Create charge using the test token
+            $charge = Stripe\Charge::create([
+                'amount' => (int)($amount * 100), // Convert to cents and ensure it's an integer
+                'currency' => 'usd', // Using USD for test tokens
+                'source' => $testToken,
+                'description' => 'Activity reservation',
+            ]);
+            
+            return $charge->status === 'succeeded';
+        } catch (\Stripe\Exception\CardException $e) {
+            // Card declined
+            error_log('Stripe CardException: ' . $e->getMessage());
+            $this->addFlash('error', 'Payment failed: ' . $e->getMessage());
+            return false;
+        } catch (\Exception $e) {
+            // Other error
+            error_log('Stripe Error: ' . $e->getMessage());
+            $this->addFlash('error', 'Payment processing error: ' . $e->getMessage());
+            return false;
+        }
     }
 }

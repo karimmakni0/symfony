@@ -79,7 +79,7 @@
                 {% for resource in activity.resources %}
                   <div class="carousel-item {% if loop.first %}active{% endif %}">
                     <div class="ratio ratio-16:9">
-                      <img src="{{ asset(resource.path) }}" alt="{{ activity.activityName }}" class="img-cover w-100 activity-image">
+                      <img src="{{ asset(resource.path) }}" alt="{{ activity.activityName }}" class="img-cover w-100 activity-image" data-bs-toggle="modal" data-bs-target="#imageModal{{ loop.index }}">
                     </div>
                   </div>
                 {% endfor %}
@@ -95,6 +95,23 @@
                 </button>
               {% endif %}
             </div>
+            
+            <!-- Image Modals for enlarged view -->
+            {% for resource in activity.resources %}
+              <div class="modal fade" id="imageModal{{ loop.index }}" tabindex="-1" aria-labelledby="imageModalLabel{{ loop.index }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-xl">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="imageModalLabel{{ loop.index }}">{{ activity.activityName }}</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                      <img src="{{ asset(resource.path) }}" alt="{{ activity.activityName }}" class="activity-modal-image">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
           {% endif %}
         </div>
       </div>
@@ -409,11 +426,13 @@
     height: 500px;
     object-fit: cover;
     object-position: center;
+    cursor: pointer;
   }
   
   .activity-image-container {
     width: 100%;
-    height: 500px;
+    height: auto;
+    max-height: 500px;
     overflow: hidden;
     position: relative;
   }
@@ -421,7 +440,14 @@
   .activity-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+  }
+  
+  .activity-modal-image {
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    object-fit: contain;
   }
   
   @media (max-width: 767px) {
