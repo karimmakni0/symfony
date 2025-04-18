@@ -18,6 +18,23 @@
   <title>{% block title %}GoTrip{% endblock %}</title>
   
   {% block stylesheets %}
+  <style>
+    /* Fix for navbar submenus - white text on white background issue */
+    .menu-item-has-children .subnav {
+      background-color: #0d2857 !important;
+    }
+    
+    .menu-item-has-children .subnav li a:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* Fix for mobile menu */
+    @media (max-width: 991px) {
+      .menu__nav .subnav {
+        background-color: #0d2857 !important;
+      }
+    }
+  </style>
   {% endblock %}
 </head>
 

@@ -103,6 +103,9 @@
                       <td>
                         <div class="d-flex x-gap-5">
                           {% if item.reservation.statuts != 'cancelled' %}
+                            <a href="{{ path('app_client_reservation_ticket', {'id': item.billet.id}) }}" class="btn btn-sm btn-success me-2" title="Download Ticket">
+                              <i class="icon-ticket text-14 mr-5"></i> Ticket
+                            </a>
                             <a href="{{ path('app_reservation_cancel', {'id': item.reservation.id}) }}" 
                                onclick="return confirm('Are you sure you want to cancel this reservation?')"
                                class="size-35 flex-center rounded-4 bg-red-3 text-white" 

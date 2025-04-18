@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Ticket #{{ billet.numero }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .ticket {
+            width: 100%;
+            border: 2px solid #0d2857;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .ticket-header {
+            background-color: #0d2857;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .ticket-body {
+            padding: 20px;
+        }
+        .ticket-info {
+            margin-bottom: 20px;
+        }
+        .ticket-footer {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 150px;
+            height: auto;
+        }
+        .activity-image {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .activity-image img {
+            max-width: 100%;
+            height: auto;
+            max-height: 200px;
+            border-radius: 8px;
+        }
+        .qrcode {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .qrcode img {
+            max-width: 150px;
+            height: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        table th {
+            text-align: left;
+            font-weight: bold;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .status-confirmed {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #664d03;
+        }
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+        .barcode {
+            text-align: center;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            font-size: 16px;
+        }
+        .heading {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #0d2857;
+        }
+        .subheading {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #666;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .divider {
+            border-top: 1px dashed #ccc;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket">
+        <div class="ticket-header">
+            <h1>Travel Ticket</h1>
+            <h2>Booking #{{ billet.numero }}</h2>
+        </div>
+        
+        <div class="ticket-body">
+            <div class="logo">
+                <h2 style="color: #0d2857; margin: 0;">GoTrip</h2>
+                <p>Your Adventure Awaits</p>
+            </div>
+            
+            <div class="heading text-center">{{ activity.activityName }}</div>
+            <div class="subheading text-center">{{ activity.activityDestination }}</div>
+            
+            {% if activityImage %}
+            <div class="activity-image">
+                <img src="{{ absolute_url(asset(activityImage)) }}" alt="{{ activity.activityName }}">
+            </div>
+            {% endif %}
+            
+            <div class="ticket-info">
+                <table>
+                    <tr>
+                        <th>Passenger Name:</th>
+                        <td>{{ user.name }} {{ user.lastname }}</td>
+                    </tr>
+                    <tr>
+                        <th>Booking Date:</th>
+                        <td>{{ reservation.dateAchat|date('d M Y') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Number of Participants:</th>
+                        <td>{{ reservation.nombre }}</td>
+                    </tr>
+                    <tr>
+                        <th>Price per Participant:</th>
+                        <td>{{ reservation.prixUnite }} TND</td>
+                    </tr>
+                    <tr>
+                        <th>Total Price:</th>
+                        <td>{{ reservation.prixTotal }} TND</td>
+                    </tr>
+                    <tr>
+                        <th>Status:</th>
+                        <td>
+                            <span class="status status-{% if reservation.statuts == 'confirmed' %}confirmed{% elseif reservation.statuts == 'pending' %}pending{% else %}cancelled{% endif %}">
+                                {{ reservation.statuts|capitalize }}
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="qrcode">
+                <img src="{{ qrCode }}" alt="Ticket QR Code">
+                <div class="barcode">{{ billet.numero }}</div>
+            </div>
+            
+            <div class="ticket-footer">
+                <p><strong>Important Information:</strong></p>
+                <p>Please present this ticket (printed or digital) at the activity venue. This serves as proof of your booking.</p>
+                <p>Issue Date: {{ issueDate|date('d M Y H:i') }}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

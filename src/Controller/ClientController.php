@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Activities;
 use App\Entity\Billet;
 use App\Entity\Users;
+use App\Entity\Reservation;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -14,6 +15,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Color\Color;
 
 #[Route('/client')]
 class ClientController extends AbstractController
@@ -178,5 +187,109 @@ class ClientController extends AbstractController
         }
         
         return $this->redirectToRoute('app_client_profile');
+    }
+
+    /**
+     * Generate PDF ticket with QR code for a booking
+     */
+    #[Route('/reservations/ticket/{id}', name: 'app_client_reservation_ticket')]
+    public function generateTicket(int $id, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Find the billet
+        $billet = $entityManager->getRepository(Billet::class)->find($id);
+        if (!$billet) {
+            $this->addFlash('error', 'Ticket not found.');
+            return $this->redirectToRoute('app_client');
+        }
+        
+        // Find the reservation associated with this billet
+        $reservation = $entityManager->getRepository(Reservation::class)->findOneBy(['billet' => $billet]);
+        if (!$reservation) {
+            $this->addFlash('error', 'Reservation not found for this ticket.');
+            return $this->redirectToRoute('app_client');
+        }
+        
+        // Check if the reservation belongs to this user
+        if ($reservation->getUser()->getId() !== $user->getId()) {
+            $this->addFlash('error', 'You do not have permission to access this ticket.');
+            return $this->redirectToRoute('app_client');
+        }
+
+        // Get the activity associated with this reservation
+        $activity = $entityManager->getRepository(Activities::class)->find($billet->getActiviteId());
+        if (!$activity) {
+            $this->addFlash('error', 'Activity not found for this reservation.');
+            return $this->redirectToRoute('app_client');
+        }
+
+        // Generate QR code with ticket information
+        $ticketData = json_encode([
+            'ticket_id' => $billet->getNumero(),
+            'activity' => $activity->getActivityName(),
+            'date' => $reservation->getDateAchat(),
+            'participants' => $reservation->getNombre(),
+            'total_price' => $reservation->getPrixTotal(),
+            'status' => $reservation->getStatuts(),
+            'user_name' => $user->getName() . ' ' . $user->getLastname(),
+        ]);
+
+        // Create QR code (using proper instantiation for version 6.0.7)
+        $qrCode = new QrCode($ticketData);
+        $qrCode->setSize(300);
+        $qrCode->setMargin(10);
+        $qrCode->setForegroundColor(new Color(0, 0, 0));
+        $qrCode->setBackgroundColor(new Color(255, 255, 255));
+        $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::HIGH));
+        $qrCode->setEncoding(new Encoding('UTF-8'));
+        $qrCode->setRoundBlockSizeMode(new RoundBlockSizeMode(RoundBlockSizeMode::MARGIN));
+
+        // Create writer
+        $writer = new PngWriter();
+        
+        // Write QR code to data URI
+        $qrDataUri = $writer->write($qrCode)->getDataUri();
+
+        // Get Activity image if available
+        $activityImage = null;
+        if ($activity->getResources() && count($activity->getResources()) > 0) {
+            $activityImage = $activity->getResources()[0]->getPath();
+        }
+
+        // Render the ticket template
+        $html = $this->renderView('client/reservations/ticket_pdf.html.twig', [
+            'billet' => $billet,
+            'reservation' => $reservation,
+            'activity' => $activity,
+            'user' => $user,
+            'qrCode' => $qrDataUri,
+            'activityImage' => $activityImage,
+            'issueDate' => new \DateTime(),
+        ]);
+
+        // Configure PDF options
+        $options = new Options();
+        $options->set('defaultFont', 'Arial');
+        $options->setIsRemoteEnabled(true);
+
+        // Create PDF
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Stream the PDF as a downloadable file
+        return new Response(
+            $dompdf->output(),
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="ticket-' . $billet->getNumero() . '.pdf"'
+            ]
+        );
     }
 }
