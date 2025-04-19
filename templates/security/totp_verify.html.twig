@@ -18,13 +18,10 @@
               </div>
             </div>
 
-            {% if error %}
-                <div class="col-12">
-                    <div class="alert alert-danger rounded-4 py-10 px-15 bg-red-3 text-red-2">
-                        {{ error }}
-                    </div>
-                </div>
-            {% endif %}
+            <!-- Status Messages -->
+            <div id="statusAlert" class="col-12" style="display:none;">
+                <div id="statusAlertContent" class="alert rounded-4 py-10 px-15"></div>
+            </div>
 
             <div class="col-12 text-center mt-10">
                 <div class="d-flex align-items-center justify-center" style="margin: 30px 0">
@@ -35,33 +32,138 @@
                 </div>
                 <h3 class="text-18 fw-500">Enter the 6-digit verification code</h3>
                 <p class="mt-10 text-15">Open Google Authenticator and enter the code shown for {{ email }}</p>
+                <p class="mt-5 text-14 text-danger">Make sure to enter the current code as it changes every 30 seconds</p>
             </div>
 
-            <form action="{{ path('app_totp_verify') }}" method="post" class="row y-gap-20">
-                <div class="col-12">
-                    <div class="form-input">
-                        <input type="text" name="totp_code" class="has-value text-center" style="letter-spacing: 5px; font-size: 20px;" placeholder=" " required autofocus>
-                        <label class="lh-1 text-14 text-light-1">6-Digit Code</label>
+            <div class="col-12">
+                <div class="form-input">
+                    <input type="text" id="totpCode" class="has-value text-center" style="letter-spacing: 5px; font-size: 20px;" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder=" " required autofocus>
+                    <label class="lh-1 text-14 text-light-1">6-Digit Code</label>
+                </div>
+                <input type="hidden" id="userId" value="{{ user_id }}">
+            </div>
+
+            <div class="col-12 d-flex justify-center mt-15">
+                <button type="button" id="verifyButton" class="button py-20 -dark-1 bg-blue-1 text-white w-100" style="max-width: 80%; min-width: 300px;">
+                    <span class="fw-500 text-16" id="buttonText">Verify and Continue</span>
+                    <div class="icon-arrow-top-right ml-15"></div>
+                    <div id="loadingSpinner" class="spinner-border spinner-border-sm text-white ml-10" role="status" style="display: none;">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-                </div>
+                </button>
+            </div>
+            
+            <div class="col-12 text-center mt-10">
+                <p class="text-15">This code changes every 30 seconds</p>
+            </div>
 
-                <input type="hidden" name="user_id" value="{{ user_id }}">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-                <div class="col-12 d-flex justify-center mt-15">
-                    <button type="submit" class="button py-20 -dark-1 bg-blue-1 text-white w-100" style="max-width: 80%; min-width: 300px;">
-                        <span class="fw-500 text-16">Verify and Continue</span>
-                        <div class="icon-arrow-top-right ml-15"></div>
-                    </button>
-                </div>
-                
-                <div class="col-12 text-center mt-10">
-                    <p class="text-15">This code changes every 30 seconds</p>
-                </div>
-            </form>
+            <div class="col-12 text-center mt-10">
+                <a href="{{ path('app_login') }}" class="text-14 text-blue-1">Cancel and return to login</a>
+            </div>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    var codeInputEl = document.getElementById('totpCode');
+    var verifyButton = document.getElementById('verifyButton');
+    var buttonText = document.getElementById('buttonText');
+    var loadingSpinner = document.getElementById('loadingSpinner');
+    var statusAlert = document.getElementById('statusAlert');
+    var statusAlertContent = document.getElementById('statusAlertContent');
+    var userId = document.getElementById('userId').value;
+    
+    // Focus on input
+    if (codeInputEl) {
+        codeInputEl.focus();
+        
+        // Only allow digits
+        codeInputEl.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    }
+    
+    // Button click handler
+    verifyButton.addEventListener('click', function() {
+        verifyCode();
+    });
+    
+    // Enter key handler
+    codeInputEl.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            verifyCode();
+        }
+    });
+    
+    // Verify code function
+    function verifyCode() {
+        var code = codeInputEl.value.trim();
+        
+        // Validate code
+        if (code.length !== 6) {
+            showStatus('Please enter a 6-digit code', 'error');
+            return;
+        }
+        
+        // Show loading state
+        buttonText.textContent = "Verifying...";
+        loadingSpinner.style.display = 'inline-block';
+        verifyButton.disabled = true;
+        
+        // Create the form element - IMPORTANT: Use the POST verification endpoint
+        var formEl = document.createElement('form');
+        formEl.method = 'POST';
+        formEl.action = '/login/totp-verify'; // Direct URL to ensure it goes to the POST route
+        formEl.style.display = 'none';
+        
+        // Create user ID input field
+        var userIdField = document.createElement('input');
+        userIdField.type = 'hidden';
+        userIdField.name = 'user_id';
+        userIdField.value = userId;
+        formEl.appendChild(userIdField);
+        
+        // Create code input field
+        var codeField = document.createElement('input');
+        codeField.type = 'hidden';
+        codeField.name = 'totp_code';
+        codeField.value = code;
+        formEl.appendChild(codeField);
+        
+        // Add form to document
+        document.body.appendChild(formEl);
+        
+        // Submit form
+        formEl.submit();
+    }
+    
+    // Show status message
+    function showStatus(message, type) {
+        statusAlertContent.textContent = message;
+        statusAlertContent.className = 'alert rounded-4 py-10 px-15';
+        
+        if (type === 'error') {
+            statusAlertContent.classList.add('bg-red-3', 'text-red-2');
+        } else if (type === 'success') {
+            statusAlertContent.classList.add('bg-green-1', 'text-white');
+        } else {
+            statusAlertContent.classList.add('bg-blue-1', 'text-white');
+        }
+        
+        statusAlert.style.display = 'block';
+    }
+    
+    // Reset form
+    function resetForm() {
+        buttonText.textContent = "Verify and Continue";
+        loadingSpinner.style.display = 'none';
+        verifyButton.disabled = false;
+        codeInputEl.focus();
+    }
+});
+</script>
 {% endblock %}
