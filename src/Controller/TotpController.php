@@ -42,10 +42,30 @@ class TotpController extends AbstractController
      */
     public function setupTotp(int $id): Response
     {
+        // Check if there's a pending registration
+        $pendingUserId = $this->session->get('pending_registration_id');
+        if (!$pendingUserId || $pendingUserId != $id) {
+            // If no pending registration or ID mismatch, redirect to register
+            return $this->redirectToRoute('app_register');
+        }
+        
         $user = $this->usersRepository->find($id);
         
         if (!$user) {
-            throw $this->createNotFoundException('User not found');
+            // If user not found, clear session and redirect to register
+            $this->session->remove('pending_registration_id');
+            $this->session->remove('registration_email');
+            return $this->redirectToRoute('app_register');
+        }
+        
+        // Ensure user is not yet enabled
+        if ($user->isEnabled()) {
+            // Account already active, redirect to login
+            $this->session->remove('pending_registration_id');
+            $this->session->remove('registration_email');
+            
+            $this->addFlash('info', 'Your account is already active. Please log in.');
+            return $this->redirectToRoute('app_login');
         }
         
         // Generate a new TOTP secret if the user doesn't have one
@@ -62,6 +82,7 @@ class TotpController extends AbstractController
             'qr_code' => $qrCodeUri,
             'totp_secret' => $user->getTotpSecret(),
             'user_id' => $user->getId(),
+            'email' => $user->getEmail(),
             'error' => null
         ]);
     }
@@ -76,24 +97,43 @@ class TotpController extends AbstractController
         $userId = $request->request->get('user_id');
         $code = $request->request->get('totp_code');
         
+        // Check if this matches our pending registration
+        $pendingUserId = $this->session->get('pending_registration_id');
+        if (!$pendingUserId || $pendingUserId != $userId) {
+            // If no pending registration or ID mismatch, redirect to register
+            return $this->redirectToRoute('app_register');
+        }
+        
         if (!$userId || !$code) {
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_totp_setup', ['id' => $pendingUserId]);
         }
         
         $user = $this->usersRepository->find($userId);
         
         if (!$user) {
-            throw $this->createNotFoundException('User not found');
+            // If user not found, clear session and redirect to register
+            $this->session->remove('pending_registration_id');
+            $this->session->remove('registration_email');
+            $this->addFlash('error', 'Registration session expired. Please try again.');
+            return $this->redirectToRoute('app_register');
         }
         
         // Verify the TOTP code
         if ($this->totpService->verifyCode($user, $code)) {
             // Enable TOTP for the user
             $user->setTotpEnabled(true);
+            
+            // Enable the user account - registration is now complete
+            $user->setEnabled(true);
+            
             $this->entityManager->flush();
             
+            // Clear registration session data
+            $this->session->remove('pending_registration_id');
+            $this->session->remove('registration_email');
+            
             // Add a flash message
-            $this->addFlash('success', 'Two-factor authentication set up successfully. You can now log in.');
+            $this->addFlash('success', 'Two-factor authentication set up successfully. Your account is now active. You can now log in.');
             
             // Redirect to login
             return $this->redirectToRoute('app_login');
@@ -104,7 +144,8 @@ class TotpController extends AbstractController
             'qr_code' => $this->totpService->getQrCodeUri($user),
             'totp_secret' => $user->getTotpSecret(),
             'user_id' => $user->getId(),
-            'error' => 'Invalid verification code. Please try again.'
+            'email' => $user->getEmail(),
+            'error' => 'Invalid verification code. Please try again. Make sure you scanned the QR code correctly with Google Authenticator.'
         ]);
     }
     
@@ -122,8 +163,15 @@ class TotpController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
         
+        $user = $this->usersRepository->find($userId);
+        if (!$user) {
+            $this->session->remove('totp_user_id');
+            return $this->redirectToRoute('app_login');
+        }
+        
         return $this->render('security/totp_verify.html.twig', [
             'user_id' => $userId,
+            'email' => $user->getEmail(),
             'error' => $request->query->get('error')
         ]);
     }
@@ -138,6 +186,12 @@ class TotpController extends AbstractController
         $userId = $request->request->get('user_id');
         $code = $request->request->get('totp_code');
         
+        // Check if this matches our session user ID
+        $sessionUserId = $this->session->get('totp_user_id');
+        if (!$sessionUserId || $sessionUserId != $userId) {
+            return $this->redirectToRoute('app_login');
+        }
+        
         if (!$userId || !$code) {
             return $this->redirectToRoute('app_login');
         }
@@ -145,7 +199,15 @@ class TotpController extends AbstractController
         $user = $this->usersRepository->find($userId);
         
         if (!$user) {
-            throw $this->createNotFoundException('User not found');
+            $this->session->remove('totp_user_id');
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Make sure user is enabled - otherwise login should not be allowed
+        if (!$user->isEnabled()) {
+            $this->session->remove('totp_user_id');
+            $this->addFlash('error', 'Your account has not been activated. Please complete the registration process first.');
+            return $this->redirectToRoute('app_login');
         }
         
         // Verify the TOTP code
@@ -165,7 +227,7 @@ class TotpController extends AbstractController
         
         // Invalid code, show error
         return $this->redirectToRoute('app_totp_verify_page', [
-            'error' => 'Invalid verification code. Please try again.'
+            'error' => 'Invalid verification code. Please try again with the current code from your Google Authenticator app.'
         ]);
     }
 }

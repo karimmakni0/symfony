@@ -12,6 +12,7 @@
                         <div class="col-12">
                             <h1 class="text-22 fw-500">Sign in or create an account</h1>
                             <p class="mt-10">Already have an account? <a href="{{ path('app_login') }}" class="text-blue-1">Log in</a></p>
+                            <p class="mt-5 text-15 text-light-1">Registration includes setting up 2-step verification for extra security.</p>
                         </div>
 
                         {% for message in app.flashes('success') %}
@@ -92,6 +93,13 @@
                             </div>
 
                             <div class="col-12">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-security text-18 text-blue-1 mr-10"></div>
+                                    <div class="text-15 lh-15">This account requires Google Authenticator for 2-step verification. You'll set it up in the next step.</div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
                                 <div class="d-flex">
                                     <div class="form-checkbox mt-5">
                                         <input type="checkbox" name="newsletter">
@@ -105,7 +113,7 @@
                             </div>
 
                                 <button type="submit" class="button py-20 -dark-1 bg-blue-1 text-white w-100">
-                                    Register <div class="icon-arrow-top-right ml-15"></div>
+                                    Register & Set Up Verification <div class="icon-arrow-top-right ml-15"></div>
                                 </button>
                         </form>
 

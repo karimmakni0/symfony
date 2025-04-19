@@ -12,6 +12,7 @@
             <div class="col-12 text-center">
               <h1 class="text-30 fw-600">Welcome Back</h1>
               <p class="mt-10">Don't have an account yet? <a href="{{ path('app_register') }}" class="text-blue-1 fw-500">Sign up for free</a></p>
+              <p class="mt-5 text-15 text-light-1">This account is protected with two-factor authentication</p>
             </div>
 
             {% if error %}
@@ -30,6 +31,14 @@
                 </div>
             {% endif %}
 
+            {% for message in app.flashes('success') %}
+                <div class="col-12">
+                    <div class="alert alert-success rounded-4 py-10 px-15 bg-green-1 text-white">
+                        {{ message }}
+                    </div>
+                </div>
+            {% endfor %}
+
             <form action="{{ path('app_login') }}" method="post" class="row y-gap-20">
                 <div class="col-12">
                     <div class="form-input">
@@ -42,6 +51,13 @@
                     <div class="form-input">
                         <input type="password" name="password" class="has-value" placeholder=" " required>
                         <label class="lh-1 text-14 text-light-1">Password</label>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-security text-18 text-blue-1 mr-10"></div>
+                        <div class="text-15 lh-15">After entering your password, you'll be asked for a verification code from your Google Authenticator app</div>
                     </div>
                 </div>
 

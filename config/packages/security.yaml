@@ -46,6 +46,9 @@ security:
         - { path: ^/publicator, roles: ROLE_PUBLICATOR }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/register/totp-setup, roles: PUBLIC_ACCESS }
+        - { path: ^/register/totp-verify, roles: PUBLIC_ACCESS }
+        - { path: ^/login/totp-verify, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: PUBLIC_ACCESS }
 
 when@test:

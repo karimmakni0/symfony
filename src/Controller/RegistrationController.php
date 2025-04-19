@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -18,17 +19,20 @@ class RegistrationController extends AbstractController
     private $usersRepository;
     private $passwordHasher;
     private $totpService;
+    private $session;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         UsersRepository $usersRepository,
         UserPasswordHasherInterface $passwordHasher,
-        TotpService $totpService
+        TotpService $totpService,
+        SessionInterface $session
     ) {
         $this->entityManager = $entityManager;
         $this->usersRepository = $usersRepository;
         $this->passwordHasher = $passwordHasher;
         $this->totpService = $totpService;
+        $this->session = $session;
     }
 
     /**
@@ -39,6 +43,12 @@ class RegistrationController extends AbstractController
         // If user is logged in, redirect
         if ($this->getUser()) {
             return $this->redirectToRoute('app_home');
+        }
+
+        // If there's a pending registration in session, redirect to TOTP setup
+        if ($this->session->has('pending_registration_id')) {
+            $userId = $this->session->get('pending_registration_id');
+            return $this->redirectToRoute('app_totp_setup', ['id' => $userId]);
         }
 
         // Display the registration form for GET request
@@ -57,6 +67,11 @@ class RegistrationController extends AbstractController
         $confirmPassword = $request->request->get('confirm_password');
 
         // Validation
+        if (!$name || !$lastname || !$email) {
+            $this->addFlash('error', 'All required fields must be filled');
+            return $this->redirectToRoute('app_register');
+        }
+
         if (!$password || strlen($password) < 6) {
             $this->addFlash('error', 'Password must be at least 6 characters long');
             return $this->redirectToRoute('app_register');
@@ -108,9 +123,16 @@ class RegistrationController extends AbstractController
             $user->setTotpSecret($totpSecret);
             $user->setTotpEnabled(false); // Not enabled until verified
             
-            // Save user to database
+            // Important: Set user as disabled until OTP verification is complete
+            $user->setEnabled(false);
+            
+            // Save user to database as a temporary account
             $this->entityManager->persist($user);
             $this->entityManager->flush();
+
+            // Store the user ID in session for the next step
+            $this->session->set('pending_registration_id', $user->getId());
+            $this->session->set('registration_email', $user->getEmail());
 
             // Redirect to TOTP setup page
             return $this->redirectToRoute('app_totp_setup', ['id' => $user->getId()]);
