@@ -8,6 +8,7 @@ use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use App\Entity\Users;
+use ParagonIE\ConstantTime\Base32;
 
 class TotpService
 {
@@ -18,7 +19,9 @@ class TotpService
      */
     public function generateSecret(): string
     {
-        return trim(TOTP::generateSecret(32));
+        // Use random_bytes instead of the protected TOTP::generateSecret()
+        $secretKey = random_bytes(32);
+        return trim(Base32::encodeUpper($secretKey));
     }
 
     /**
