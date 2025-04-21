@@ -563,64 +563,128 @@ class BlogController extends AbstractController
         // Convert image to base64
         $imageData = base64_encode(file_get_contents($imageFile->getPathname()));
         
-        // Build the prompt
+        // Build a more structured prompt with detailed instructions
         $activityName = $activity->getActivityName();
         $activityDestination = $activity->getActivityDestination();
-        $prompt = "Response only with a description for a blog in the picture as adventure for activity {$activityName} in {$activityDestination} in a viving way and creative";
+        $prompt = "Create an engaging and vivid travel blog post about {$activityName} in {$activityDestination} based on the uploaded image.
+
+IMPORTANT: Respond ONLY with the blog content. Do not include any introductions or explanations.
+
+Your blog post should:
+1. Have a catchy title in bold (using Markdown **Title**)
+2. Be 2-3 paragraphs long (200-300 words)
+3. Include specific details about {$activityName} that are visible in the image
+4. Incorporate the location ({$activityDestination}) naturally in the narrative
+5. Use an enthusiastic, first-person perspective
+6. Evoke emotions and sensory details (sights, sounds, feelings)
+7. End with a compelling reason for readers to try this activity
+
+REMEMBER: Return ONLY the formatted blog content without any introductory text like 'Here's a blog post' or 'Okay, here's a description.'";
         
-        // Call the Gemini API
-        try {
-            $apiKey = $_ENV['GEMINI_API_KEY']; // Read API key from environment
-            
-            // Update to use the current Gemini API endpoint and model
-            $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1/models/gemini-pro-vision:generateContent', [
-                'query' => [
-                    'key' => $apiKey
-                ],
-                'json' => [
-                    'contents' => [
-                        [
-                            'role' => 'user',
-                            'parts' => [
-                                [
-                                    'text' => $prompt
-                                ],
-                                [
-                                    'inline_data' => [
-                                        'mime_type' => $imageFile->getMimeType(),
-                                        'data' => $imageData
+        // Try three different model endpoints to see which one works - using latest v1beta API
+        $modelEndpoints = [
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent',
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-vision:generateContent'
+        ];
+        
+        $apiResponse = null;
+        $lastError = null;
+        
+        // Try each endpoint until one works
+        foreach ($modelEndpoints as $endpoint) {
+            try {
+                $this->logger->info('Trying Gemini endpoint', ['endpoint' => $endpoint]);
+                
+                $apiKey = $_ENV['GEMINI_API_KEY']; // Read API key from environment
+                
+                // Log the request details for debugging (without sensitive data)
+                $this->logger->info('Sending request to Gemini API', [
+                    'model' => 'gemini-pro-vision',
+                    'imageType' => $imageFile->getMimeType(),
+                    'prompt' => $prompt
+                ]);
+                
+                $response = $this->httpClient->request('POST', $endpoint, [
+                    'query' => [
+                        'key' => $apiKey
+                    ],
+                    'json' => [
+                        'contents' => [
+                            [
+                                'parts' => [
+                                    [
+                                        'text' => $prompt
+                                    ],
+                                    [
+                                        'inline_data' => [
+                                            'mime_type' => $imageFile->getMimeType(),
+                                            'data' => $imageData
+                                        ]
                                     ]
                                 ]
                             ]
+                        ],
+                        'generation_config' => [
+                            'temperature' => 0.4,
+                            'max_output_tokens' => 800
                         ]
-                    ],
-                    'generation_config' => [
-                        'temperature' => 0.4,
-                        'max_output_tokens' => 800
                     ]
-                ]
-            ]);
-            
-            $data = $response->toArray();
-            
-            // Add debugging output
-            $this->logger->info('Gemini API Response', ['data' => $data]);
-            
-            // Extract and return the generated content from the new API structure
-            if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-                $generatedContent = $data['candidates'][0]['content']['parts'][0]['text'];
-                return new JsonResponse(['content' => $generatedContent]);
-            } else if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-                // Alternative response structure
-                $generatedContent = $data['candidates'][0]['content']['parts'][0]['text'];
-                return new JsonResponse(['content' => $generatedContent]);
-            } else {
-                // Log the full response for debugging
-                $this->logger->error('Unexpected Gemini API response structure', ['data' => $data]);
-                return new JsonResponse(['error' => 'Could not generate content from image. Unexpected response format.'], Response::HTTP_BAD_REQUEST);
+                ]);
+                
+                $statusCode = $response->getStatusCode();
+                if ($statusCode === 200) {
+                    $apiResponse = $response;
+                    $this->logger->info('Successful endpoint found', ['endpoint' => $endpoint]);
+                    break;
+                } else {
+                    $lastError = "Received status code {$statusCode} from {$endpoint}";
+                    $this->logger->warning('API returned non-200 status', [
+                        'endpoint' => $endpoint,
+                        'status' => $statusCode,
+                        'response' => $response->getContent(false)
+                    ]);
+                }
+            } catch (\Exception $e) {
+                $lastError = $e->getMessage();
+                $this->logger->warning('Exception when trying endpoint', [
+                    'endpoint' => $endpoint,
+                    'error' => $e->getMessage()
+                ]);
             }
-        } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'API Error: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        
+        // If no successful response was found
+        if (!$apiResponse) {
+            return new JsonResponse([
+                'error' => "API Error: Could not connect to any Gemini endpoint. Last error: {$lastError}"
+            ], Response::HTTP_BAD_GATEWAY);
+        }
+        
+        $response = $apiResponse;
+        
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            $this->logger->error('Gemini API returned non-200 status code', [
+                'status' => $statusCode,
+                'response' => $response->getContent(false)
+            ]);
+            return new JsonResponse(['error' => "API Error: Received status code {$statusCode}"], Response::HTTP_BAD_GATEWAY);
+        }
+        
+        $data = $response->toArray();
+        
+        // Add debugging output
+        $this->logger->info('Gemini API Response', ['data' => $data]);
+        
+        // Extract and return the generated content from the new API structure
+        if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+            $generatedContent = $data['candidates'][0]['content']['parts'][0]['text'];
+            return new JsonResponse(['content' => $generatedContent]);
+        } else {
+            // Log the full response for debugging
+            $this->logger->error('Unexpected Gemini API response structure', ['data' => $data]);
+            return new JsonResponse(['error' => 'Could not generate content from image. Unexpected response format.'], Response::HTTP_BAD_REQUEST);
         }
     }
 }

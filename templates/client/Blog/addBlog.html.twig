@@ -246,6 +246,12 @@
     console.log('Blog image input found:', blogImageInput);
     console.log('Blog content area found:', blogContentArea);
     
+    // Debug form elements more extensively
+    var allTextareas = document.querySelectorAll('textarea');
+    console.log('All textareas on page:', allTextareas);
+    var formContent = document.querySelector('textarea[name="post_form[description]"]');
+    console.log('Content textarea by name:', formContent);
+    
     if (generateButton) {
       generateButton.addEventListener('click', function(e) {
         e.preventDefault(); // Prevent form submission
@@ -366,12 +372,16 @@
         showLoadingModal();
         
         // Send API request
-        fetch('{{ path('app_blog_generate_content') }}', 
+        fetch(
+          '{{ path('blog_generate_content') }}', 
           { 
             method: 'POST', 
             body: formData, 
             cache: 'no-cache', 
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
           }
         )
         .then(function(response) {
@@ -382,13 +392,48 @@
           
           if (data.error) {
             showErrorModal(data.error);
-          } else if (data.content && blogContentArea) {
-            // Insert generated content into the editor
-            blogContentArea.value = data.content;
+          } else if (data.content) {
+            // Try multiple approaches to find the content field
+            var contentField = blogContentArea || 
+                              document.querySelector('textarea[name="post_form[description]"]') || 
+                              document.querySelector('textarea');
             
-            // Trigger focus/blur event to activate the label animation
-            if (blogContentArea.value.trim() !== '') {
-              blogContentArea.classList.add('is-active');
+            console.log('Using content field:', contentField);
+            
+            if (contentField) {
+              // Insert generated content into the editor
+              contentField.value = data.content;
+              console.log('Content set to:', contentField.value.substring(0, 50) + '...');
+              
+              // Trigger focus/blur event to activate the label animation
+              if (contentField.value.trim() !== '') {
+                contentField.classList.add('is-active');
+                
+                // Focus the field to ensure it's visible to the user
+                contentField.focus();
+                // Scroll to the content field
+                contentField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Show success notification
+                var successMessage = document.createElement('div');
+                successMessage.className = 'alert alert-success mb-20 mt-20';
+                successMessage.innerHTML = '<div class="px-20 py-15 bg-green-1 rounded-4"><h5 class="text-white fw-500">Content successfully generated! You can now publish your blog post.</h5></div>';
+                
+                // Insert the success message before the form
+                var formElement = document.getElementById('blog-form');
+                if (formElement && formElement.parentNode) {
+                  formElement.parentNode.insertBefore(successMessage, formElement);
+                  
+                  // Remove the message after 5 seconds
+                  setTimeout(function() {
+                    if (successMessage.parentNode) {
+                      successMessage.parentNode.removeChild(successMessage);
+                    }
+                  }, 5000);
+                }
+              }
+            } else {
+              showErrorModal('Could not find the content field to insert the generated text. Please copy it manually: ' + data.content);
             }
           }
         })

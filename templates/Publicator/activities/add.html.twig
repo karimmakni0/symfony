@@ -41,7 +41,7 @@
         </div>
     </div>
     
-    {{ form_start(form, {'attr': {'class': 'row y-gap-30 justify-center', 'enctype': 'multipart/form-data'}}) }}
+    {{ form_start(form, {'attr': {'class': 'row y-gap-30 justify-center', 'enctype': 'multipart/form-data', 'id': 'activity-form'}}) }}
     <div class="col-xl-9 col-lg-10">
         <div class="row x-gap-20 y-gap-30">
             <div class="col-12">
@@ -117,6 +117,41 @@
             </div>
 
             <div class="col-12">
+                <div class="location-picker-container bg-light-2 rounded-4 px-20 py-20">
+                    <h5 class="text-15 fw-500">Select Activity Location</h5>
+                    <div id="mapbox-container" style="width: 100%; height: 350px;"></div>
+                    
+                    <div class="mt-10 d-flex flex-column">
+                        <div id="coordinates-display" class="my-10 p-10 bg-blue-1 rounded-4 text-white">
+                            <div class="fw-500">Selected Location:</div>
+                            <div class="d-flex gap-10 mt-5">
+                                <div class="flex-grow-1">
+                                    <label class="form-label">Latitude</label>
+                                    <input id="debug-lat" type="text" class="form-control" value="48.8566">
+                                </div>
+                                <div class="flex-grow-1">
+                                    <label class="form-label">Longitude</label>
+                                    <input id="debug-lng" type="text" class="form-control" value="2.3522">
+                                </div>
+                            </div>
+                            <div class="mt-10">
+                                <button type="button" id="update-from-debug" class="btn btn-sm btn-primary w-100">Set These Coordinates</button>
+                            </div>
+                        </div>
+                        
+                        <div id="debug-output" class="my-10 p-10 bg-dark-1 rounded-4 text-white" style="height: 100px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                            Debug log will appear here...
+                        </div>
+                    </div>
+
+                    <div class="d-none">
+                        {{ form_widget(form.latitude, {'attr': {'id': 'hidden-latitude', 'name': 'activity_form[latitude]'}}) }}
+                        {{ form_widget(form.longitude, {'attr': {'id': 'hidden-longitude', 'name': 'activity_form[longitude]'}}) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
                 {{ form_label(form.activity_images, 'Activity Images', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
                 <span class="text-danger">*</span>
                 <div class="mt-10 rounded-4 px-30 py-30 border border-light bg-white">
@@ -155,58 +190,374 @@
 {% endblock %}
 
 {% block javascripts %}
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Image upload handling elements
         const imageUpload = document.getElementById('imageUpload');
         const previewsContainer = document.getElementById('previewsContainer');
         const imageCountContainer = document.getElementById('imageCountContainer');
-        const countSpan = imageCountContainer.querySelector('span');
+        const countSpan = imageCountContainer?.querySelector('span');
         
-        imageUpload.addEventListener('change', function() {
-            // Clear previous previews
-            previewsContainer.innerHTML = '';
-            
-            if (this.files && this.files.length > 0) {
-                countSpan.textContent = `${this.files.length} file(s) selected`;
-                imageCountContainer.classList.remove('d-none');
-                
-                // Create preview for each selected file
-                for (let i = 0; i < this.files.length; i++) {
-                    const file = this.files[i];
-                    
-                    if (file.type.match('image.*')) {
-                        const reader = new FileReader();
-                        
-                        reader.onload = function(e) {
-                            const previewCol = document.createElement('div');
-                            previewCol.className = 'col-md-3 col-sm-6 mb-15';
-                            
-                            const previewCard = document.createElement('div');
-                            previewCard.className = 'border rounded-4 p-10 h-100 d-flex flex-column';
-                            
-                            const previewImg = document.createElement('img');
-                            previewImg.src = e.target.result;
-                            previewImg.className = 'w-100 rounded-4';
-                            previewImg.style.height = '100px';
-                            previewImg.style.objectFit = 'cover';
-                            
-                            const imageName = document.createElement('div');
-                            imageName.className = 'text-14 mt-5 text-center text-truncate';
-                            imageName.textContent = file.name;
-                            
-                            previewCard.appendChild(previewImg);
-                            previewCard.appendChild(imageName);
-                            previewCol.appendChild(previewCard);
-                            previewsContainer.appendChild(previewCol);
-                        }
-                        
-                        reader.readAsDataURL(file);
-                    }
-                }
-            } else {
-                imageCountContainer.classList.add('d-none');
+        // ========================
+        // DEBUG OUTPUT - Remove any existing debug
+        // ========================
+        const debugOutput = document.getElementById('debug-output');
+        if (debugOutput) {
+            debugOutput.innerHTML = '';
+        }
+        
+        // Create debug log function
+        function logDebug(message) {
+            console.log(message);
+            if (debugOutput) {
+                const now = new Date();
+                const timeStr = now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
+                const logLine = document.createElement('div');
+                logLine.textContent = `[${timeStr}] ${message}`;
+                debugOutput.appendChild(logLine);
+                debugOutput.scrollTop = debugOutput.scrollHeight;
             }
+        }
+        
+        // Get form elements for coordinates
+        const activityForm = document.getElementById('activity-form');
+        const hiddenLatitude = document.getElementById('hidden-latitude');
+        const hiddenLongitude = document.getElementById('hidden-longitude');
+        
+        // Get debug elements for direct input
+        const debugLatInput = document.getElementById('debug-lat');
+        const debugLngInput = document.getElementById('debug-lng');
+        const updateFromDebugBtn = document.getElementById('update-from-debug');
+        
+        // ========================
+        // MAP INITIALIZATION
+        // ========================
+        
+        // Set API token
+        logDebug('Setting Mapbox token...');
+        mapboxgl.accessToken = "{{ app.request.server.get('MAPBOX_API')|default('pk.eyJ1IjoibmloZWR4dG4iLCJhIjoiY205cmNmNDZoMHc3bTJpczQ3b3FodWVibCJ9.MBPaL38J-sYOaaw2BUQO0Q') }}";
+        
+        logDebug('Creating map...');
+        
+        // Create map - starting at a different location (Paris) to avoid Tunisia default
+        const map = new mapboxgl.Map({
+            container: 'mapbox-container',
+            style: 'mapbox://styles/mapbox/satellite-streets-v12',
+            center: [2.3522, 48.8566], // Paris coordinates - deliberately not Tunisia
+            zoom: 10,
+            pitch: 45,
+            bearing: 0
         });
+        
+        // ========================
+        // COORDINATE HANDLING
+        // ========================
+        
+        // Function to sync from map to form
+        function syncCoordinatesFromMap() {
+            if (!map || !map.getCenter) {
+                logDebug('Error: Map not initialized properly');
+                return;
+            }
+            
+            try {
+                const center = map.getCenter();
+                const lat = center.lat.toFixed(6);
+                const lng = center.lng.toFixed(6);
+                
+                logDebug(`Map center: ${lat}, ${lng}`);
+                
+                // Update visible inputs
+                if (debugLatInput && debugLngInput) {
+                    debugLatInput.value = lat;
+                    debugLngInput.value = lng;
+                    logDebug('Updated debug inputs');
+                } else {
+                    logDebug('Debug inputs not found');
+                }
+                
+                // Update hidden form fields
+                if (hiddenLatitude && hiddenLongitude) {
+                    hiddenLatitude.value = lat;
+                    hiddenLongitude.value = lng;
+                    logDebug('Updated hidden fields');
+                } else {
+                    logDebug('Hidden fields not found');
+                }
+                
+                return { lat, lng };
+            } catch (e) {
+                logDebug('Error getting map center: ' + e.message);
+            }
+        }
+        
+        // Update map from manually entered coordinates
+        function syncMapFromInputs() {
+            try {
+                const lat = parseFloat(debugLatInput.value);
+                const lng = parseFloat(debugLngInput.value);
+                
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    logDebug(`Moving map to: ${lat}, ${lng}`);
+                    
+                    map.flyTo({
+                        center: [lng, lat],
+                        zoom: 12
+                    });
+                    
+                    // Update hidden form fields directly
+                    if (hiddenLatitude && hiddenLongitude) {
+                        hiddenLatitude.value = lat.toFixed(6);
+                        hiddenLongitude.value = lng.toFixed(6);
+                        logDebug('Updated hidden fields directly');
+                    }
+                } else {
+                    logDebug('Invalid coordinates entered');
+                }
+            } catch (e) {
+                logDebug('Error updating map: ' + e.message);
+            }
+        }
+        
+        // Force update hidden fields from debug fields
+        function forceUpdateHiddenFields() {
+            if (hiddenLatitude && hiddenLongitude && debugLatInput && debugLngInput) {
+                try {
+                    // Directly set values
+                    hiddenLatitude.value = debugLatInput.value;
+                    hiddenLongitude.value = debugLngInput.value;
+                    
+                    // Log what we've set
+                    logDebug(`Force-updated hidden fields: ${hiddenLatitude.value}, ${hiddenLongitude.value}`);
+                } catch (e) {
+                    logDebug('Error force updating fields: ' + e.message);
+                }
+            }
+        }
+        
+        // ========================
+        // MAP SETUP AND EVENTS
+        // ========================
+        
+        // Add basic controls
+        logDebug('Adding map controls...');
+        map.addControl(new mapboxgl.NavigationControl());
+        
+        // Create marker at map center
+        const marker = new mapboxgl.Marker({
+            color: "#FF0000",
+            draggable: true
+        }).setLngLat([2.3522, 48.8566])
+          .addTo(map);
+          
+        // Update coordinates when marker is dragged
+        marker.on('dragend', function() {
+            const lngLat = marker.getLngLat();
+            debugLatInput.value = lngLat.lat.toFixed(6);
+            debugLngInput.value = lngLat.lng.toFixed(6);
+            forceUpdateHiddenFields();
+            logDebug(`Marker dragged to: ${lngLat.lat.toFixed(6)}, ${lngLat.lng.toFixed(6)}`);
+        });
+        
+        // Try to add geocoder if available
+        try {
+            if (typeof MapboxGeocoder !== 'undefined') {
+                logDebug('Adding Mapbox geocoder...');
+                const geocoder = new MapboxGeocoder({
+                    accessToken: mapboxgl.accessToken,
+                    mapboxgl: mapboxgl,
+                    marker: false
+                });
+                map.addControl(geocoder);
+                
+                // Add event listener for geocoder results
+                geocoder.on('result', function(e) {
+                    logDebug('Geocoder result received');
+                    marker.setLngLat(e.result.center);
+                    setTimeout(function() {
+                        const coords = syncCoordinatesFromMap();
+                        logDebug(`Updated after geocoder: ${coords.lat}, ${coords.lng}`);
+                    }, 500);
+                });
+            } else {
+                logDebug('MapboxGeocoder not available, skipping geocoder');
+            }
+        } catch (e) {
+            logDebug('Error initializing geocoder: ' + e.message);
+        }
+        
+        // Map initialization and terrain
+        map.on('load', function() {
+            logDebug('Map loaded');
+            
+            try {
+                // Add 3D terrain
+                map.addSource('mapbox-dem', {
+                    'type': 'raster-dem',
+                    'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+                    'tileSize': 512,
+                    'maxzoom': 14
+                });
+                
+                map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+                logDebug('3D terrain added');
+            } catch (e) {
+                logDebug('Error adding terrain: ' + e.message);
+            }
+            
+            // Set initial coordinates
+            const coords = syncCoordinatesFromMap();
+            logDebug(`Initial coordinates set: ${coords?.lat}, ${coords?.lng}`);
+            
+            // Update marker position to match map center
+            marker.setLngLat(map.getCenter());
+        });
+        
+        // When map moves, update marker position
+        map.on('move', function() {
+            marker.setLngLat(map.getCenter());
+        });
+        
+        // Update coordinates when map stops moving
+        map.on('moveend', function() {
+            const coords = syncCoordinatesFromMap();
+            logDebug(`Map moved to: ${coords?.lat}, ${coords?.lng}`);
+        });
+        
+        // ========================
+        // BUTTON LISTENERS
+        // ========================
+        
+        // Update coordinates from manual input
+        if (updateFromDebugBtn) {
+            updateFromDebugBtn.addEventListener('click', function() {
+                logDebug('Manual update button clicked');
+                syncMapFromInputs();
+                forceUpdateHiddenFields();
+            });
+        }
+        
+        // Listen for direct input changes
+        if (debugLatInput && debugLngInput) {
+            debugLatInput.addEventListener('change', forceUpdateHiddenFields);
+            debugLngInput.addEventListener('change', forceUpdateHiddenFields);
+        }
+        
+        // ========================
+        // FORM SUBMISSION
+        // ========================
+        
+        // Handle form submission
+        if (activityForm) {
+            activityForm.addEventListener('submit', function(e) {
+                // Final force update of hidden fields
+                forceUpdateHiddenFields();
+                
+                // Get final values
+                const finalLat = hiddenLatitude.value;
+                const finalLng = hiddenLongitude.value;
+                
+                logDebug(`Form submission - Final coordinates: ${finalLat}, ${finalLng}`);
+                
+                // Ensure the form fields are valid for submission
+                let isValid = true;
+                let errorMessage = '';
+                
+                // Check for empty coordinates
+                if (!finalLat || !finalLng) {
+                    isValid = false;
+                    errorMessage = 'Coordinates cannot be empty. Please select a location on the map.';
+                    logDebug('ERROR: Empty coordinates detected');
+                } 
+                // Check for default Paris coordinates
+                else if (finalLat === '48.8566' && finalLng === '2.3522') {
+                    isValid = false;
+                    errorMessage = 'Please select a specific location for your activity. The coordinates are still set to the default Paris location.';
+                    logDebug('ERROR: Default Paris coordinates detected');
+                }
+                // Check for default Tunisia coordinates 
+                else if (finalLat === '36.800000' && finalLng === '10.180000') {
+                    isValid = false;
+                    errorMessage = 'Please select a specific location for your activity. The coordinates are still set to the default Tunisia location.';
+                    logDebug('ERROR: Default Tunisia coordinates detected');
+                }
+                
+                // If form is not valid, prevent submission and show error
+                if (!isValid) {
+                    e.preventDefault();
+                    alert(errorMessage);
+                    return false;
+                }
+                
+                // All checks passed, allow form submission
+                logDebug('FORM SUBMISSION ALLOWED - Coordinates valid: ' + finalLat + ', ' + finalLng);
+                
+                // Double check that the hidden fields have been updated
+                const formData = new FormData(activityForm);
+                logDebug('FORM DATA: latitude=' + formData.get('activity_form[latitude]') + ', longitude=' + formData.get('activity_form[longitude]'));
+                
+                return true;
+            });
+        }
+        
+        // ========================
+        // IMAGE UPLOAD HANDLING
+        // ========================
+        
+        // Image upload handling
+        if (imageUpload) {
+            imageUpload.addEventListener('change', function() {
+                // Clear previous previews
+                if (previewsContainer) previewsContainer.innerHTML = '';
+                
+                if (this.files && this.files.length > 0 && countSpan) {
+                    countSpan.textContent = `${this.files.length} file(s) selected`;
+                    imageCountContainer.classList.remove('d-none');
+                    
+                    // Create preview for each selected file
+                    for (let i = 0; i <this.files.length; i++) {
+                        const file = this.files[i];
+                        
+                        if (file.type.match('image.*')) {
+                            const reader = new FileReader();
+                            
+                            reader.onload = function(e) {
+                                if (!previewsContainer) return;
+                                
+                                const previewCol = document.createElement('div');
+                                previewCol.className = 'col-md-3 col-sm-6 mb-15';
+                                
+                                const previewCard = document.createElement('div');
+                                previewCard.className = 'border rounded-4 p-10 h-100 d-flex flex-column';
+                                
+                                const previewImg = document.createElement('img');
+                                previewImg.src = e.target.result;
+                                previewImg.className = 'w-100 rounded-4';
+                                previewImg.style.height = '100px';
+                                previewImg.style.objectFit = 'cover';
+                                
+                                const imageName = document.createElement('div');
+                                imageName.className = 'text-14 mt-5 text-center text-truncate';
+                                imageName.textContent = file.name;
+                                
+                                previewCard.appendChild(previewImg);
+                                previewCard.appendChild(imageName);
+                                previewCol.appendChild(previewCard);
+                                previewsContainer.appendChild(previewCol);
+                            }
+                            
+                            reader.readAsDataURL(file);
+                        }
+                    }
+                } else if (imageCountContainer) {
+                    imageCountContainer.classList.add('d-none');
+                }
+            });
+        }
     });
 </script>
 <style>

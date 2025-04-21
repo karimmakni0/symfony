@@ -164,6 +164,32 @@ class ActivityFormType extends AbstractType
                     ]),
                 ],
             ])
+            ->add('latitude', TextType::class, [
+                'label' => 'Latitude',
+                'required' => true,
+                'attr' => [
+                    'class' => 'border-light location-field',
+                    'readonly' => true,
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Latitude is required. Please select a location on the map.',
+                    ]),
+                ],
+            ])
+            ->add('longitude', TextType::class, [
+                'label' => 'Longitude',
+                'required' => true,
+                'attr' => [
+                    'class' => 'border-light location-field',
+                    'readonly' => true,
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Longitude is required. Please select a location on the map.',
+                    ]),
+                ],
+            ])
             ->add('activity_images', FileType::class, [
                 'label' => 'Activity Images',
                 'mapped' => false,

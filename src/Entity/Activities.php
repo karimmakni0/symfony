@@ -53,6 +53,12 @@ class Activities
     #[ORM\Column(type: "integer", nullable: true)]
     private $max_number;
 
+    #[ORM\Column(type: "decimal", precision: 10, scale: 8, nullable: true)]
+    private $latitude;
+
+    #[ORM\Column(type: "decimal", precision: 11, scale: 8, nullable: true)]
+    private $longitude;
+
     public function __construct()
     {
         $this->created_at = new \DateTime();
@@ -239,6 +245,30 @@ class Activities
     public function setMaxNumber(?int $max_number): self
     {
         $this->max_number = $max_number;
+
+        return $this;
+    }
+
+    public function getLatitude(): ?string
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?string $latitude): self
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    public function getLongitude(): ?string
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?string $longitude): self
+    {
+        $this->longitude = $longitude;
 
         return $this;
     }
