@@ -9,6 +9,7 @@ use App\Form\CommentFormType;
 use App\Repository\PostRepository;
 use App\Repository\UsersRepository;
 use App\Repository\CommentRepository;
+use App\Repository\BlogRatingRepository;
 use App\Repository\ActivitiesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,6 +28,7 @@ class BlogController extends AbstractController
     private $commentRepository;
     private $usersRepository;
     private $activitiesRepository;
+    private $blogRatingRepository;
     private $security;
 
     public function __construct(
@@ -35,6 +37,7 @@ class BlogController extends AbstractController
         CommentRepository $commentRepository,
         UsersRepository $usersRepository,
         ActivitiesRepository $activitiesRepository,
+        BlogRatingRepository $blogRatingRepository,
         Security $security
     ) {
         $this->entityManager = $entityManager;
@@ -42,6 +45,7 @@ class BlogController extends AbstractController
         $this->commentRepository = $commentRepository;
         $this->usersRepository = $usersRepository;
         $this->activitiesRepository = $activitiesRepository;
+        $this->blogRatingRepository = $blogRatingRepository;
         $this->security = $security;
     }
 
@@ -90,6 +94,13 @@ class BlogController extends AbstractController
         foreach ($activities as $activity) {
             $activitiesById[$activity->getId()] = $activity;
         }
+        
+        // Get rating statistics for all posts
+        $postIds = array_map(function($post) {
+            return $post->getId();
+        }, $posts);
+        
+        $ratingStats = $this->blogRatingRepository->getRatingStatsForPosts($postIds);
 
         return $this->render('client/Blog/index.html.twig', [
             'posts' => $posts,
@@ -98,7 +109,8 @@ class BlogController extends AbstractController
             'activitiesById' => $activitiesById,
             'selectedActivityId' => $activityId,
             'myBlogsOnly' => $myBlogsOnly,
-            'currentUserId' => $userId
+            'currentUserId' => $userId,
+            'ratingStats' => $ratingStats
         ]);
     }
 
@@ -123,74 +135,81 @@ class BlogController extends AbstractController
         }
 
         // Get comments for this post
-        $comments = $this->commentRepository->findBy(['postId' => $id], ['date' => 'DESC']);
-
-        // Get users for the comments
+        $comments = $this->commentRepository->findBy(['postId' => $id], ['date' => 'ASC']);
+        
+        // Get users for displaying comment author names
         $commentUserIds = array_map(function($comment) {
             return $comment->getUserId();
         }, $comments);
-
-        $commentUsers = $this->usersRepository->findBy(['id' => array_unique($commentUserIds ? $commentUserIds : [0])]);
+        
+        $commentUsers = $this->usersRepository->findBy(['id' => array_unique($commentUserIds)]);
         $commentUsersById = [];
         foreach ($commentUsers as $user) {
             $commentUsersById[$user->getId()] = $user;
         }
 
-        // Check if current user is the post author (for edit/delete permissions)
-        $isAuthor = false;
-        $currentUser = $this->security->getUser();
-        if ($currentUser && $post->getUserId() === $currentUser->getId()) {
-            $isAuthor = true;
-        }
-        
-        // Create a new comment instance and form
+        // Create form for new comment
         $newComment = new Comment();
         $newComment->setPostId($id);
-        if ($currentUser) {
-            $newComment->setUserId($currentUser->getId());
-        }
-        
-        $commentForm = $this->createForm(CommentFormType::class, $newComment, [
-            'action' => $this->generateUrl('app_blog_comment_add', ['postId' => $id]),
-            'method' => 'POST',
-        ]);
-        
+        $commentForm = $this->createForm(CommentFormType::class, $newComment);
         $commentForm->handleRequest($request);
         
-        // Create edit forms for each comment
-        $editForms = [];
-        foreach ($comments as $comment) {
-            if ($currentUser && $currentUser->getId() === $comment->getUserId()) {
-                $editForm = $this->createForm(CommentFormType::class, $comment, [
-                    'action' => $this->generateUrl('app_blog_comment_edit', ['id' => $comment->getId()]),
-                    'method' => 'POST',
-                ]);
-                $editForms[$comment->getId()] = $editForm->createView();
+        // Handle comment form submission
+        if ($commentForm->isSubmitted() && $commentForm->isValid()) {
+            $user = $this->security->getUser();
+            if (!$user) {
+                return $this->redirectToRoute('app_login');
             }
+            
+            $newComment->setUserId($user->getId());
+            $newComment->setDate(new \DateTime());
+            
+            $this->entityManager->persist($newComment);
+            $this->entityManager->flush();
+            
+            $this->addFlash('success', 'Comment added successfully!');
+            return $this->redirectToRoute('app_blog_details', ['id' => $id]);
         }
         
-        // Get related posts (same activity or same author)
-        $relatedPosts = $this->postRepository->findBy([
-            'activityId' => $post->getActivityId()
-        ], ['date' => 'DESC'], 3);
+        // Create forms for editing comments
+        $editForms = [];
+        foreach ($comments as $comment) {
+            $form = $this->createForm(CommentFormType::class, $comment, [
+                'action' => $this->generateUrl('app_blog_comment_edit', ['id' => $comment->getId()]),
+            ]);
+            $editForms[$comment->getId()] = $form->createView();
+        }
+
+        // Check if current user is the author of the post
+        $currentUser = $this->security->getUser();
+        $isAuthor = $currentUser && $post->getUserId() === $currentUser->getId();
         
-        // Remove the current post from related posts
-        $relatedPosts = array_filter($relatedPosts, function($relatedPost) use ($post) {
-            return $relatedPost->getId() !== $post->getId();
-        });
+        // Get blog rating information
+        $likesCount = $this->blogRatingRepository->countLikesByPostId($id);
+        $dislikesCount = $this->blogRatingRepository->countDislikesByPostId($id);
+        
+        // Get user's current rating if authenticated
+        $userRating = null;
+        if ($currentUser) {
+            $existingRating = $this->blogRatingRepository->findByUserAndPost($currentUser->getId(), $id);
+            if ($existingRating) {
+                $userRating = $existingRating->isLike() ? 'like' : 'dislike';
+            }
+        }
 
         return $this->render('client/Blog/details.html.twig', [
             'post' => $post,
             'author' => $author,
             'activity' => $activity,
-            'resources' => $resources,
+            'resources' => $resources ?? [],
             'comments' => $comments,
             'commentUsers' => $commentUsersById,
-            'isAuthor' => $isAuthor,
             'commentForm' => $commentForm->createView(),
             'editForms' => $editForms,
-            'relatedPosts' => $relatedPosts,
-            'currentUser' => $currentUser
+            'isAuthor' => $isAuthor,
+            'likesCount' => $likesCount,
+            'dislikesCount' => $dislikesCount,
+            'userRating' => $userRating
         ]);
     }
 

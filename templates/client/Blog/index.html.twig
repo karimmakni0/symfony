@@ -113,6 +113,18 @@
                           </span>
                         </div>
                         
+                        <!-- Blog Rating Display -->
+                        <div class="d-flex mt-10 items-center">
+                          <div class="d-flex items-center mr-20">
+                            <i class="icon-thumbs-up text-blue-1 text-16 mr-5"></i>
+                            <span class="text-14">{{ ratingStats[post.id]['likes'] }}</span>
+                          </div>
+                          <div class="d-flex items-center">
+                            <i class="icon-thumbs-down text-red-1 text-16 mr-5"></i>
+                            <span class="text-14">{{ ratingStats[post.id]['dislikes'] }}</span>
+                          </div>
+                        </div>
+                        
                         <div class="mt-15">
                           <p class="text-15 lh-16 text-light-1 line-clamp-2">{{ post.description|striptags|slice(0, 100) }}{% if post.description|length > 100 %}...{% endif %}</p>
                         </div>

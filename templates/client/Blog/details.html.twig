@@ -332,27 +332,33 @@
   document.addEventListener('DOMContentLoaded', function() {
     const ratingButtons = document.querySelectorAll('.rating-btn');
     
-    ratingButtons.forEach(button => {
+    ratingButtons.forEach(function(button) {
       button.addEventListener('click', function() {
         {% if app.user %}
           const postId = this.closest('.blog-rating-section').dataset.postId;
           const isLike = this.dataset.rating === 'like';
+          const toggleUrl = "{{ path('app_blog_rating_toggle', {'postId': 'PLACEHOLDER_ID', 'isLike': 'PLACEHOLDER_LIKE'}) }}";
+          
+          // Replace placeholders with actual values
+          const url = toggleUrl
+            .replace('PLACEHOLDER_ID', postId)
+            .replace('PLACEHOLDER_LIKE', isLike ? '1' : '0');
           
           // Send AJAX request to toggle rating
-          fetch(`{{ path('app_blog_rating_toggle', {'postId': 'REPLACE_POST_ID', 'isLike': 'REPLACE_IS_LIKE'}) }}`
-            .replace('REPLACE_POST_ID', postId)
-            .replace('REPLACE_IS_LIKE', isLike ? '1' : '0'), {
+          fetch(url, {
             method: 'POST',
             headers: {
               'X-Requested-With': 'XMLHttpRequest'
             }
           })
-          .then(response => response.json())
-          .then(data => {
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(data) {
             if (data.success) {
               // Update like/dislike counts
-              const likeBtn = document.querySelector(`.blog-rating-section[data-post-id="${postId}"] .like-btn`);
-              const dislikeBtn = document.querySelector(`.blog-rating-section[data-post-id="${postId}"] .dislike-btn`);
+              const likeBtn = document.querySelector('.blog-rating-section[data-post-id="' + postId + '"] .like-btn');
+              const dislikeBtn = document.querySelector('.blog-rating-section[data-post-id="' + postId + '"] .dislike-btn');
               
               likeBtn.querySelector('.likes-count').textContent = data.likesCount;
               dislikeBtn.querySelector('.dislikes-count').textContent = data.dislikesCount;
@@ -368,7 +374,9 @@
               }
             }
           })
-          .catch(error => console.error('Error:', error));
+          .catch(function(error) {
+            console.error('Error:', error);
+          });
         {% else %}
           // Redirect to login page for unauthenticated users
           window.location.href = "{{ path('app_login') }}";
