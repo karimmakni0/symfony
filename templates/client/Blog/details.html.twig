@@ -75,13 +75,15 @@
               <div class="d-flex items-center">
                 <div class="me-4 blog-rating-section" data-post-id="{{ post.id }}">
                   <!-- Like Button -->
-                  <button class="button -sm -blue-1 bg-blue-1-05 text-blue-1 rounded-4 me-2 rating-btn like-btn {% if userRating == 'like' %}active{% endif %}" data-rating="like">
-                    <i class="icon-thumbs-up mr-5"></i> <span class="likes-count">{{ likesCount|default(0) }}</span>
+                  <button class="button -md bg-white border-1 border-light-2 rounded-8 me-3 rating-btn like-btn {% if userRating == 'like' %}active{% endif %}" data-rating="like">
+                    <i class="icon-heart text-20 {% if userRating == 'like' %}text-blue-1{% else %}text-light-1{% endif %} mr-5"></i> 
+                    <span class="likes-count fw-500 {% if userRating == 'like' %}text-blue-1{% else %}text-dark-1{% endif %}">{{ likesCount|default(0) }}</span>
                   </button>
                   
                   <!-- Dislike Button -->
-                  <button class="button -sm -red-1 bg-red-1-05 text-red-1 rounded-4 rating-btn dislike-btn {% if userRating == 'dislike' %}active{% endif %}" data-rating="dislike">
-                    <i class="icon-thumbs-down mr-5"></i> <span class="dislikes-count">{{ dislikesCount|default(0) }}</span>
+                  <button class="button -md bg-white border-1 border-light-2 rounded-8 rating-btn dislike-btn {% if userRating == 'dislike' %}active{% endif %}" data-rating="dislike">
+                    <i class="icon-thumbs-down text-20 {% if userRating == 'dislike' %}text-red-1{% else %}text-light-1{% endif %} mr-5"></i> 
+                    <span class="dislikes-count fw-500 {% if userRating == 'dislike' %}text-red-1{% else %}text-dark-1{% endif %}">{{ dislikesCount|default(0) }}</span>
                   </button>
                 </div>
                 
@@ -480,13 +482,30 @@
   
   /* Rating button styles */
   .rating-btn.active.like-btn {
-    background-color: var(--color-blue-1) !important;
-    color: white !important;
+    background-color: #E5F0FD !important;
+    border-color: var(--color-blue-1) !important;
   }
   
   .rating-btn.active.dislike-btn {
-    background-color: var(--color-red-1) !important;
-    color: white !important;
+    background-color: #FDEDED !important;
+    border-color: var(--color-red-1) !important;
+  }
+  
+  .rating-btn:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .rating-btn.like-btn:hover .icon-heart {
+    color: var(--color-blue-1) !important;
+  }
+  
+  .rating-btn.dislike-btn:hover .icon-thumbs-down {
+    color: var(--color-red-1) !important;
+  }
+  
+  .blog-rating-section {
+    display: flex;
+    align-items: center;
   }
 </style>
 {% endblock %}

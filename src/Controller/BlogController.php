@@ -196,6 +196,16 @@ class BlogController extends AbstractController
                 $userRating = $existingRating->isLike() ? 'like' : 'dislike';
             }
         }
+        
+        // Get related posts (same activity or same author)
+        $relatedPosts = $this->postRepository->findBy([
+            'activityId' => $post->getActivityId()
+        ], ['date' => 'DESC'], 3);
+        
+        // Remove the current post from related posts
+        $relatedPosts = array_filter($relatedPosts, function($relatedPost) use ($post) {
+            return $relatedPost->getId() !== $post->getId();
+        });
 
         return $this->render('client/Blog/details.html.twig', [
             'post' => $post,
@@ -209,7 +219,8 @@ class BlogController extends AbstractController
             'isAuthor' => $isAuthor,
             'likesCount' => $likesCount,
             'dislikesCount' => $dislikesCount,
-            'userRating' => $userRating
+            'userRating' => $userRating,
+            'relatedPosts' => $relatedPosts
         ]);
     }
 

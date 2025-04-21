@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\BlogRatingRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BlogRatingRepository::class)]
@@ -23,10 +24,10 @@ class BlogRating
     #[ORM\Column]
     private ?bool $isLike = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
     public function __construct()
