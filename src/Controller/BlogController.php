@@ -15,10 +15,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 #[Route('/blog')]
 class BlogController extends AbstractController
@@ -30,6 +34,8 @@ class BlogController extends AbstractController
     private $activitiesRepository;
     private $blogRatingRepository;
     private $security;
+    private $httpClient;
+    private $params;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -38,7 +44,9 @@ class BlogController extends AbstractController
         UsersRepository $usersRepository,
         ActivitiesRepository $activitiesRepository,
         BlogRatingRepository $blogRatingRepository,
-        Security $security
+        Security $security,
+        HttpClientInterface $httpClient,
+        ParameterBagInterface $params
     ) {
         $this->entityManager = $entityManager;
         $this->postRepository = $postRepository;
@@ -47,6 +55,8 @@ class BlogController extends AbstractController
         $this->activitiesRepository = $activitiesRepository;
         $this->blogRatingRepository = $blogRatingRepository;
         $this->security = $security;
+        $this->httpClient = $httpClient;
+        $this->params = $params;
     }
 
     #[Route('/', name: 'app_blog_index')]
@@ -517,5 +527,85 @@ class BlogController extends AbstractController
 
         $this->addFlash('success', 'Comment deleted successfully!');
         return $this->redirectToRoute('app_blog_details', ['id' => $postId]);
+    }
+
+    #[Route('/generate-content', name: 'app_blog_generate_content', methods: ['POST'])]
+    public function generateContent(Request $request): JsonResponse
+    {
+        // Check if user is logged in
+        $user = $this->security->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'You must be logged in'], Response::HTTP_UNAUTHORIZED);
+        }
+        
+        // Get the activity ID from the request
+        $activityId = $request->request->get('activityId');
+        if (!$activityId) {
+            return new JsonResponse(['error' => 'Activity must be selected'], Response::HTTP_BAD_REQUEST);
+        }
+        
+        // Get activity details
+        $activity = $this->activitiesRepository->find($activityId);
+        if (!$activity) {
+            return new JsonResponse(['error' => 'Activity not found'], Response::HTTP_NOT_FOUND);
+        }
+        
+        // Get the uploaded image
+        $imageFile = $request->files->get('image');
+        if (!$imageFile) {
+            return new JsonResponse(['error' => 'Image must be uploaded'], Response::HTTP_BAD_REQUEST);
+        }
+        
+        // Convert image to base64
+        $imageData = base64_encode(file_get_contents($imageFile->getPathname()));
+        
+        // Build the prompt
+        $activityName = $activity->getActivityName();
+        $activityDestination = $activity->getActivityDestination();
+        $prompt = "Response only with a description for a blog in the picture as adventure for activity {$activityName} in {$activityDestination} in a viving way and creative";
+        
+        // Call the Gemini API
+        try {
+            $apiKey = $_ENV['GEMINI_API_KEY']; // Read API key from environment
+            
+            $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent', [
+                'query' => [
+                    'key' => $apiKey
+                ],
+                'json' => [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                [
+                                    'text' => $prompt
+                                ],
+                                [
+                                    'inline_data' => [
+                                        'mime_type' => $imageFile->getMimeType(),
+                                        'data' => $imageData
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'generation_config' => [
+                        'temperature' => 0.4,
+                        'max_output_tokens' => 800
+                    ]
+                ]
+            ]);
+            
+            $data = $response->toArray();
+            
+            // Extract and return the generated content
+            if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+                $generatedContent = $data['candidates'][0]['content']['parts'][0]['text'];
+                return new JsonResponse(['content' => $generatedContent]);
+            } else {
+                return new JsonResponse(['error' => 'Could not generate content from image'], Response::HTTP_BAD_REQUEST);
+            }
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'API Error: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

@@ -27,7 +27,7 @@
             </div>
 
             <div class="col-12">
-              {{ form_start(form, {'attr': {'class': 'row y-gap-20', 'enctype': 'multipart/form-data'}}) }}
+              {{ form_start(form, {'attr': {'class': 'row y-gap-20', 'enctype': 'multipart/form-data', 'id': 'blog-form'}}) }}
                 <div class="col-12">
                   <div class="form-input">
                     {{ form_widget(form.title) }}
@@ -41,7 +41,7 @@
                 <div class="col-12">
                   <div class="form-input">
                     {{ form_label(form.activityId, 'Select Activity *', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                    {{ form_widget(form.activityId, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_widget(form.activityId, {'attr': {'class': 'form-select', 'id': 'activity-select'}}) }}
                     <div class="text-danger mt-5">
                       {{ form_errors(form.activityId) }}
                     </div>
@@ -50,7 +50,7 @@
 
                 <div class="col-12">
                   <div class="form-input">
-                    {{ form_widget(form.description) }}
+                    {{ form_widget(form.description, {'attr': {'id': 'blog-content'}}) }}
                     {{ form_label(form.description, 'Content *', {'label_attr': {'class': 'lh-1 text-16 text-light-1'}}) }}
                     <div class="text-danger mt-5">
                       {{ form_errors(form.description) }}
@@ -61,7 +61,7 @@
                 <div class="col-12">
                   <div class="form-input">
                     {{ form_label(form.picture, 'Image', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                    {{ form_widget(form.picture, {'attr': {'class': 'form-control py-10 px-15 bg-light-2 rounded-4'}}) }}
+                    {{ form_widget(form.picture, {'attr': {'class': 'form-control py-10 px-15 bg-light-2 rounded-4', 'id': 'blog-image'}}) }}
                     <small class="d-block mt-10 text-14 text-light-1">Recommended size: 800x600px, Max size: 2MB</small>
                     <div class="text-danger mt-5">
                       {{ form_errors(form.picture) }}
@@ -76,6 +76,13 @@
                         Publish Post <i class="icon-arrow-right ml-10"></i>
                       </button>
                     </div>
+                    
+                    <div class="col-auto">
+                      <button type="button" id="generate-ai-button" class="button -md bg-purple-1 text-white">
+                        <i class="icon-sparkles mr-10"></i> Generate with AI
+                      </button>
+                    </div>
+                    
                     <div class="col-auto">
                       <a href="{{ path('app_blog_index') }}" class="button -md -blue-1 bg-blue-1-05 text-blue-1">
                         Cancel
@@ -92,20 +99,22 @@
   </div>
 </section>
 
+<div id="modal-container"></div>
+
 {% block javascripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Preview uploaded image
-    const imageInput = document.querySelector('input[type="file"]');
+    var imageInput = document.querySelector('input[type="file"]');
     
     if (imageInput) {
       imageInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
-          const reader = new FileReader();
+          var reader = new FileReader();
           
           reader.onload = function(e) {
             // Create image preview container if it doesn't exist
-            let previewContainer = document.getElementById('image-preview');
+            var previewContainer = document.getElementById('image-preview');
             
             if (!previewContainer) {
               previewContainer = document.createElement('div');
@@ -117,14 +126,14 @@
             }
             
             // Create image element
-            const img = document.createElement('img');
+            var img = document.createElement('img');
             img.src = e.target.result;
             img.className = 'img-fluid rounded-4';
             img.style.maxHeight = '200px';
             previewContainer.appendChild(img);
             
             // Add file name
-            const fileName = document.createElement('div');
+            var fileName = document.createElement('div');
             fileName.className = 'mt-10 text-14 text-light-1';
             fileName.textContent = this.files[0].name;
             previewContainer.appendChild(fileName);
@@ -134,7 +143,151 @@
         }
       });
     }
+    
+    // Modal handling
+    var loadingModalHTML = `
+      <div class="modal-backdrop" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1040;"></div>
+      <div class="modal" style="display: block; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1050; overflow-x: hidden; overflow-y: auto;">
+        <div class="modal-dialog modal-dialog-centered" style="position: relative; width: auto; margin: 1.75rem auto; max-width: 500px;">
+          <div class="modal-content" style="position: relative; background-color: #fff; border-radius: 0.3rem; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5); outline: 0;">
+            <div class="modal-body text-center py-30">
+              <div class="spinner-border text-purple-1 mb-20" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <h5 class="text-18 fw-500">Generating content with AI...</h5>
+              <p class="mt-10">This might take a few moments. Please wait.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    var errorModalHTML = `
+      <div class="modal-backdrop" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1040;"></div>
+      <div class="modal" style="display: block; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1050; overflow-x: hidden; overflow-y: auto;">
+        <div class="modal-dialog modal-dialog-centered" style="position: relative; width: auto; margin: 1.75rem auto; max-width: 500px;">
+          <div class="modal-content" style="position: relative; background-color: #fff; border-radius: 0.3rem; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5); outline: 0;">
+            <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid #dee2e6;">
+              <h5 class="modal-title text-18 fw-500">Missing Information</h5>
+              <button type="button" class="btn-close-custom" style="background: transparent; border: 0; font-size: 1.5rem; font-weight: 700; color: #000; opacity: 0.5; cursor: pointer;">&times;</button>
+            </div>
+            <div class="modal-body py-30">
+              <p id="error-message-text">Please upload an image and select an activity to generate content.</p>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; padding: 1rem; border-top: 1px solid #dee2e6;">
+              <button type="button" class="button -md -blue-1 bg-blue-1-05 text-blue-1" id="error-close-btn">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Create modal container if it doesn't exist
+    var modalContainer = document.getElementById('modal-container');
+    if (!modalContainer) {
+      modalContainer = document.createElement('div');
+      modalContainer.id = 'modal-container';
+      document.body.appendChild(modalContainer);
+    }
+    
+    function showLoadingModal() {
+      document.body.style.overflow = 'hidden'; // Prevent scrolling
+      modalContainer.innerHTML = loadingModalHTML;
+    }
+    
+    function hideLoadingModal() {
+      document.body.style.overflow = '';
+      modalContainer.innerHTML = '';
+    }
+    
+    function showErrorModal(message) {
+      document.body.style.overflow = 'hidden'; // Prevent scrolling
+      modalContainer.innerHTML = errorModalHTML;
+      
+      // Set error message
+      var errorMessage = document.getElementById('error-message-text');
+      if (errorMessage && message) {
+        errorMessage.textContent = message;
+      }
+      
+      // Add event listeners for close buttons
+      var closeButton = document.querySelector('.btn-close-custom');
+      var closeBtn = document.getElementById('error-close-btn');
+      
+      if (closeButton) {
+        closeButton.addEventListener('click', hideErrorModal);
+      }
+      
+      if (closeBtn) {
+        closeBtn.addEventListener('click', hideErrorModal);
+      }
+    }
+    
+    function hideErrorModal() {
+      document.body.style.overflow = '';
+      modalContainer.innerHTML = '';
+    }
+    
+    // AI content generation
+    var generateButton = document.getElementById('generate-ai-button');
+    var activitySelect = document.getElementById('activity-select');
+    var blogImageInput = document.getElementById('blog-image');
+    var blogContentArea = document.getElementById('blog-content');
+    
+    if (generateButton) {
+      generateButton.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent form submission
+        
+        // Validate inputs
+        if (!activitySelect || !activitySelect.value || activitySelect.value === '') {
+          showErrorModal('Please select an activity first.');
+          return;
+        }
+        
+        if (!blogImageInput || !blogImageInput.files || blogImageInput.files.length === 0) {
+          showErrorModal('Please upload an image first.');
+          return;
+        }
+        
+        // Show loading modal
+        showLoadingModal();
+        
+        // Prepare form data for API request
+        var formData = new FormData();
+        formData.append('activityId', activitySelect.value);
+        formData.append('image', blogImageInput.files[0]);
+        
+        // Send API request
+        fetch('{{ path('app_blog_generate_content') }}', {
+          method: 'POST',
+          body: formData,
+          cache: 'no-cache'
+        })
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
+          hideLoadingModal();
+          
+          if (data.error) {
+            showErrorModal(data.error);
+          } else if (data.content && blogContentArea) {
+            // Insert generated content into the editor
+            blogContentArea.value = data.content;
+            
+            // Trigger focus/blur event to activate the label animation
+            if (blogContentArea.value.trim() !== '') {
+              blogContentArea.classList.add('is-active');
+            }
+          }
+        })
+        .catch(function(error) {
+          hideLoadingModal();
+          showErrorModal('An error occurred. Please try again later.');
+          console.error('Error:', error);
+        });
+      });
+    }
   });
 </script>
-{% endblock %}
 {% endblock %}
