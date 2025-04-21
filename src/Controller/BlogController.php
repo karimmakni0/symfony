@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Psr\Log\LoggerInterface;
 
 #[Route('/blog')]
 class BlogController extends AbstractController
@@ -36,6 +37,7 @@ class BlogController extends AbstractController
     private $security;
     private $httpClient;
     private $params;
+    private $logger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -46,7 +48,8 @@ class BlogController extends AbstractController
         BlogRatingRepository $blogRatingRepository,
         Security $security,
         HttpClientInterface $httpClient,
-        ParameterBagInterface $params
+        ParameterBagInterface $params,
+        LoggerInterface $logger
     ) {
         $this->entityManager = $entityManager;
         $this->postRepository = $postRepository;
@@ -57,6 +60,7 @@ class BlogController extends AbstractController
         $this->security = $security;
         $this->httpClient = $httpClient;
         $this->params = $params;
+        $this->logger = $logger;
     }
 
     #[Route('/', name: 'app_blog_index')]
@@ -568,13 +572,15 @@ class BlogController extends AbstractController
         try {
             $apiKey = $_ENV['GEMINI_API_KEY']; // Read API key from environment
             
-            $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent', [
+            // Update to use the current Gemini API endpoint and model
+            $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1/models/gemini-pro-vision:generateContent', [
                 'query' => [
                     'key' => $apiKey
                 ],
                 'json' => [
                     'contents' => [
                         [
+                            'role' => 'user',
                             'parts' => [
                                 [
                                     'text' => $prompt
@@ -597,12 +603,21 @@ class BlogController extends AbstractController
             
             $data = $response->toArray();
             
-            // Extract and return the generated content
+            // Add debugging output
+            $this->logger->info('Gemini API Response', ['data' => $data]);
+            
+            // Extract and return the generated content from the new API structure
             if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
                 $generatedContent = $data['candidates'][0]['content']['parts'][0]['text'];
                 return new JsonResponse(['content' => $generatedContent]);
+            } else if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+                // Alternative response structure
+                $generatedContent = $data['candidates'][0]['content']['parts'][0]['text'];
+                return new JsonResponse(['content' => $generatedContent]);
             } else {
-                return new JsonResponse(['error' => 'Could not generate content from image'], Response::HTTP_BAD_REQUEST);
+                // Log the full response for debugging
+                $this->logger->error('Unexpected Gemini API response structure', ['data' => $data]);
+                return new JsonResponse(['error' => 'Could not generate content from image. Unexpected response format.'], Response::HTTP_BAD_REQUEST);
             }
         } catch (\Exception $e) {
             return new JsonResponse(['error' => 'API Error: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);

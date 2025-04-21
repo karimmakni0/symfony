@@ -230,13 +230,57 @@
     
     // AI content generation
     var generateButton = document.getElementById('generate-ai-button');
-    var activitySelect = document.getElementById('activity-select');
-    var blogImageInput = document.getElementById('blog-image');
+    // Try multiple approaches to find the activity select element
+    var activitySelect = document.getElementById('activity-select') || 
+                        document.querySelector('select[name="post_form[activityId]"]') ||
+                        document.querySelector('select[id$="_activityId"]');
+    // Try multiple approaches to find the image input
+    var blogImageInput = document.getElementById('blog-image') || 
+                         document.querySelector('input[type="file"]') ||
+                         document.querySelector('input[name="post_form[picture]"]');
     var blogContentArea = document.getElementById('blog-content');
+    
+    // Log found elements for debugging
+    console.log('Generate button:', generateButton);
+    console.log('Activity select found:', activitySelect);
+    console.log('Blog image input found:', blogImageInput);
+    console.log('Blog content area found:', blogContentArea);
     
     if (generateButton) {
       generateButton.addEventListener('click', function(e) {
         e.preventDefault(); // Prevent form submission
+        
+        // Add debug logging
+        console.log('Activity select element:', activitySelect);
+        console.log('Blog image input element:', blogImageInput);
+        
+        if (activitySelect) {
+          console.log('Activity value:', activitySelect.value);
+          console.log('Activity options:', activitySelect.options);
+          console.log('Activity selected index:', activitySelect.selectedIndex);
+        }
+        
+        if (blogImageInput) {
+          console.log('Blog image files:', blogImageInput.files);
+          console.log('Blog image has files:', blogImageInput.files && blogImageInput.files.length > 0);
+          if (blogImageInput.files && blogImageInput.files.length > 0) {
+            console.log('First file name:', blogImageInput.files[0].name);
+          }
+        }
+        
+        // Try to find all file inputs in the form as a fallback
+        var formElement = document.getElementById('blog-form');
+        if (formElement) {
+          var fileInputs = formElement.querySelectorAll('input[type="file"]');
+          console.log('All file inputs in form:', fileInputs);
+          
+          if (fileInputs.length > 0 && (!blogImageInput || !blogImageInput.files || blogImageInput.files.length === 0)) {
+            // Use the first file input we find as a fallback
+            blogImageInput = fileInputs[0];
+            console.log('Using fallback file input:', blogImageInput);
+            console.log('Fallback has files:', blogImageInput.files && blogImageInput.files.length > 0);
+          }
+        }
         
         // Validate inputs
         if (!activitySelect || !activitySelect.value || activitySelect.value === '') {
@@ -244,25 +288,92 @@
           return;
         }
         
-        if (!blogImageInput || !blogImageInput.files || blogImageInput.files.length === 0) {
+        // First check direct blogImageInput
+        var hasImage = false;
+        if (blogImageInput && blogImageInput.files && blogImageInput.files.length > 0) {
+          hasImage = true;
+        } else {
+          // Try to find any file input with files in the form
+          var formElement = document.getElementById('blog-form');
+          if (formElement) {
+            var fileInputs = formElement.querySelectorAll('input[type="file"]');
+            for (var i = 0; i < fileInputs.length; i++) {
+              if (fileInputs[i].files && fileInputs[i].files.length > 0) {
+                blogImageInput = fileInputs[i]; // Reassign to the one with files
+                hasImage = true;
+                break;
+              }
+            }
+          }
+        }
+        
+        if (!hasImage) {
           showErrorModal('Please upload an image first.');
           return;
+        }
+        
+        // Prepare form data for API request
+        var formData = new FormData();
+        
+        // Get activity ID - try getting the value directly from the form if possible
+        var activityId = activitySelect ? activitySelect.value : '';
+        
+        // If still no value, try getting it from the form directly
+        if (!activityId || activityId === '') {
+          var formElement = document.getElementById('blog-form');
+          if (formElement) {
+            // Try to find any select element within the form
+            var selects = formElement.querySelectorAll('select');
+            console.log('All select elements in form:', selects);
+            
+            if (selects.length > 0) {
+              // Use the first select element we find (assuming it's the activity dropdown)
+              activityId = selects[0].value;
+              console.log('Using select value from form:', activityId);
+            }
+          }
+        }
+        
+        // Get the file from blogImageInput or try to find it from the form
+        var imageFile = null;
+        if (blogImageInput && blogImageInput.files && blogImageInput.files.length > 0) {
+          imageFile = blogImageInput.files[0];
+          console.log('Using image file from input:', imageFile.name);
+        } else {
+          // Try to find the file from any file input in the form
+          var formElement = document.getElementById('blog-form');
+          if (formElement) {
+            var fileInputs = formElement.querySelectorAll('input[type="file"]');
+            for (var i = 0; i < fileInputs.length; i++) {
+              if (fileInputs[i].files && fileInputs[i].files.length > 0) {
+                imageFile = fileInputs[i].files[0];
+                console.log('Found image file from form:', imageFile.name);
+                break;
+              }
+            }
+          }
+        }
+        
+        formData.append('activityId', activityId);
+        if (imageFile) {
+          formData.append('image', imageFile);
+          console.log('Image added to FormData:', imageFile.name);
+        } else {
+          console.error('No image file found!');
         }
         
         // Show loading modal
         showLoadingModal();
         
-        // Prepare form data for API request
-        var formData = new FormData();
-        formData.append('activityId', activitySelect.value);
-        formData.append('image', blogImageInput.files[0]);
-        
         // Send API request
-        fetch('{{ path('app_blog_generate_content') }}', {
-          method: 'POST',
-          body: formData,
-          cache: 'no-cache'
-        })
+        fetch('{{ path('app_blog_generate_content') }}', 
+          { 
+            method: 'POST', 
+            body: formData, 
+            cache: 'no-cache', 
+            credentials: 'same-origin'
+          }
+        )
         .then(function(response) {
           return response.json();
         })
@@ -290,4 +401,6 @@
     }
   });
 </script>
-{% endblock %}
+{% endblock javascripts %}
+
+{% endblock body %}
