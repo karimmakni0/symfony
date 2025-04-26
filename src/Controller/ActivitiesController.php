@@ -457,15 +457,15 @@ class ActivitiesController extends AbstractController
             $this->entityManager->remove($activity);
             $this->entityManager->flush();
             
-            $this->addFlash('success', 'Activity deleted successfully!');
+            // Use query parameter instead of flash message
+            return $this->redirectToRoute('app_publicator_activities', ['success' => 'activity_deleted']);
         } catch (\Exception $e) {
             // Log the detailed error for debugging
             error_log('Error deleting activity: ' . $e->getMessage() . ' | ' . $e->getTraceAsString());
             
             $this->addFlash('error', 'Error deleting activity. Please contact the administrator.');
+            return $this->redirectToRoute('app_publicator_activities');
         }
-        
-        return $this->redirectToRoute('app_publicator_activities');
     }
     
     // Removed redundant publicator profile route

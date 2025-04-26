@@ -265,18 +265,30 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Check URL parameters for success message
+    // Check URL parameters for success messages
     const urlParams = new URLSearchParams(window.location.search);
     const successParam = urlParams.get('success');
     
-    if (successParam === 'activity_created') {
-        Swal.fire({
-            title: 'Success!',
-            text: 'Activity created successfully!',
-            icon: 'success',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#3554D1'
-        });
+    // Handle different success messages
+    if (successParam) {
+        let title = 'Success!';
+        let message = '';
+        
+        if (successParam === 'activity_created') {
+            message = 'Activity created successfully!';
+        } else if (successParam === 'activity_deleted') {
+            message = 'Activity deleted successfully!';
+        }
+        
+        if (message) {
+            Swal.fire({
+                title: title,
+                text: message,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3554D1'
+            });
+        }
         
         // Remove the success parameter from URL without reloading the page
         const newUrl = window.location.pathname;
