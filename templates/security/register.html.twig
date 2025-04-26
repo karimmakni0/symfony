@@ -3,16 +3,22 @@
 {% block title %}Register - GoTrip{% endblock %}
 
 {% block body %}
+<!-- Add FontAwesome for better icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<!-- Add hCaptcha script -->
+<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 <section class="layout-pt-lg layout-pb-lg bg-blue-2">
     <div class="container">
         <div class="row justify-center">
             <div class="col-xl-6 col-lg-7 col-md-9">
                 <div class="px-50 py-50 sm:px-20 sm:py-20 bg-white shadow-4 rounded-4">
                     <div class="row y-gap-20">
-                        <div class="col-12">
-                            <h1 class="text-22 fw-500">Sign in or create an account</h1>
-                            <p class="mt-10">Already have an account? <a href="{{ path('app_login') }}" class="text-blue-1">Log in</a></p>
-                            <p class="mt-5 text-15 text-light-1">Registration includes setting up 2-step verification for extra security.</p>
+                        <div class="col-12 text-center">
+                            <div class="size-60 flex-center bg-blue-1 rounded-full mx-auto mb-10">
+                                <i class="fa fa-user-plus text-24 text-white"></i>
+                            </div>
+                            <h1 class="text-30 fw-600">Create an Account</h1>
+                            <p class="mt-10">Already have an account? <a href="{{ path('app_login') }}" class="text-blue-1 fw-500"><i class="fa fa-sign-in-alt me-1"></i> Log in</a></p>
                         </div>
 
                         {% for message in app.flashes('success') %}
@@ -35,115 +41,221 @@
                             <div class="col-12">
                                 <div class="form-input">
                                     <input type="text" name="name" required>
-                                    <label class="lh-1 text-14 text-light-1">First Name</label>
+                                    <label class="lh-1 text-14 text-light-1"><i class="fa fa-user me-1"></i> First Name</label>
                                 </div>
                             </div>
 
                             <div class="col-12">
                                 <div class="form-input">
                                     <input type="text" name="lastname" required>
-                                    <label class="lh-1 text-14 text-light-1">Last Name</label>
+                                    <label class="lh-1 text-14 text-light-1"><i class="fa fa-user me-1"></i> Last Name</label>
                                 </div>
                             </div>
 
                             <div class="col-12">
                                 <div class="form-input">
                                     <input type="email" name="email" required>
-                                    <label class="lh-1 text-14 text-light-1">Email</label>
+                                    <label class="lh-1 text-14 text-light-1"><i class="fa fa-envelope me-1"></i> Email</label>
                                 </div>
                             </div>
-<div class="col-12">
-    <div class="form-input">
-        <input type="text" name="phone" maxlength="20">
-        <label class="lh-1 text-14 text-light-1">Phone</label>
-    </div>
-</div>
-
-<div class="col-12">
-    <div class="form-input">
-        <input type="date" name="birthday">
-        <label class="lh-1 text-14 text-light-1">Birthday</label>
-    </div>
-</div>
-
-<div class="col-12">
-    <div class="form-input">
-        <select name="gender" class="form-control" required>
-            <option value="" disabled selected>Select your gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-        </select>
-        <label class="lh-1 text-14 text-light-1">Gender</label>
-    </div>
-</div>
-
                             <div class="col-12">
                                 <div class="form-input">
-                                    <input type="password" name="password" required>
-                                    <label class="lh-1 text-14 text-light-1">Password</label>
+                                    <input type="text" name="phone" maxlength="20">
+                                    <label class="lh-1 text-14 text-light-1"><i class="fa fa-phone me-1"></i> Phone</label>
                                 </div>
                             </div>
 
                             <div class="col-12">
                                 <div class="form-input">
-                                    <input type="password" name="confirm_password" required>
-                                    <label class="lh-1 text-14 text-light-1">Confirm Password</label>
+                                    <input type="date" name="birthday" class="has-value">
+                                    <label class="lh-1 text-14 text-light-1"><i class="fa fa-birthday-cake me-1"></i> Birthday</label>
                                 </div>
                             </div>
 
                             <div class="col-12">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon-security text-18 text-blue-1 mr-10"></div>
-                                    <div class="text-15 lh-15">This account requires Google Authenticator for 2-step verification. You'll set it up in the next step.</div>
+                                <div class="form-group mb-0">
+                                    <label class="text-14 text-light-1 mb-1"><i class="fa fa-venus-mars me-1"></i> Gender</label>
+                                    <select name="gender" class="form-select w-100" style="height: 50px; border-radius: 4px; border: 1px solid #ddd; padding: 0 15px;" required>
+                                        <option value="" disabled selected>Select your gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
                                 </div>
                             </div>
 
                             <div class="col-12">
-                                <div class="d-flex">
-                                    <div class="form-checkbox mt-5">
-                                        <input type="checkbox" name="newsletter">
-                                        <div class="form-checkbox__mark">
-                                            <div class="form-checkbox__icon icon-check"></div>
-                                        </div>
+                                <div class="form-input">
+                                    <input type="password" name="password" id="password" required>
+                                    <label class="lh-1 text-14 text-light-1"><i class="fa fa-lock me-1"></i> Password</label>
+                                </div>
+                            </div>
+                            
+                            <!-- Password strength meter -->
+                            <div class="col-12">
+                                <div class="password-strength-meter mt-5">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-14">Password strength:</span>
+                                        <span class="text-14 fw-500" id="password-strength-text">None</span>
                                     </div>
-
-                                    <div class="text-15 lh-15 text-light-1 ml-10">Email me exclusive GoTrip promotions. I can opt out later as stated in the Privacy Policy.</div>
+                                    <div class="password-strength-bar mt-2 mb-2" style="display: flex; width: 100%; height: 8px; border-radius: 10px; overflow: hidden;">
+                                        <div id="strength-segment-1" class="strength-segment" style="flex: 1; height: 100%; background-color: #eee; margin-right: 3px; transition: background-color 0.3s ease;"></div>
+                                        <div id="strength-segment-2" class="strength-segment" style="flex: 1; height: 100%; background-color: #eee; margin-right: 3px; transition: background-color 0.3s ease;"></div>
+                                        <div id="strength-segment-3" class="strength-segment" style="flex: 1; height: 100%; background-color: #eee; margin-right: 3px; transition: background-color 0.3s ease;"></div>
+                                        <div id="strength-segment-4" class="strength-segment" style="flex: 1; height: 100%; background-color: #eee; transition: background-color 0.3s ease;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Password requirements -->
+                            <div class="col-12 mt-10">
+                                <div class="password-requirements">
+                                    <p class="text-14 mb-2">Password must:</p>
+                                    <ul class="text-14 text-light-1 ps-3" style="list-style-type: none;">
+                                        <li id="length-check"><i class="fa fa-times-circle text-danger me-1"></i> Be at least 8 characters long</li>
+                                        <li id="uppercase-check"><i class="fa fa-times-circle text-danger me-1"></i> Include an uppercase letter</li>
+                                        <li id="number-check"><i class="fa fa-times-circle text-danger me-1"></i> Include a number</li>
+                                        <li id="special-check"><i class="fa fa-times-circle text-danger me-1"></i> Include a special character</li>
+                                    </ul>
                                 </div>
                             </div>
 
-                                <button type="submit" class="button py-20 -dark-1 bg-blue-1 text-white w-100">
-                                    Register & Set Up Verification <div class="icon-arrow-top-right ml-15"></div>
+                            <div class="col-12">
+                                <div class="form-input">
+                                    <input type="password" name="confirm_password" id="password_confirm" required>
+                                    <label class="lh-1 text-14 text-light-1"><i class="fa fa-check-circle me-1"></i> Confirm Password</label>
+                                </div>
+                            </div>
+
+
+                            <!-- Add hCaptcha widget before the submit button -->
+                            <div class="col-12 d-flex justify-center mt-15">
+                                <div class="h-captcha" data-sitekey="579e1b04-d52c-4bf4-be44-9704c79a23a0"></div>
+                            </div>
+
+                            <div class="col-12 d-flex justify-center mt-25">
+                                <button type="submit" class="button py-20 -dark-1 bg-blue-1 text-white w-100 rounded-pill" style="max-width: 80%; min-width: 300px;">
+                                    <i class="fa fa-user-plus me-2"></i> <span class="fw-500 text-16">Register</span>
                                 </button>
+                            </div>
+                            
+                            <div class="col-12 text-center mt-15">
+                                <p class="text-14 text-light-1">By registering, you agree to GoTrip's <a href="#" class="text-blue-1">Terms of Service</a> and <a href="#" class="text-blue-1">Privacy Policy</a>.</p>
+                            </div>
                         </form>
-
-                        <div class="row y-gap-20 pt-30">
-                            <div class="col-12">
-                                <div class="text-center">or sign in with</div>
-
-                                <button class="button col-12 -outline-blue-1 text-blue-1 py-15 rounded-8 mt-10">
-                                    <i class="icon-facebook text-15 mr-10"></i>
-                                    Facebook
-                                </button>
-
-                                <button class="button col-12 -outline-red-1 text-red-1 py-15 rounded-8 mt-15">
-                                    <i class="icon-google text-15 mr-10"></i>
-                                    Google
-                                </button>
-
-                                <button class="button col-12 -outline-dark-2 text-dark-2 py-15 rounded-8 mt-15">
-                                    <i class="icon-apple text-15 mr-10"></i>
-                                    Apple
-                                </button>
-                            </div>
-                            <div class="col-12">
-                                <div class="text-center px-30">By signing in, I agree to GoTrip Terms of Use and Privacy Policy.</div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- Password validation script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('password_confirm');
+    const strengthMeter = document.getElementById('password-strength-meter');
+    const strengthText = document.getElementById('password-strength-text');
+    const lengthCheck = document.getElementById('length-check');
+    const uppercaseCheck = document.getElementById('uppercase-check');
+    const numberCheck = document.getElementById('number-check');
+    const specialCheck = document.getElementById('special-check');
+    
+    const updatePasswordStrength = function() {
+        const password = passwordInput.value;
+        let strength = 0;
+        let message = 'None';
+        let segmentColors = ['#eee', '#eee', '#eee', '#eee'];
+        
+        // Update individual checks
+        if (password.length >= 8) {
+            lengthCheck.innerHTML = '<i class="fa fa-check-circle text-success me-1"></i> Be at least 8 characters long';
+            strength += 25;
+        } else {
+            lengthCheck.innerHTML = '<i class="fa fa-times-circle text-danger me-1"></i> Be at least 8 characters long';
+        }
+        
+        if (/[A-Z]/.test(password)) {
+            uppercaseCheck.innerHTML = '<i class="fa fa-check-circle text-success me-1"></i> Include an uppercase letter';
+            strength += 25;
+        } else {
+            uppercaseCheck.innerHTML = '<i class="fa fa-times-circle text-danger me-1"></i> Include an uppercase letter';
+        }
+        
+        if (/[0-9]/.test(password)) {
+            numberCheck.innerHTML = '<i class="fa fa-check-circle text-success me-1"></i> Include a number';
+            strength += 25;
+        } else {
+            numberCheck.innerHTML = '<i class="fa fa-times-circle text-danger me-1"></i> Include a number';
+        }
+        
+        if (/[^A-Za-z0-9]/.test(password)) {
+            specialCheck.innerHTML = '<i class="fa fa-check-circle text-success me-1"></i> Include a special character';
+            strength += 25;
+        } else {
+            specialCheck.innerHTML = '<i class="fa fa-times-circle text-danger me-1"></i> Include a special character';
+        }
+        
+        // Update strength meter visual segments
+        if (strength >= 25) {
+            segmentColors[0] = '#dc3545'; // danger/red
+        } 
+        if (strength >= 50) {
+            segmentColors[0] = '#ffc107'; // warning/yellow
+            segmentColors[1] = '#ffc107';
+        } 
+        if (strength >= 75) {
+            segmentColors[0] = '#0dcaf0'; // info/blue
+            segmentColors[1] = '#0dcaf0';
+            segmentColors[2] = '#0dcaf0';
+        } 
+        if (strength >= 100) {
+            segmentColors[0] = '#198754'; // success/green
+            segmentColors[1] = '#198754';
+            segmentColors[2] = '#198754';
+            segmentColors[3] = '#198754';
+        }
+        
+        // Set segment colors
+        for (let i = 1; i <= 4; i++) {
+            document.getElementById('strength-segment-' + i).style.backgroundColor = segmentColors[i-1];
+        }
+        
+        // Update strength message
+        if (strength == 0) {
+            message = 'None';
+        } else if (strength <= 25) {
+            message = 'Weak';
+        } else if (strength <= 50) {
+            message = 'Fair';
+        } else if (strength <= 75) {
+            message = 'Good';
+        } else {
+            message = 'Strong';
+        }
+        
+        strengthText.textContent = message;
+    };
+    
+    // Check password match
+    const checkPasswordMatch = function() {
+        if (confirmInput.value && passwordInput.value !== confirmInput.value) {
+            confirmInput.setCustomValidity('Passwords do not match');
+        } else {
+            confirmInput.setCustomValidity('');
+        }
+    };
+    
+    passwordInput.addEventListener('input', function() {
+        updatePasswordStrength();
+        checkPasswordMatch();
+    });
+    
+    confirmInput.addEventListener('input', checkPasswordMatch);
+    
+    // Initialize
+    updatePasswordStrength();
+});
+</script>
 {% endblock %}

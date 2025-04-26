@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Users;
 use App\Repository\UsersRepository;
+use App\Service\LoginNotificationService;
 use App\Service\TotpService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,6 +26,7 @@ class TotpController extends AbstractController
     private $totpService;
     private $session;
     private $eventDispatcher;
+    private $loginNotificationService;
 
     public function __construct(
         Security $security,
@@ -32,7 +34,8 @@ class TotpController extends AbstractController
         UsersRepository $usersRepository,
         TotpService $totpService,
         SessionInterface $session,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        LoginNotificationService $loginNotificationService
     ) {
         $this->security = $security;
         $this->entityManager = $entityManager;
@@ -40,6 +43,7 @@ class TotpController extends AbstractController
         $this->totpService = $totpService;
         $this->session = $session;
         $this->eventDispatcher = $eventDispatcher;
+        $this->loginNotificationService = $loginNotificationService;
     }
 
     /**
@@ -221,8 +225,12 @@ class TotpController extends AbstractController
             if ($this->totpService->verifyCode($user, $code)) {
                 error_log("Code is valid for user: " . $user->getEmail());
                 
-                // Clear pending login session
+                // Store a flag for login notification before modifying the session
+                $shouldSendNotification = $this->session->get('check_new_device') === true;
+                
+                // Clear pending login session and notification flag early
                 $this->session->remove('pending_login_user_id');
+                $this->session->remove('check_new_device');
                 
                 // Log the user in programmatically
                 $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
@@ -234,6 +242,25 @@ class TotpController extends AbstractController
                 // Dispatch login event to update security context
                 $event = new InteractiveLoginEvent($request, $token);
                 $this->eventDispatcher->dispatch($event);
+                
+                // Save the session changes immediately 
+                $this->session->save();
+                
+                // Process login notification after session is saved
+                if ($shouldSendNotification) {
+                    try {
+                        // Record the login and check if it's a new device
+                        $isNewDevice = $this->loginNotificationService->recordLogin($user, $request);
+                        
+                        // If it's a new device, send a notification email
+                        if ($isNewDevice) {
+                            $this->loginNotificationService->sendLoginNotificationEmail($user, $request);
+                            error_log("Login notification email sent to: " . $user->getEmail());
+                        }
+                    } catch (\Exception $e) {
+                        error_log("Failed to process login notification: " . $e->getMessage());
+                    }
+                }
                 
                 // Log and add flash message
                 error_log("User authenticated: " . $user->getEmail());

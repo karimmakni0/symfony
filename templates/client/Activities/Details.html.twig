@@ -3,62 +3,90 @@
 {% block title %}{{ activity.activityName }} - Activity Details{% endblock %}
 
 {% block body %}
-<div class="hero-section pt-5">
-  <div class="container">
-    <div class="row mb-4">
-      <div class="col-12">
-        <h1 class="display-5 fw-bold text-primary">{{ activity.activityName }}</h1>
-        <div class="d-flex flex-wrap align-items-center mb-3">
-          <span class="badge bg-primary me-2 mb-2">{{ activity.activityType ?? 'Activity' }}</span>
-          <span class="badge bg-info me-2 mb-2"><i class="fa fa-map-marker-alt me-1"></i> {{ activity.activityDestination }}</span>
-          <span class="badge bg-success me-2 mb-2"><i class="fa fa-clock me-1"></i> {{ activity.activityDuration ?? 'Flexible' }}</span>
-          <span class="badge bg-warning me-2 mb-2"><i class="fa fa-users me-1"></i> {{ activity.maxNumber - totalBookedTickets }} spots left</span>
+<div class="hero-section">
+  <!-- Modern Hero Banner -->
+  <div class="hero-banner position-relative mb-5">
+    {% if activity.resources is not empty %}
+      {% set featured_image = activity.resources|first %}
+      <div class="hero-image-container">
+        <img src="{{ asset(featured_image.path) }}" alt="{{ activity.activityName }}" class="hero-image">
+        <div class="hero-overlay"></div>
+      </div>
+    {% else %}
+      <div class="hero-image-container">
+        <img src="{{ asset('assets/img/activities/default.jpg') }}" alt="{{ activity.activityName }}" class="hero-image">
+        <div class="hero-overlay"></div>
+      </div>
+    {% endif %}
+    
+    <div class="container position-relative">
+      <div class="hero-content text-white">
+        <div class="mb-3">
+          <span class="hero-badge">{{ activity.activityType ?? 'Activity' }}</span>
+          <div class="rating-stars mt-2">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star-half-alt"></i>
+            <span class="ms-2 text-white">(4.5)</span>
+          </div>
+        </div>
+        <h1 class="hero-title mb-4 glow-effect">{{ activity.activityName }}</h1>
+        <div class="hero-highlights d-flex flex-wrap">
+          <div class="highlight-item me-4 mb-3">
+            <i class="fas fa-map-marker-alt me-2"></i>
+            <span>{{ activity.activityDestination }}</span>
+          </div>
+          {% if activity.activityDuration %}
+          <div class="highlight-item me-4 mb-3">
+            <i class="fas fa-clock me-2"></i>
+            <span>{{ activity.activityDuration }}</span>
+          </div>
+          {% endif %}
+          <div class="highlight-item me-4 mb-3">
+            <i class="fas fa-users me-2"></i>
+            <span>{{ activity.maxNumber - totalBookedTickets }} spots left</span>
+          </div>
+          <div class="highlight-item mb-3">
+            <i class="fas fa-tag me-2"></i>
+            <span>{{ activity.activityPrice|number_format(2) }} TND</span>
+          </div>
         </div>
       </div>
     </div>
-
-    <!-- Horizontal Image Gallery -->
+  </div>
+  
+  <div class="container">
+    <!-- Thumbnails Gallery -->
     <div class="row mb-5">
       <div class="col-12">
-        <div class="gallery-container rounded-4 shadow-sm">
-          <div class="row g-0">
-            {% if activity.resources is not empty %}
-              {% set featured_image = activity.resources|first %}
-              <div class="col-md-8">
-                <div class="main-image-container">
-                  <img src="{{ asset(featured_image.path) }}" alt="{{ activity.activityName }}">
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="thumbnails-container">
-                  {% for i in 1..3 %}
-                    {% if activity.resources[i] is defined %}
-                      <div class="thumbnail-item">
-                        <img src="{{ asset(activity.resources[i].path) }}" alt="{{ activity.activityName }}">
-                      </div>
-                    {% endif %}
-                  {% endfor %}
-                  
-                  {% if activity.resources|length > 4 %}
-                    <div class="thumbnail-item">
-                      <div class="more-overlay">
-                        <img src="{{ asset(activity.resources[4 < activity.resources|length ? 4 : activity.resources|length - 1].path) }}" alt="{{ activity.activityName }}">
-                        <div class="more-text">
-                          <a href="#imageGalleryModal" data-bs-toggle="modal" class="text-white fw-bold">
-                            +{{ activity.resources|length - 4 }} more
-                          </a>
-                        </div>
-                      </div>
+        <div class="thumbnails-gallery">
+          <div class="row g-3">
+            {% if activity.resources is not empty and activity.resources|length > 1 %}
+              {% for i in 1..4 %}
+                {% if activity.resources[i] is defined %}
+                  <div class="col-6 col-md-3">
+                    <div class="thumbnail-card">
+                      <img src="{{ asset(activity.resources[i].path) }}" alt="{{ activity.activityName }} - Photo {{ i+1 }}" class="img-fluid rounded-3">
                     </div>
-                  {% endif %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+              
+              {% if activity.resources|length > 5 %}
+                <div class="col-6 col-md-3">
+                  <div class="thumbnail-card position-relative">
+                    <img src="{{ asset(activity.resources[5 < activity.resources|length ? 5 : activity.resources|length - 1].path) }}" alt="{{ activity.activityName }}" class="img-fluid rounded-3">
+                    <div class="more-photos-overlay rounded-3">
+                      <a href="#imageGalleryModal" data-bs-toggle="modal" class="d-flex flex-column align-items-center justify-content-center h-100 text-decoration-none">
+                        <i class="fas fa-images fa-2x mb-2 text-white"></i>
+                        <span class="text-white fw-bold">+{{ activity.resources|length - 5 }} photos</span>
+                      </a>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            {% else %}
-              <div class="col-12">
-                <div class="main-image-container">
-                  <img src="{{ asset('assets/img/activities/default.jpg') }}" alt="{{ activity.activityName }}">
-                </div>
-              </div>
+              {% endif %}
             {% endif %}
           </div>
         </div>
@@ -70,117 +98,196 @@
 
     <div class="row g-4">
       <div class="col-lg-8">
-        <!-- Activity Summary -->
-        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
-          <div class="row mb-3">
-            <div class="col-md-7">
-              <div class="h4 text-primary mb-3">About this activity</div>
-              <p>{{ activity.activityDescription|striptags|slice(0, 200) }}{% if activity.activityDescription|length > 200 %}...{% endif %}</p>
-            </div>
-            <div class="col-md-5">
-              <div class="text-center">
-                <div class="display-6 text-primary mb-2">{{ activity.activityPrice|number_format(2) }} TND</div>
-                <span class="d-block small text-muted">per person</span>
-              </div>
+        <!-- Activity Details Card -->
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+          <!-- Gradient header -->
+          <div class="card-header bg-gradient-primary p-4">
+            <div class="d-flex align-items-center">
+              <i class="fas fa-info-circle fa-2x me-3 text-white"></i>
+              <h3 class="mb-0 text-white">Activity Details</h3>
             </div>
           </div>
           
-          <!-- Key Details -->
-          <div class="row text-center g-3">
-            {% if activity.activityDestination %}
-            <div class="col-6 col-md-3">
-              <div class="border rounded-3 p-3 h-100">
-                <i class="fa fa-map-marker-alt text-primary mb-2 fs-4"></i>
-                <h6 class="mb-1">Location</h6>
-                <small class="text-muted">{{ activity.activityDestination }}</small>
-              </div>
-            </div>
-            {% endif %}
-            
-            {% if activity.activityDuration %}
-            <div class="col-6 col-md-3">
-              <div class="border rounded-3 p-3 h-100">
-                <i class="fa fa-clock text-primary mb-2 fs-4"></i>
-                <h6 class="mb-1">Duration</h6>
-                <small class="text-muted">{{ activity.activityDuration }}</small>
-              </div>
-            </div>
-            {% endif %}
-            
-            <div class="col-6 col-md-3">
-              <div class="border rounded-3 p-3 h-100">
-                <i class="fa fa-users text-primary mb-2 fs-4"></i>
-                <h6 class="mb-1">Group Size</h6>
-                <small class="text-muted">{{ activity.maxNumber }} max</small>
+          <!-- Key Features -->
+          <div class="card-body p-0">
+            <!-- Guarantees banner -->
+            <div class="guarantees-banner bg-light p-3 d-flex justify-content-between align-items-center border-bottom">
+              <div class="d-flex flex-wrap">
+                <div class="guarantee-item me-4">
+                  <i class="fas fa-shield-alt text-success me-2"></i>
+                  <span class="fw-bold">Best Price Guarantee</span>
+                </div>
+                <div class="guarantee-item me-4">
+                  <i class="fas fa-undo-alt text-success me-2"></i>
+                  <span class="fw-bold">Free Cancellation</span>
+                </div>
+                <div class="guarantee-item">
+                  <i class="fas fa-check-circle text-success me-2"></i>
+                  <span class="fw-bold">Instant Confirmation</span>
+                </div>
               </div>
             </div>
             
-            <div class="col-6 col-md-3">
-              <div class="border rounded-3 p-3 h-100">
-                <i class="fa fa-tag text-primary mb-2 fs-4"></i>
-                <h6 class="mb-1">Category</h6>
-                <small class="text-muted">{{ activity.activityType|default('Activity') }}</small>
+            <!-- Key details in icons -->
+            <div class="p-4">
+              <div class="row text-center g-3 mb-4">
+                {% if activity.activityDestination %}
+                <div class="col-6 col-md-3">
+                  <div class="feature-card p-3 h-100">
+                    <div class="feature-icon bg-primary-subtle rounded-circle p-3 mb-3 mx-auto">
+                      <i class="fas fa-map-marker-alt text-primary fs-4"></i>
+                    </div>
+                    <h6 class="mb-1">Location</h6>
+                    <small class="text-muted">{{ activity.activityDestination }}</small>
+                  </div>
+                </div>
+                {% endif %}
+                
+                {% if activity.activityDuration %}
+                <div class="col-6 col-md-3">
+                  <div class="feature-card p-3 h-100">
+                    <div class="feature-icon bg-primary-subtle rounded-circle p-3 mb-3 mx-auto">
+                      <i class="fas fa-clock text-primary fs-4"></i>
+                    </div>
+                    <h6 class="mb-1">Duration</h6>
+                    <small class="text-muted">{{ activity.activityDuration }}</small>
+                  </div>
+                </div>
+                {% endif %}
+                
+                <div class="col-6 col-md-3">
+                  <div class="feature-card p-3 h-100">
+                    <div class="feature-icon bg-primary-subtle rounded-circle p-3 mb-3 mx-auto">
+                      <i class="fas fa-users text-primary fs-4"></i>
+                    </div>
+                    <h6 class="mb-1">Group Size</h6>
+                    <small class="text-muted">{{ activity.maxNumber }} max</small>
+                  </div>
+                </div>
+                
+                <div class="col-6 col-md-3">
+                  <div class="feature-card p-3 h-100">
+                    <div class="feature-icon bg-primary-subtle rounded-circle p-3 mb-3 mx-auto">
+                      <i class="fas fa-th-large text-primary fs-4"></i>
+                    </div>
+                    <h6 class="mb-1">Category</h6>
+                    <small class="text-muted">{{ activity.activityType|default('Activity') }}</small>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Activity description -->
+              <h4 class="border-bottom pb-2 mb-3">About This Activity</h4>
+              <div class="activity-description mb-4">
+                {{ activity.activityDescription|raw }}
               </div>
             </div>
-          </div>
-        </div>
-        
-        <!-- Activity Description -->
-        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
-          <h3 class="text-primary mb-4 border-bottom pb-2">Activity Description</h3>
-          <div class="activity-description">
-            {{ activity.activityDescription|raw }}
           </div>
         </div>
         
         <!-- Availability section -->
-        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
-          <h3 class="text-primary mb-4 border-bottom pb-2">Availability Information</h3>
-          <div class="row">
-            <div class="col-md-7">
-              <div class="progress mb-3" style="height: 25px;">
-                {% set percentBooked = activity.maxNumber > 0 ? (totalBookedTickets / activity.maxNumber) * 100 : 0 %}
-                <div class="progress-bar bg-success" role="progressbar" 
-                     data-percent="{{ percentBooked }}"
-                     aria-valuenow="{{ totalBookedTickets }}" aria-valuemin="0" aria-valuemax="{{ activity.maxNumber }}">
-                  <span>{{ totalBookedTickets }} / {{ activity.maxNumber }}</span>
+        <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
+          <div class="card-header bg-gradient-info p-4 text-white">
+            <div class="d-flex align-items-center">
+              <i class="fas fa-calendar-alt fa-2x me-3"></i>
+              <h3 class="mb-0">Availability</h3>
+            </div>
+          </div>
+          
+          <div class="card-body p-4">
+            <div class="availability-stats mb-4">
+              {% set percentBooked = activity.maxNumber > 0 ? (totalBookedTickets / activity.maxNumber) * 100 : 0 %}
+              {% set percentAvailable = 100 - percentBooked %}
+              {% set availableSpots = activity.maxNumber - totalBookedTickets %}
+              
+              <!-- Visual indicator -->
+              <div class="position-relative mb-4">
+                <div class="progress" style="height: 40px; background-color: #e9ecef; border-radius: 20px;">
+                  <div class="progress-bar bg-success" role="progressbar" 
+                       style="width: {{ percentBooked }}%;"
+                       aria-valuenow="{{ totalBookedTickets }}" aria-valuemin="0" aria-valuemax="{{ activity.maxNumber }}">
+                  </div>
+                </div>
+                <div class="position-absolute top-0 start-0 end-0 bottom-0 d-flex align-items-center justify-content-center">
+                  <span class="text-dark fw-bold fs-5">{{ totalBookedTickets }} / {{ activity.maxNumber }}</span>
                 </div>
               </div>
               
-              <div class="mt-4">
-                <div class="d-flex align-items-center mb-2">
-                  <div class="me-3" style="width:20px; height:20px; background-color: #0d6efd; border-radius:50%;"></div>
-                  <span>Available Spots - {{ activity.maxNumber - totalBookedTickets }}</span>
+              <!-- Availability details -->
+              <div class="row g-4 mb-3">
+                <div class="col-md-6">
+                  <div class="availability-card available p-3 text-center rounded-4 h-100">
+                    <div class="availability-icon mb-2">
+                      <i class="fas fa-check-circle fa-3x text-primary"></i>
+                    </div>
+                    <h4 class="fw-bold">{{ availableSpots }}</h4>
+                    <p class="mb-0">Available Spots</p>
+                  </div>
                 </div>
-                <div class="d-flex align-items-center">
-                  <div class="me-3" style="width:20px; height:20px; background-color: #198754; border-radius:50%;"></div>
-                  <span>Booked Spots - {{ totalBookedTickets }}</span>
+                <div class="col-md-6">
+                  <div class="availability-card booked p-3 text-center rounded-4 h-100">
+                    <div class="availability-icon mb-2">
+                      <i class="fas fa-user-check fa-3x text-success"></i>
+                    </div>
+                    <h4 class="fw-bold">{{ totalBookedTickets }}</h4>
+                    <p class="mb-0">Booked Spots</p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="col-md-5">
-              <div class="card h-100 p-3 border-primary">
-                <div class="card-body text-center">
-                  <h5 class="card-title text-primary">Spots</h5>
-                  <div class="display-4 mb-3">{{ activity.maxNumber - totalBookedTickets }}</div>
-                  <p class="mb-0">spots remaining out of {{ activity.maxNumber }}</p>
-                  {% if activity.maxNumber - totalBookedTickets <= 5 and activity.maxNumber - totalBookedTickets > 0 %}
-                    <div class="alert alert-warning mt-3 mb-0">
-                      <i class="fa fa-exclamation-triangle me-2"></i> Only {{ activity.maxNumber - totalBookedTickets }} spots left!
-                    </div>
-                  {% endif %}
-                </div>
+              
+              <!-- Status indicator -->
+              <div class="availability-status p-3 rounded-4 text-center">
+                <h3 class="display-4 fw-bold mb-2">
+                  {{ availableSpots }}
+                  <span class="fs-6 text-muted">out of {{ activity.maxNumber }}</span>
+                </h3>
+                <p class="mb-0 fs-5">Spots Remaining</p>
+                
+                {% if availableSpots <= 5 and availableSpots > 0 %}
+                  <div class="limited-availability mt-3 p-2 rounded bg-warning-subtle">
+                    <i class="fas fa-exclamation-circle me-2 text-warning"></i>
+                    <span class="fw-bold">Limited availability!</span> Book soon to secure your spot.
+                  </div>
+                {% elseif availableSpots <= 0 %}
+                  <div class="sold-out mt-3 p-2 rounded bg-danger-subtle">
+                    <i class="fas fa-times-circle me-2 text-danger"></i>
+                    <span class="fw-bold">Sold out!</span> No more spots available for this activity.
+                  </div>
+                {% else %}
+                  <div class="good-availability mt-3 p-2 rounded bg-success-subtle">
+                    <i class="fas fa-thumbs-up me-2 text-success"></i>
+                    <span class="fw-bold">Good availability!</span> Plenty of spots still available.
+                  </div>
+                {% endif %}
               </div>
             </div>
           </div>
         </div>
         
-        <!-- Location section -->
+        <!-- Maps & Location section -->
         {% if activity.activityDestination %}
-        <div class="card shadow-sm border-0 rounded-4 p-4 mb-4 bg-white">
-          <h3 class="text-primary mb-4 border-bottom pb-2">Location</h3>
-          <div class="ratio ratio-16x9">
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25864.76992860789!2d10.17991905!3d36.79177545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd337f5e7ef543%3A0xd671924e714a0275!2z2KrZiNmG2LPYjCDYqtmI2YbYsw!5e0!3m2!1sar!2stn!4v1682169865368!5m2!1sar!2stn" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+          <div class="card-header bg-gradient-location p-4">
+            <div class="d-flex align-items-center">
+              <i class="fas fa-map-marker-alt fa-2x me-3 text-white"></i>
+              <h3 class="mb-0 text-white">Location & Map</h3>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="location-info p-3 d-flex align-items-center justify-content-between bg-light">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-compass text-success me-2 fs-5"></i>
+                <span class="fw-bold">{{ activity.activityDestination }}</span>
+              </div>
+              <a href="https://www.google.com/maps/search/{{ activity.activityDestination|url_encode }}" target="_blank" class="btn btn-sm btn-outline-success">
+                <i class="fas fa-directions me-1"></i> Get Directions
+              </a>
+            </div>
+            <div class="map-container">
+              <div class="full-map-wrapper">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25864.76992860789!2d10.17991905!3d36.79177545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd337f5e7ef543%3A0xd671924e714a0275!2z2KrZiNmG2LPYjCDYqtmI2YbYsw!5e0!3m2!1sar!2stn!4v1682169865368!5m2!1sar!2stn" class="full-map" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              </div>
+            </div>
           </div>
         </div>
         {% endif %}
@@ -188,58 +295,111 @@
       
       <div class="col-lg-4">
         <!-- Booking card -->
-        <div class="card shadow-lg border-0 rounded-4 p-0 mb-4 bg-white sticky-top" style="top: 100px;">
-          <div class="card-header bg-primary text-white p-3 text-center rounded-top-4">
-            <h3 class="mb-0 fs-5">Book this activity</h3>
+        <div class="booking-card card border-0 rounded-4 mb-4 sticky-top" style="top: 100px; z-index: 900;">
+          <div class="card-header bg-gradient-primary text-white p-4 rounded-top-4">
+            <h4 class="mb-0"><i class="fa fa-calendar-check me-2"></i>Book This Activity</h4>
           </div>
           <div class="card-body p-4">
-            <div class="p-3 bg-light rounded mb-4">
-              <div class="d-flex justify-content-between mb-2">
-                <span>Price per person:</span>
+            <div class="price-display text-center mb-4 p-3 bg-light rounded-3">
+              <div class="fs-6 text-muted mb-1">Starting from</div>
+              <div class="display-5 fw-bold text-primary">{{ activity.activityPrice|number_format(2) }}<span class="fs-5"> TND</span></div>
+              <div class="badge bg-success mt-2">Best Price Guarantee</div>
+            </div>
+            
+            <div class="booking-summary bg-light rounded-3 p-3 mb-4">
+              <h6 class="d-flex align-items-center mb-3"><i class="fa fa-receipt me-2 text-primary"></i>Booking Summary</h6>
+              <div class="d-flex justify-content-between mb-2 summary-item">
+                <span><i class="fa fa-tag me-1 text-muted"></i>Price per person:</span>
                 <span class="fw-bold">{{ activity.activityPrice|number_format(2) }} TND</span>
               </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span>Number of participants:</span>
-                <span id="summaryTicketCount">1</span>
+              <div class="d-flex justify-content-between mb-2 summary-item">
+                <span><i class="fa fa-users me-1 text-muted"></i>Participants:</span>
+                <span id="summaryTicketCount" class="fw-bold">1</span>
               </div>
-              <hr>
-              <div class="d-flex justify-content-between mb-0">
+              <hr class="my-2">
+              <div class="d-flex justify-content-between summary-total">
                 <span class="fw-bold">Total price:</span>
                 <span class="fw-bold text-primary fs-5" id="summaryTotalPrice">{{ activity.activityPrice|number_format(2) }} TND</span>
               </div>
             </div>
             
-            <form action="{{ path('app_payment_reservation', {'id': activity.id}) }}" method="post">
-              <div class="form-group mb-3">
-                <label class="form-label">Select number of participants:</label>
-                <div class="input-group">
-                  <button type="button" class="btn btn-outline-primary" id="decreaseParticipants">
-                    <i class="fa fa-minus"></i>
+            <form action="{{ path('app_payment_reservation', {'id': activity.id}) }}" method="post" class="booking-form">
+              <!-- Participants Selector -->
+              <div class="mb-4">
+                <div class="booking-form-label">
+                  <i class="fas fa-users booking-icon-bubble"></i>
+                  <span>Number of Participants</span>
+                </div>
+                
+                <div class="participants-selector">
+                  <button type="button" class="participant-btn decrease" id="decreaseParticipants">
+                    <i class="fas fa-minus"></i>
                   </button>
-                  <input type="number" name="participants" id="directParticipantsInput" class="form-control text-center" value="1" min="1" max="{{ activity.maxNumber - totalBookedTickets }}">
-                  <button type="button" class="btn btn-outline-primary" id="increaseParticipants">
-                    <i class="fa fa-plus"></i>
+                  <div class="participant-display">
+                    <input type="number" name="participants" id="directParticipantsInput" 
+                           value="1" min="1" max="{{ activity.maxNumber - totalBookedTickets }}" readonly>
+                  </div>
+                  <button type="button" class="participant-btn increase" id="increaseParticipants">
+                    <i class="fas fa-plus"></i>
                   </button>
+                </div>
+                
+                <div class="booking-info-row">
+                  <div class="info-item">
+                    <i class="fas fa-info-circle text-primary"></i>
+                    <span>Max {{ activity.maxNumber }} participants</span>
+                  </div>
+                  <div class="info-item highlight">
+                    <i class="fas fa-user-check text-success"></i>
+                    <span><span id="spotsLeft">{{ activity.maxNumber - totalBookedTickets }}</span> spots left</span>
+                  </div>
+                </div>
+              </div>
+              
+              <br>
+              <!-- Date Selector -->
+              <div class="mb-4">
+                <div class="booking-form-label">
+                  <i class="fas fa-calendar booking-icon-bubble"></i>
+                  <span>Select Date</span>
+                </div>
+                
+                <div class="date-selector">
+                  <input type="date" name="reservationDate" id="reservationDate" required min="{{ 'now'|date('Y-m-d') }}">
                 </div>
               </div>
               
               <input type="hidden" name="totalPrice" id="hiddenTotalPrice" value="{{ activity.activityPrice|number_format(2) }}">
-              
-              <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary btn-lg">
-                  <i class="fa fa-shopping-cart me-2"></i> Book Now
-                </button>
-              </div>
+              <br>
+              <button type="submit" class="book-now-button">
+                <div class="btn-content">
+                  <i class="fas fa-check-circle"></i>
+                  <span>Book Now</span>
+                </div>
+                <div class="btn-bg-hover"></div>
+              </button>
             </form>
             
-            <div class="mt-3">
-              <div class="d-flex align-items-center mb-2">
-                <i class="fa fa-lock text-success me-2"></i>
-                <span class="small">Secure payment process</span>
-              </div>
-              <div class="d-flex align-items-center">
-                <i class="fa fa-calendar-check text-primary me-2"></i>
-                <span class="small">Free cancellation up to 24 hours before</span>
+            <div class="trust-badges text-center mt-4">
+              <div class="row g-2">
+                <div class="col-4">
+                  <div class="trust-item p-2">
+                    <i class="fas fa-lock text-success fs-4"></i>
+                    <small class="d-block mt-1">Secure</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="trust-item p-2">
+                    <i class="fas fa-undo text-success fs-4"></i>
+                    <small class="d-block mt-1">Free Cancellation</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="trust-item p-2">
+                    <i class="fas fa-bolt text-success fs-4"></i>
+                    <small class="d-block mt-1">Instant Confirmation</small>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -290,43 +450,110 @@
     const summaryTicketCount = document.getElementById('summaryTicketCount');
     const summaryTotalPrice = document.getElementById('summaryTotalPrice');
     const hiddenTotalPrice = document.getElementById('hiddenTotalPrice');
+    const decreaseButton = document.getElementById('decreaseParticipants');
+    const increaseButton = document.getElementById('increaseParticipants');
+    const spotsLeftElement = document.getElementById('spotsLeft');
+    const bookNowButton = document.querySelector('.book-now-btn');
     
-    // Set initial values
-    const activityPrice = Number('{{ activity.activityPrice|default(0) }}');
-    const maxTickets = Number('{{ activity.maxNumber - totalBookedTickets }}');
-    let count = 1;
+    const pricePerPerson = {{ activity.activityPrice }};
+    const maxParticipants = {{ activity.maxNumber }};
+    const bookedTickets = {{ totalBookedTickets }};
     
-    // Increase participants
-    document.getElementById('increaseParticipants').addEventListener('click', function() {
-      if (count < maxTickets) {
-        count++;
-        updateValues();
+    function updatePrices() {
+      const participants = parseInt(participantsInput.value, 10);
+      const totalPrice = (participants * pricePerPerson).toFixed(2);
+      
+      // Apply animation effects
+      summaryTicketCount.classList.add('highlight-text');
+      summaryTotalPrice.classList.add('highlight-text');
+      
+      // Update text content
+      summaryTicketCount.textContent = participants;
+      summaryTotalPrice.textContent = totalPrice + ' TND';
+      hiddenTotalPrice.value = totalPrice;
+      
+      // Update spots left
+      spotsLeftElement.textContent = maxParticipants - bookedTickets - participants + 1;
+      
+      // Add urgency message if spots are limited
+      if (maxParticipants - bookedTickets - participants + 1 < 5) {
+        spotsLeftElement.classList.add('text-danger');
+        spotsLeftElement.classList.add('fw-bold');
+      } else {
+        spotsLeftElement.classList.remove('text-danger');
+        spotsLeftElement.classList.remove('fw-bold');
+      }
+      
+      // Remove animation classes after short delay
+      setTimeout(function() {
+        summaryTicketCount.classList.remove('highlight-text');
+        summaryTotalPrice.classList.remove('highlight-text');
+      }, 500);
+    }
+    
+    decreaseButton.addEventListener('click', function() {
+      if (participantsInput.value > 1) {
+        participantsInput.classList.add('pulse-animation');
+        participantsInput.value = parseInt(participantsInput.value, 10) - 1;
+        updatePrices();
+        
+        setTimeout(function() {
+          participantsInput.classList.remove('pulse-animation');
+        }, 300);
       }
     });
     
-    // Decrease participants
-    document.getElementById('decreaseParticipants').addEventListener('click', function() {
-      if (count > 1) {
-        count--;
-        updateValues();
+    increaseButton.addEventListener('click', function() {
+      const maxValue = parseInt(participantsInput.getAttribute('max'), 10);
+      if (parseInt(participantsInput.value, 10) < maxValue) {
+        participantsInput.classList.add('pulse-animation');
+        participantsInput.value = parseInt(participantsInput.value, 10) + 1;
+        updatePrices();
+        
+        setTimeout(function() {
+          participantsInput.classList.remove('pulse-animation');
+        }, 300);
       }
     });
     
-    // Handle manual input
-    participantsInput.addEventListener('input', function() {
-      let val = parseInt(participantsInput.value);
-      if (isNaN(val) || val < 1) val = 1;
-      if (val > maxTickets) val = maxTickets;
-      count = val;
-      updateValues();
+    participantsInput.addEventListener('change', function() {
+      let value = parseInt(this.value, 10);
+      const maxValue = parseInt(this.getAttribute('max'), 10);
+      
+      if (isNaN(value) || value < 1) {
+        value = 1;
+      } else if (value > maxValue) {
+        value = maxValue;
+      }
+      
+      this.value = value;
+      updatePrices();
     });
     
-    // Update all values
-    function updateValues() {
-      participantsInput.value = count;
-      summaryTicketCount.textContent = count;
-      summaryTotalPrice.textContent = (count * activityPrice).toFixed(2) + ' TND';
-      hiddenTotalPrice.value = (count * activityPrice).toFixed(2);
+    // Set today's date as default reservation date
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy = today.getFullYear();
+    const formattedDate = yyyy + '-' + mm + '-' + dd;
+    
+    const reservationDateInput = document.getElementById('reservationDate');
+    if (reservationDateInput) {
+      reservationDateInput.min = formattedDate;
+      reservationDateInput.value = formattedDate;
+    }
+    
+    // Add visual feedback when hovering over the book button
+    if (bookNowButton) {
+      bookNowButton.addEventListener('mouseenter', function() {
+        this.innerHTML = '<i class="fas fa-check-circle me-2"></i><span>Secure Your Spot!</span>';
+        this.classList.add('btn-lg-pulse');
+      });
+      
+      bookNowButton.addEventListener('mouseleave', function() {
+        this.innerHTML = '<i class="fas fa-check-circle me-2"></i><span>Book Now</span>';
+        this.classList.remove('btn-lg-pulse');
+      });
     }
   });
 </script>
@@ -343,11 +570,397 @@
 
 {% block stylesheets %}
 {{ parent() }}
+<!-- Font Awesome CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
-  /* Activity details page custom styles */
+  /* Modern Hero Section Styles */
   .hero-section {
-    margin-top: 80px;
+    margin-top: 0;
+    background-color: #fff;
+  }
+  
+  .hero-banner {
+    height: 500px;
+    overflow: hidden;
+  }
+  
+  .hero-image-container {
+    height: 500px;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  
+  .hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 100%);
+  }
+  
+  .hero-content {
+    padding-top: 280px;
+    padding-bottom: 50px;
+    position: relative;
+    z-index: 2;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+  }
+  
+  .glow-effect {
+    animation: text-glow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes text-glow {
+    from {
+      text-shadow: 0 0 10px rgba(13, 110, 253, 0.3), 0 0 20px rgba(13, 110, 253, 0.2);
+    }
+    to {
+      text-shadow: 0 0 12px rgba(13, 110, 253, 0.4), 0 0 22px rgba(13, 110, 253, 0.3);
+    }
+  }
+  
+  .hero-badge {
+    padding: 8px 15px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-block;
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    color: white;
+    box-shadow: 0 2px 10px rgba(13, 110, 253, 0.4);
+  }
+  
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+    color: #ffffff; /* Clean white */
+    letter-spacing: 0.5px;
+  }
+  
+  .hero-highlights {
+    font-size: 1.1rem;
+  }
+  
+  .highlight-item {
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    font-weight: 500;
+  }
+  
+  .highlight-item i {
+    color: #0d6efd; /* Bootstrap primary blue */
+  }
+  
+  .rating-stars {
+    color: #ffc107; /* Keep this gold color as it's standard for ratings */
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+  }
+  
+  /* Map Styling */
+  .full-map-wrapper {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    border-radius: 0 0 8px 8px;
+  }
+  
+  .full-map {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  /* Thumbnail Gallery */
+  .thumbnail-card {
+    height: 180px;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .thumbnail-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  }
+  
+  .thumbnail-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .thumbnail-card:hover img {
+    transform: scale(1.1);
+  }
+  
+  .more-photos-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  .more-photos-overlay:hover {
+    background-color: rgba(0,0,0,0.7);
+  }
+  
+  /* Booking Card Styles */
+  .booking-card {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .booking-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  }
+  
+  .price-display {
+    border-left: 4px solid #0d6efd;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+  }
+  
+  .price-display:hover {
+    transform: translateY(-2px);
+  }
+  
+  /* Booking Form Styling */
+  .booking-form {
+    padding: 5px;
+  }
+  
+  .booking-form-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  .booking-icon-bubble {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    color: white;
+    border-radius: 50%;
+    margin-right: 12px;
+    box-shadow: 0 3px 6px rgba(13, 110, 253, 0.2);
+  }
+  
+  /* Participants Selector */
+  .participants-selector {
+    display: flex;
+    align-items: center;
     background-color: #f8f9fa;
+    border-radius: 50px;
+    padding: 5px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+  }
+  
+  .participants-selector:focus-within {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  }
+  
+  .participant-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    background: white;
+    color: #0d6efd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .participant-btn:hover {
+    transform: scale(1.05);
+  }
+  
+  .decrease:hover {
+    background-color: #f8d7da;
+    color: #dc3545;
+  }
+  
+  .increase:hover {
+    background-color: #d1e7dd;
+    color: #198754;
+  }
+  
+  .participant-display {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #212529;
+  }
+  
+  .participant-display input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #0d6efd;
+    -moz-appearance: textfield;
+  }
+  
+  .participant-display input::-webkit-outer-spin-button,
+  .participant-display input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  /* Date Selector */
+  .date-selector {
+    position: relative;
+  }
+  
+  .date-selector input {
+    width: 100%;
+    height: 55px;
+    padding: 0 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 50px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+  }
+  
+  .date-selector input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    outline: none;
+  }
+  
+  /* Booking Info */
+  .booking-info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  
+  .info-item {
+    display: flex;
+    align-items: center;
+    color: #6c757d;
+  }
+  
+  .info-item i {
+    margin-right: 5px;
+  }
+  
+  .info-item.highlight {
+    color: #198754;
+    font-weight: 500;
+  }
+  
+  /* Book Now Button */
+  .book-now-button {
+    position: relative;
+    width: 100%;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+  }
+  
+  .book-now-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
+  }
+  
+  .btn-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .btn-content i {
+    margin-right: 10px;
+    font-size: 20px;
+  }
+  
+  .btn-bg-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #198754, #0d6efd);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+  }
+  
+  .book-now-button:hover .btn-bg-hover {
+    opacity: 1;
+  }
+  
+  /* Trust badges */
+  .trust-badges {
+    border-top: 1px dashed #dee2e6;
+    padding-top: 15px;
+  }
+  
+  .trust-item {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .trust-item:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
   }
   
   /* Gallery Styles */
@@ -364,6 +977,11 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .main-image-container img:hover {
+    transform: scale(1.05);
   }
   
   .thumbnails-container {
@@ -375,6 +993,12 @@
   .thumbnail-item {
     height: 25%;
     overflow: hidden;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+  
+  .thumbnail-item:hover {
+    opacity: 0.8;
   }
   
   .thumbnail-item img {
@@ -397,54 +1021,296 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background-color 0.3s ease;
   }
   
-  /* Similar Activities */
-  .similar-img-container {
-    height: 180px;
-    overflow: hidden;
+  .more-text:hover {
+    background-color: rgba(0,0,0,0.7);
   }
   
-  .similar-img-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  /* Tab styles */
+  .nav-tabs .nav-link {
+    color: #6c757d;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
   }
   
-  /* Provider */
-  .provider-avatar {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto;
-    background-color: #0d2857;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 32px;
-    font-weight: bold;
+  .nav-tabs .nav-link.active {
+    color: #0d6efd;
+    border-bottom-color: #0d6efd;
+    background-color: transparent;
+  }
+  
+  .nav-tabs .nav-link:hover:not(.active) {
+    border-bottom-color: #dee2e6;
   }
   
   /* Description */
   .activity-description {
     line-height: 1.8;
+    font-size: 16px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
   }
   
   .activity-description p {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .activity-description p:last-child {
+    margin-bottom: 0;
   }
   
   .activity-description img {
     max-width: 100%;
     height: auto;
     border-radius: 8px;
-    margin: 1rem 0;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
   }
   
+  .activity-description img:hover {
+    transform: scale(1.02);
+  }
+  
+  .activity-description ul,
+  .activity-description ol {
+    padding-left: 25px;
+    margin-bottom: 20px;
+  }
+  
+  .activity-description h1, 
+  .activity-description h2, 
+  .activity-description h3 {
+    color: #6f42c1;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .activity-description a {
+    color: #0d6efd;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .activity-description a:hover {
+    color: #0a58ca;
+    text-decoration: underline;
+  }
+  
+  /* Badges and buttons */
   .badge {
     padding: 0.5rem 0.8rem;
     font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .badge:hover {
+    opacity: 0.9;
+  }
+  
+  /* Key details boxes */
+  .border.rounded-3 {
+    transition: all 0.3s ease;
+  }
+  
+  .border.rounded-3:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+    transform: translateY(-2px);
+  }
+  
+  /* Animation styles */
+  .pulse-animation {
+    animation: pulse-effect 0.3s ease;
+  }
+  
+  @keyframes pulse-effect {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  .highlight-text {
+    animation: highlight-effect 0.5s ease;
+  }
+  
+  @keyframes highlight-effect {
+    0% { color: #0d6efd; }
+    50% { color: #198754; }
+    100% { color: #0d6efd; }
+  }
+  
+  .btn-lg-pulse {
+    animation: btn-pulse 1s infinite;
+  }
+  
+  @keyframes btn-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+  
+  /* Booking form styles */
+  .form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    border-color: #0d6efd;
+  }
+  
+  /* Button styles */
+  .btn-primary {
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Progress bar animation */
+  .progress-bar {
+    transition: width 1s ease;
+  }
+  
+  /* Booking section */
+  .sticky-top {
+    transition: all 0.3s ease;
+  }
+  
+  .card {
+    transition: all 0.3s ease;
+    border: none;
+  }
+  
+  .card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Gradient backgrounds */
+  .bg-gradient-info {
+    background: linear-gradient(135deg, #0dcaf0 0%, #0a92b3 100%);
+  }
+  
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  }
+  
+  .bg-gradient-description {
+    background: linear-gradient(135deg, #6f42c1 0%, #4e2e8b 100%);
+  }
+  
+  .bg-gradient-location {
+    background: linear-gradient(135deg, #198754 0%, #115740 100%);
+  }
+  
+  .bg-primary-subtle {
+    background-color: rgba(13, 110, 253, 0.1);
+  }
+  
+  /* Feature cards */
+  .feature-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+  }
+  
+  .feature-card:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+    transform: translateY(-5px);
+  }
+  
+  .feature-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .feature-card:hover .feature-icon {
+    transform: scale(1.1);
+  }
+  
+  /* Price banner */
+  .activity-price-banner {
+    transition: all 0.3s ease;
+  }
+  
+  .activity-price-banner:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .availability-card {
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .availability-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  }
+  
+  .availability-card.available {
+    background-color: rgba(13, 110, 253, 0.05);
+    border-left: 3px solid #0d6efd;
+  }
+  
+  .availability-card.booked {
+    background-color: rgba(25, 135, 84, 0.05);
+    border-left: 3px solid #198754;
+  }
+  
+  .availability-status {
+    background-color: #f8f9fa;
+    border: 1px dashed #dee2e6;
+  }
+  
+  /* Progress bar enhancement */
+  .progress {
+    overflow: visible;
+    margin-top: 10px;
+    margin-bottom: 26px;
+    height: 10px;
+  }
+  
+  .progress .progress-bar {
+    position: relative;
+    animation: animate-positive 2s;
+    overflow: visible;
+  }
+  
+  @keyframes animate-positive {
+    0% { width: 0%; }
+  }
+  
+  /* Input number controls */
+  .input-group-text {
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .input-group-text:hover {
+    background-color: #e9ecef;
+  }
+  
+  /* Summary section */
+  .summary-header {
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .summary-total {
+    border-top: 1px solid #dee2e6;
+    padding-top: 10px;
+    margin-top: 10px;
+    font-weight: 600;
   }
   
   /* Responsive Adjustments */

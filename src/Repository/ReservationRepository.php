@@ -97,4 +97,52 @@ class ReservationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    
+    /**
+     * Filter bookings by search term, activity, status, and date
+     */
+    public function filterBookings(array $filters = [])
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->select('r, u, b')
+            ->join('r.user', 'u')
+            ->join('r.billet', 'b');
+            
+        // Filter by search term (ticket number, user name, etc.)
+        if (!empty($filters['search'])) {
+            $searchTerm = '%' . $filters['search'] . '%';
+            $qb->andWhere('b.numero LIKE :search OR u.name LIKE :search OR u.lastname LIKE :search OR u.email LIKE :search')
+               ->setParameter('search', $searchTerm);
+        }
+        
+        // Filter by activity
+        if (!empty($filters['activity'])) {
+            $qb->andWhere('b.activiteId = :activityId')
+               ->setParameter('activityId', $filters['activity']);
+        }
+        
+        // Filter by status
+        if (!empty($filters['status'])) {
+            $qb->andWhere('r.statuts = :status')
+               ->setParameter('status', $filters['status']);
+        }
+        
+        // Filter by specific date
+        if (!empty($filters['date_from'])) {
+            $date = new \DateTime($filters['date_from']);
+            $startOfDay = clone $date;
+            $startOfDay->setTime(0, 0, 0); // Start of day
+            
+            $endOfDay = clone $date;
+            $endOfDay->setTime(23, 59, 59); // End of day
+            
+            $qb->andWhere('r.date BETWEEN :startDate AND :endDate')
+               ->setParameter('startDate', $startOfDay)
+               ->setParameter('endDate', $endOfDay);
+        }
+        
+        return $qb->orderBy('r.id', 'DESC')
+                 ->getQuery()
+                 ->getResult();
+    }
 }

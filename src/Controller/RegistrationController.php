@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Users;
 use App\Repository\UsersRepository;
+use App\Service\HCaptchaService;
 use App\Service\TotpService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,19 +21,22 @@ class RegistrationController extends AbstractController
     private $passwordHasher;
     private $totpService;
     private $session;
+    private $hCaptchaService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         UsersRepository $usersRepository,
         UserPasswordHasherInterface $passwordHasher,
         TotpService $totpService,
-        SessionInterface $session
+        SessionInterface $session,
+        HCaptchaService $hCaptchaService
     ) {
         $this->entityManager = $entityManager;
         $this->usersRepository = $usersRepository;
         $this->passwordHasher = $passwordHasher;
         $this->totpService = $totpService;
         $this->session = $session;
+        $this->hCaptchaService = $hCaptchaService;
     }
 
     /**
@@ -65,6 +69,15 @@ class RegistrationController extends AbstractController
         $gender = $request->request->get('gender');
         $password = $request->request->get('password');
         $confirmPassword = $request->request->get('confirm_password');
+        
+        // Verify hCaptcha response
+        $hCaptchaResponse = $request->request->get('h-captcha-response');
+        $clientIp = $request->getClientIp();
+        
+        if (!$this->hCaptchaService->verify($hCaptchaResponse, $clientIp)) {
+            $this->addFlash('error', 'Please verify that you are not a robot.');
+            return $this->redirectToRoute('app_register');
+        }
 
         // Validation
         if (!$name || !$lastname || !$email) {
@@ -72,8 +85,14 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('app_register');
         }
 
-        if (!$password || strlen($password) < 6) {
-            $this->addFlash('error', 'Password must be at least 6 characters long');
+        // Improved password validation with more secure requirements
+        if (!$password || 
+            strlen($password) < 8 || 
+            !preg_match('/[A-Z]/', $password) || 
+            !preg_match('/[0-9]/', $password) || 
+            !preg_match('/[^A-Za-z0-9]/', $password)) {
+            
+            $this->addFlash('error', 'Password must be at least 8 characters long and include an uppercase letter, a number, and a special character.');
             return $this->redirectToRoute('app_register');
         }
 

@@ -1,0 +1,137 @@
+/* Additional fixes for the bookings table */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  padding-bottom: 6px;
+}
+
+.table-4 {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-4 th {
+  padding: 16px 20px;
+  white-space: nowrap;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.table-4 td {
+  padding: 16px 20px;
+  vertical-align: middle;
+}
+
+/* Ensure email text doesn't overflow */
+.text-light-1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+  display: block;
+}
+
+/* Fix table layout */
+.table-4 {
+  table-layout: fixed;
+}
+
+/* Make sure all cells have padding */
+.table-4 td {
+  padding: 16px 12px;
+}
+
+/* Prevent content overflow in cells */
+.table-4 td > div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fix filter section on smaller screens */
+@media (max-width: 992px) {
+  .search-field input,
+  .select-field select {
+    font-size: 14px;
+    height: 45px;
+  }
+  
+  .button.-md {
+    height: 45px !important;
+  }
+  
+  /* Ensure table scrolls horizontally on mobile */
+  .table-4 {
+    min-width: 850px;
+  }
+}
+
+/* Fix spacing in the filter bar */
+.g-3 > * {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Ensure date picker shows properly */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  margin-left: 0.5em;
+}
+
+/* Trim long user names and emails */
+.user-info-cell {
+  max-width: 200px;
+}
+
+.user-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.user-email {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+  display: block;
+}
+
+/* Ensure action buttons have proper spacing */
+.action-buttons-cell {
+  min-width: 80px;
+}
+
+/* Fix column widths to prevent jumping */
+th.id-column, td.id-column {
+  width: 80px;
+}
+
+th.ticket-column, td.ticket-column {
+  width: 130px;
+}
+
+th.activity-column, td.activity-column {
+  width: 120px;
+}
+
+th.user-column, td.user-column {
+  width: 200px;
+}
+
+th.places-column, td.places-column {
+  width: 80px;
+}
+
+th.price-column, td.price-column {
+  width: 80px;
+}
+
+th.status-column, td.status-column {
+  width: 120px;
+}
+
+th.actions-column, td.actions-column {
+  width: 100px;
+}

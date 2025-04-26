@@ -2,6 +2,12 @@
 
 {% block title %}Manage Activities{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-activities.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-pagination.css') }}">
+{% endblock %}
+
 {% block body %}
 <div class="row y-gap-20 justify-between items-end pb-30">
     <div class="col-auto">
@@ -10,29 +16,68 @@
     </div>
 </div>
 
+<!-- Filter Section -->
+<div class="filter-form-container">
+    <div class="filter-header">
+        <h3 class="filter-title">Filter Activities</h3>
+        <a href="{{ path('admin_activities') }}" class="clear-filters-link">
+            Clear All Filters
+        </a>
+    </div>
+    
+    <form action="{{ path('admin_activities') }}" method="GET" class="filter-form js-filter-form">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="search-field">
+                    <input type="text" name="search" value="{{ app.request.query.get('search') }}" class="form-control" placeholder="Search by name, destination or genre">
+                </div>
+            </div>
+            
+            <div class="col-lg-3">
+                <div class="select-field">
+                    <select name="genre" class="form-select">
+                        <option value="">All Genres</option>
+                        <option value="Adventure" {% if app.request.query.get('genre') == 'Adventure' %}selected{% endif %}>Adventure</option>
+                        <option value="Cultural" {% if app.request.query.get('genre') == 'Cultural' %}selected{% endif %}>Cultural</option>
+                        <option value="Beach" {% if app.request.query.get('genre') == 'Beach' %}selected{% endif %}>Beach</option>
+                        <option value="Other" {% if app.request.query.get('genre') == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="col-lg-1">
+                <button type="submit" class="filter-button">
+                    <i class="icon-search"></i>
+                    Filter
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
 <div class="py-30 px-30 rounded-4 bg-white shadow-3">
     <div class="tabs -underline-2 js-tabs">
         <div class="tabs__controls row x-gap-40 y-gap-10 lg:x-gap-20 js-tabs-controls">
             <div class="col-auto">
-                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">All Activities ({{ activities|length }})</button>
+                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".js-tabs-content-1">{% if app.request.query.has('search') or app.request.query.has('genre') %}Filtered{% else %}All{% endif %} Activities ({{ activities|length }})</button>
             </div>
         </div>
 
         <div class="tabs__content pt-30 js-tabs-content">
-            <div class="tabs__pane -tab-item-1 is-tab-el-active">
-                <div class="overflow-scroll scroll-bar-1">
-                    <table class="table-4 -border-bottom col-12">
-                        <thead class="bg-light-2">
+            <div class="tabs__pane js-tabs-content-1 is-tab-el-active">
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Activity Name</th>
-                                <th>Destination</th>
-                                <th>Created By</th>
-                                <th>Duration</th>
-                                <th>Price</th>
-                                <th>Genre</th>
-                                <th>Date</th>
-                                <th>Actions</th>
+                                <th class="col-id">ID</th>
+                                <th class="col-name">Activity Name</th>
+                                <th class="col-destination">Destination</th>
+                                <th class="col-creator">Created By</th>
+                                <th class="col-duration">Duration</th>
+                                <th class="col-price">Price</th>
+                                <th class="col-genre">Genre</th>
+                                <th class="col-date">Date</th>
+                                <th class="col-actions">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -43,61 +88,80 @@
                             {% else %}
                                 {% for activity in activities %}
                                     <tr>
-                                        <td>#{{ activity.id }}</td>
+                                        <td>
+                                            <div class="id-badge">#{{ activity.id }}</div>
+                                        </td>
                                         <td>
                                             <div>
-                                                <div class="fw-500">{{ activity.activityName }}</div>
-                                                <div class="text-14 lh-15 text-light-1">
-                                                    {{ activity.activityDescription|length > 50 ? activity.activityDescription|slice(0, 50) ~ '...' : activity.activityDescription }}
+                                                <div class="activity-name">{{ activity.activityName }}</div>
+                                                <div class="activity-description">
+                                                    {{ activity.activityDescription }}
                                                 </div>
                                             </div>
                                         </td>
                                         <td>{{ activity.activityDestination }}</td>
                                         <td>
                                             {% if activity.user %}
-                                                <div>
-                                                    <div class="fw-500">{{ activity.user.username }}</div>
-                                                    <div class="text-14 lh-15 text-light-1">{{ activity.user.email }}</div>
+                                                <div class="user-cell">
+                                                    <div class="user-details">
+                                                        <div class="user-name-row">
+                                                            <span>{{ activity.user.name|default(activity.user.username) }}</span>
+                                                            <a href="javascript:void(0)" onclick="showUserDetails({
+                                                                id: {{ activity.user.id }},
+                                                                name: '{{ activity.user.name|default(activity.user.username)|e('js') }}',
+                                                                email: '{{ activity.user.email|e('js') }}',
+                                                                roles: '{{ activity.user.roles|join(', ')|e('js') }}'
+                                                            })" class="view-details-link">
+                                                                <i class="icon-eye text-blue-1"></i> View
+                                                            </a>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             {% else %}
                                                 <div class="text-14 text-light-1">Unknown User</div>
                                             {% endif %}
                                         </td>
                                         <td>{{ activity.activityDuration }}</td>
-                                        <td class="fw-500">
-                                            {% if activity.activityPrice %}
-                                                ${{ activity.activityPrice }}
-                                            {% else %}
-                                                Free
-                                            {% endif %}
+                                        <td>
+                                            <div class="fw-500{% if not activity.activityPrice %} text-green-2{% endif %}">
+                                                {% if activity.activityPrice %}
+                                                    ${{ activity.activityPrice }}
+                                                {% else %}
+                                                    Free
+                                                {% endif %}
+                                            </div>
                                         </td>
                                         <td>
                                             {% if activity.activityGenre %}
-                                                <div class="rounded-100 py-4 px-10 text-center {% if activity.activityGenre == 'Adventure' %}bg-yellow-4 text-yellow-3{% elseif activity.activityGenre == 'Cultural' %}bg-blue-1-05 text-blue-1{% elseif activity.activityGenre == 'Beach' %}bg-blue-2 text-blue-1{% else %}bg-green-1 text-green-2{% endif %}">
+                                                <div class="genre-badge {% if activity.activityGenre == 'Adventure' %}genre-adventure{% elseif activity.activityGenre == 'Cultural' %}genre-cultural{% elseif activity.activityGenre == 'Beach' %}genre-beach{% else %}genre-other{% endif %}">
                                                     {{ activity.activityGenre }}
                                                 </div>
                                             {% else %}
-                                                <div class="rounded-100 py-4 px-10 text-center bg-light-2 text-light-1">
+                                                <div class="genre-badge genre-uncategorized">
                                                     Uncategorized
                                                 </div>
                                             {% endif %}
                                         </td>
                                         <td>
                                             {% if activity.activityDate %}
-                                                {{ activity.activityDate|date('d/m/Y') }}
+                                                <div>{{ activity.activityDate|date('d/m/Y') }}</div>
                                             {% else %}
-                                                Any date
+                                                <div class="text-light-1">Any date</div>
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <div class="row x-gap-10 y-gap-10">
-                                                <div class="col-auto">
-                                                    <a href="{{ path('admin_delete_activity', {'id': activity.id}) }}"
-                                                       onclick="return confirm('Are you sure you want to delete the activity: {{ activity.activityName }}? This action cannot be undone.')"
-                                                       class="flex-center size-35 rounded-4 bg-red-3 text-white">
-                                                        <i class="icon-trash text-12"></i>
-                                                    </a>
-                                                </div>
+                                            <div class="action-buttons">
+                                                <a href="#" class="action-button view-button" 
+                                                   data-bs-toggle="tooltip" title="View Details"
+                                                   onclick="showActivityDetails('{{ activity.activityName }}', '{{ activity.activityDescription|e('js') }}', '{{ activity.activityDestination }}', '{{ activity.activityPrice ? '$' ~ activity.activityPrice : 'Free' }}', '{{ activity.activityGenre }}', '{{ activity.activityDate ? activity.activityDate|date('d/m/Y') : 'Any date' }}'); return false;">
+                                                    <i class="icon-eye"></i>
+                                                </a>
+                                                <a href="{{ path('admin_delete_activity', {'id': activity.id}) }}"
+                                                   class="action-button delete-button"
+                                                   data-bs-toggle="tooltip" title="Delete Activity"
+                                                   onclick="return confirmDelete('{{ activity.activityName }}', {{ activity.id }})">
+                                                    <i class="icon-trash"></i>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
@@ -105,6 +169,18 @@
                             {% endif %}
                         </tbody>
                     </table>
+                    
+                    {# Pagination #}
+                    {% if totalPages > 1 %}
+                        <div class="pagination-container">
+                            {% include 'admin/components/pagination.html.twig' with {
+                                currentPage: currentPage,
+                                totalPages: totalPages,
+                                routeName: 'admin_activities',
+                                queryParams: app.request.query.all|merge({page: null})
+                            } %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -113,9 +189,267 @@
 {% endblock %}
 
 {% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Activity management JavaScript
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Real-time filtering
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                document.querySelector('.js-filter-form').submit();
+            });
+        }
+        
+        const genreSelect = document.querySelector('select[name="genre"]');
+        if (genreSelect) {
+            genreSelect.addEventListener('change', function() {
+                document.querySelector('.js-filter-form').submit();
+            });
+        }
     });
+    
+    function confirmDelete(activityName, activityId) {
+        event.preventDefault();
+        
+        Swal.fire({
+            title: 'Are you sure?',
+            html: `You are about to delete the activity: <strong>${activityName}</strong>.<br>This action cannot be undone.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d93025',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `{{ path('admin_delete_activity', {'id': 'ACTIVITY_ID'}) }}`.replace('ACTIVITY_ID', activityId);
+            }
+        });
+        
+        return false;
+    }
+    
+    function showUserDetails(user) {
+        Swal.fire({
+            title: 'User Details',
+            html: `
+                <div class="user-details-popup">
+                    <div class="user-info-row">
+                        <div class="user-info-label">Name:</div>
+                        <div class="user-info-value">${user.name}</div>
+                    </div>
+                    <div class="user-info-row">
+                        <div class="user-info-label">Email:</div>
+                        <div class="user-info-value">${user.email}</div>
+                    </div>
+                    <div class="user-info-row">
+                        <div class="user-info-label">ID:</div>
+                        <div class="user-info-value">#${user.id}</div>
+                    </div>
+                    <div class="user-info-row">
+                        <div class="user-info-label">Roles:</div>
+                        <div class="user-info-value">${user.roles}</div>
+                    </div>
+                </div>
+            `,
+            width: '500px',
+            padding: '20px',
+            customClass: {
+                popup: 'user-details-swal-popup',
+                title: 'user-details-swal-title',
+                htmlContainer: 'user-details-swal-html'
+            }
+        });
+    }
+    
+    function showActivityDetails(name, description, destination, price, genre, date) {
+        Swal.fire({
+            title: '<span class="details-title-icon"><i class="icon-map-pin"></i></span>' + name,
+            html: `
+                <div class="activity-details">
+                    <div class="activity-details-header">
+                        <div class="detail-badge">${genre}</div>
+                        <div class="detail-price">${price}</div>
+                    </div>
+
+                    <div class="activity-details-section">
+                        <div class="section-title">About This Activity</div>
+                        <div class="section-content">${description}</div>
+                    </div>
+
+                    <div class="activity-details-info">
+                        <div class="info-item">
+                            <div class="info-icon"><i class="icon-map-pin"></i></div>
+                            <div class="info-content">
+                                <div class="info-label">Destination</div>
+                                <div class="info-value">${destination}</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="icon-calendar"></i></div>
+                            <div class="info-content">
+                                <div class="info-label">Date</div>
+                                <div class="info-value">${date}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            width: '650px',
+            padding: '0',
+            background: '#f8fafc',
+            showConfirmButton: false,
+            showCloseButton: true,
+            customClass: {
+                popup: 'activity-details-popup',
+                title: 'activity-details-title',
+                closeButton: 'activity-details-close',
+                content: 'activity-details-content'
+            }
+        });
+    }
 </script>
+<style>
+    .activity-details-popup {
+        font-family: inherit;
+        border-radius: 16px !important;
+        overflow: hidden;
+    }
+    
+    .activity-details-title {
+        position: relative;
+        font-size: 22px;
+        font-weight: 700;
+        color: #051036;
+        padding: 25px 30px !important;
+        text-align: left;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+    }
+    
+    .details-title-icon {
+        margin-right: 12px;
+        width: 36px;
+        height: 36px;
+        background-color: rgba(53, 84, 209, 0.1);
+        color: #3554d1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    
+    .activity-details-close {
+        color: #051036 !important;
+        opacity: 0.5;
+    }
+    
+    .activity-details {
+        text-align: left;
+        background-color: #f8fafc;
+    }
+    
+    .activity-details-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 30px;
+        background-color: #fff;
+    }
+    
+    .detail-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        background-color: rgba(53, 84, 209, 0.08);
+        color: #3554d1;
+        font-weight: 500;
+        font-size: 13px;
+        border-radius: 30px;
+    }
+    
+    .detail-price {
+        font-size: 16px;
+        font-weight: 700;
+        color: #051036;
+    }
+    
+    .activity-details-section {
+        padding: 25px 30px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background-color: #fff;
+    }
+    
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #051036;
+        margin-bottom: 15px;
+    }
+    
+    .section-content {
+        color: #697488;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+    
+    .activity-details-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 25px 30px;
+        background-color: #f8fafc;
+    }
+    
+    .info-item {
+        flex: 1;
+        min-width: 250px;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+    }
+    
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(53, 84, 209, 0.08);
+        color: #3554d1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+    
+    .info-content {
+        flex: 1;
+    }
+    
+    .info-label {
+        font-size: 13px;
+        color: #697488;
+        margin-bottom: 5px;
+    }
+    
+    .info-value {
+        font-size: 15px;
+        font-weight: 500;
+        color: #051036;
+    }
+    
+    .activity-details-content {
+        padding: 0 !important;
+    }
+</style>
 {% endblock %}

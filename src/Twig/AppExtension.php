@@ -5,6 +5,7 @@ namespace App\Twig;
 use App\Entity\Activities;
 use Doctrine\ORM\EntityManagerInterface;
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 class AppExtension extends AbstractExtension
@@ -21,6 +22,18 @@ class AppExtension extends AbstractExtension
         return [
             new TwigFunction('getActivityById', [$this, 'getActivityById']),
         ];
+    }
+
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('string', [$this, 'stringFilter']),
+        ];
+    }
+
+    public function stringFilter($value): string
+    {
+        return (string) $value;
     }
 
     public function getActivityById(int $id): ?Activities

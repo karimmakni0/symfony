@@ -30,13 +30,30 @@ class DestinationsController extends AbstractController
 
 
     #[Route('/destinations', name: 'app_destinations')]
-    public function clientDestinations(): Response
+    public function clientDestinations(Request $request): Response
     {
-        // Get all destinations to display to clients
-        $destinations = $this->destinationsRepository->findAll();
+        // Get pagination parameters
+        $page = $request->query->getInt('page', 1);
+        $limit = 9; // Number of destinations per page
+        
+        // Get total destinations count for pagination
+        $totalDestinations = $this->destinationsRepository->count([]);
+        $maxPages = ceil($totalDestinations / $limit);
+        
+        // Get destinations for current page
+        $destinations = $this->destinationsRepository->findBy(
+            [], // criteria
+            ['created_at' => 'DESC'], // order by
+            $limit, // limit
+            ($page - 1) * $limit // offset
+        );
         
         return $this->render('client/Destinations/index.html.twig', [
-            'destinations' => $destinations
+            'destinations' => $destinations,
+            'current_page' => $page,
+            'max_pages' => $maxPages,
+            'total_items' => $totalDestinations,
+            'items_per_page' => $limit
         ]);
     }
 
@@ -112,7 +129,8 @@ class DestinationsController extends AbstractController
             $this->entityManager->persist($destination);
             $this->entityManager->flush();
             
-            $this->addFlash('success', 'New destination created successfully!');
+            // Set a session flag for SweetAlert instead of flash message
+            $request->getSession()->set('destination_created', true);
             return $this->redirectToRoute('app_publicator_destinations');
         }
         
@@ -185,6 +203,15 @@ class DestinationsController extends AbstractController
             // Save the destination
             $this->entityManager->flush();
             
+            // If it's an AJAX request, return a JSON response
+            if ($request->isXmlHttpRequest()) {
+                return $this->json([
+                    'success' => true,
+                    'message' => 'Destination updated successfully!'
+                ]);
+            }
+            
+            // For regular requests, add flash message and redirect
             $this->addFlash('success', 'Destination updated successfully!');
             return $this->redirectToRoute('app_publicator_destinations');
         }

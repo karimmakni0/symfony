@@ -5,209 +5,383 @@
 {% block body %}
 <section class="layout-pt-md layout-pb-lg">
   <div class="container">
-    <div class="row y-gap-20 justify-between items-end pb-40 lg:pb-40 md:pb-40">
-      <div class="col-auto">
-        <h1 class="text-30 lh-14 fw-600">My Booking History</h1>
-        <div class="text-15 text-light-1">View your past and upcoming reservations</div>
+    <!-- Page Header with Stats Dashboard -->
+    <div class="row y-gap-20 justify-between items-end pb-40 lg:pb-30 md:pb-20">
+      <div class="col-12 col-md-7">
+        <div class="d-flex">  
+          <div class="bg-blue-1-05 rounded-4 px-20 py-20 me-20 d-none d-md-flex animate-pulse">
+            <i class="icon-ticket text-40 text-blue-1"></i>
+          </div>
+          <div>
+            <h1 class="text-30 lh-14 fw-600">My Booking History</h1>
+            <div class="d-flex items-center text-15 text-light-1 pt-10">
+              <i class="icon-calendar text-16 me-8"></i>
+              <span>View your past and upcoming reservations</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Stats Cards -->
+      <div class="col-12 col-md-5">
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="statistics-card confirmed-card">
+              <div class="statistics-card-body">
+                <div class="stat-content">
+                  <div class="stat-label">CONFIRMED</div>
+                  <div class="stat-value">{{ reservationData|filter(r => r.reservation.statuts == 'confirmed')|length }}</div>
+                  <div class="stat-subtitle">Bookings</div>
+                </div>
+                <div class="stat-icon-container">
+                  <div class="stat-icon-circle">
+                    <i class="icon-check"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="statistics-card upcoming-card">
+              <div class="statistics-card-body">
+                <div class="stat-content">
+                  <div class="stat-label">UPCOMING</div>
+                  <div class="stat-value">{{ reservationData|filter(r => r.reservation.statuts != 'cancelled')|length }}</div>
+                  <div class="stat-subtitle">Bookings</div>
+                </div>
+                <div class="stat-icon-container">
+                  <div class="stat-icon-circle">
+                    <i class="icon-calendar"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="tabs -underline-2 js-tabs">
-      <div class="tabs__controls row x-gap-40 y-gap-10 lg:x-gap-20 js-tabs-controls">
-        <div class="col-auto">
-          <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">All Reservations</button>
-        </div>
-        <div class="col-auto">
-          <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button" data-tab-target=".-tab-item-2">Upcoming</button>
-        </div>
-        <div class="col-auto">
-          <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button" data-tab-target=".-tab-item-3">Past</button>
+    <!-- Filter Bar -->
+    <div class="row pb-20">
+      <div class="col-12">
+        <div class="py-15 px-20 rounded-12 bg-white border-light shadow-3 filter-bar">
+          <div class="row y-gap-10 justify-between items-center">
+            <div class="col-md-7 col-12">
+              <div class="tabs tab-buttons-modern js-tabs">
+                <div class="tabs__controls d-flex flex-wrap x-gap-30 y-gap-10 lg:x-gap-20 js-tabs-controls">
+                  <div>
+                    <button class="tab-button js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">
+                      <i class="icon-grid"></i> All Reservations
+                    </button>
+                  </div>
+                  <div>
+                    <button class="tab-button js-tabs-button" data-tab-target=".-tab-item-2">
+                      <i class="icon-calendar"></i> Upcoming
+                    </button>
+                  </div>
+                  <div>
+                    <button class="tab-button js-tabs-button" data-tab-target=".-tab-item-3">
+                      <i class="icon-check"></i> Past
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-5 col-12">
+              <div class="d-flex items-center justify-content-md-end">
+                <div class="search-container me-10">
+                  <div class="search-box">
+                    <input type="text" id="searchBooking" placeholder="Search bookings...">
+                    <button type="button" class="search-button">
+                      <i class="icon-search"></i>
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="dropdown js-dropdown js-form-dd">
+                  <div class="toggle-element -dropdown js-click-dropdown dropdown-menu dropdown-menu-custom">
+                    <div class="text-14 y-gap-15 js-dropdown-list p-3">
+                      <div><button class="dropdown-item-custom js-dropdown-link" data-sort="date-desc"><i class="icon-calendar-2 mr-10"></i>Recent First</button></div>
+                      <div><button class="dropdown-item-custom js-dropdown-link" data-sort="date-asc"><i class="icon-calendar-2 mr-10"></i>Oldest First</button></div>
+                      <div><button class="dropdown-item-custom js-dropdown-link" data-sort="price-desc"><i class="icon-tag mr-10"></i>Price: High to Low</button></div>
+                      <div><button class="dropdown-item-custom js-dropdown-link" data-sort="price-asc"><i class="icon-tag mr-10"></i>Price: Low to High</button></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="tabs__content pt-30 js-tabs-content">
+      <div class="tabs__content pt-10 js-tabs-content">
         <div class="tabs__pane -tab-item-1 is-tab-el-active">
           {% if reservationData is empty %}
             <div class="border-top-light pt-30">
-              <div class="alert alert-info">
-                <i class="icon-info-circle text-blue-1 mr-10"></i>
-                You don't have any reservations yet.
+              <div class="alert alert-info d-flex items-center">
+                <i class="icon-info-circle text-blue-1 text-24 mr-15"></i>
+                <div>
+                  <h5 class="text-16 fw-500 mb-5">No Reservations Found</h5>
+                  <p class="text-14">You don't have any reservations yet. Explore our activities to start your adventure!</p>
+                  <a href="{{ path('app_client_activities') }}" class="button -md -dark-1 bg-blue-1 text-white mt-10">
+                    <i class="icon-search me-10"></i> Browse Activities
+                  </a>
+                </div>
               </div>
             </div>
           {% else %}
-            <div class="overflow-scroll scroll-bar-1">
-              <table class="table-3 -border-bottom col-12">
-                <thead class="bg-light-2">
-                  <tr>
-                    <th>Booking #</th>
-                    <th>Activity</th>
-                    <th>Date</th>
-                    <th>Participants</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for item in reservationData %}
-                    <tr>
-                      <td>{{ item.billet.numero }}</td>
-                      <td>
-                        <div class="d-flex items-center">
-                          {% if item.activity.resources is defined and item.activity.resources|length > 0 %}
-                            <img src="{{ asset(item.activity.resources|first.path) }}" alt="{{ item.activity.activityName }}" class="size-40 rounded-4 object-cover mr-10">
+            <div id="reservationsTable" class="booking-table">
+              <div class="table-responsive">
+                <table class="table-modern -border-bottom w-100">
+                  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+                  <thead>
+                    <tr class="bg-blue-1-05 border-0">
+                      <th class="rounded-start-4 px-20 py-15 text-nowrap table-header" width="10%">
+                        <div class="table-header-content">
+                          <i class="fas fa-file-alt text-16 text-light-1 me-10"></i>
+                          <span class="text-15 fw-500">Booking #</span>
+                        </div>
+                      </th>
+                      <th class="table-header text-nowrap" width="20%">
+                        <div class="table-header-content">
+                          <i class="icon-destination text-16 text-light-1 me-10"></i>
+                          <span class="text-15 fw-500">Activity</span>
+                        </div>
+                      </th>
+                      <th class="table-header text-nowrap" width="10%">
+                        <div class="table-header-content">
+                          <i class="icon-calendar text-16 text-light-1 me-10"></i>
+                          <span class="text-15 fw-500">Date</span>
+                        </div>
+                      </th>
+                      <th class="table-header text-nowrap" width="10%">
+                        <div class="table-header-content">
+                          <i class="icon-user text-16 text-light-1 me-10"></i>
+                          <span class="text-15 fw-500">Participants</span>
+                        </div>
+                      </th>
+                      <th class="table-header text-nowrap" width="15%">
+                        <div class="table-header-content">
+                          <i class="fa fa-tag text-16 text-light-1 me-10"></i>
+                          <span class="text-15 fw-500">Price</span>
+                        </div>
+                      </th>
+                      <th class="table-header text-nowrap" width="15%">
+                        <div class="table-header-content">
+                          <i class="icon-check text-16 text-light-1 me-10"></i>
+                          <span class="text-15 fw-500">Status</span>
+                        </div>
+                      </th>
+                      <th class="rounded-end-4 table-header text-nowrap" width="20%">
+                        <div class="table-header-content">
+                          <i class="icon-settings text-16 text-light-1 me-10"></i>
+                          <span class="text-15 fw-500">Actions</span>
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in reservationData %}
+                      <tr class="border-bottom border-light reservation-row" data-status="{{ item.reservation.statuts }}" data-date="{{ item.reservation.dateAchat|date('Y-m-d') }}" data-price="{{ item.reservation.prixTotal }}">
+                        <td class="px-20 py-15">
+                          <div class="fw-500 text-blue-1">{{ item.billet.numero }}</div>
+                        </td>
+                        <td>
+                          <div class="d-flex items-center">
+                            {% if item.activity.resources is defined and item.activity.resources|length > 0 %}
+                              <div class="activity-image-container">
+                                <img src="{{ asset(item.activity.resources|first.path) }}" alt="{{ item.activity.activityName }}" class="size-60 rounded-4 object-cover mr-15">
+                              </div>
+                            {% else %}
+                              <div class="size-60 rounded-4 flex-center bg-blue-1-05 text-blue-1 mr-15">
+                                <i class="icon-ticket text-30"></i>
+                              </div>
+                            {% endif %}
+                            <div>
+                              <div class="text-15 lh-15 fw-500 mb-5">{{ item.activity.activityName }}</div>
+                              <div class="d-flex items-center text-13 lh-15 text-light-1">
+                                <i class="icon-location text-12 mr-5"></i>
+                                {{ item.activity.activityDestination }}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="d-flex items-center">
+                            <div class="size-35 flex-center bg-blue-1-05 rounded-4 mr-10">
+                              <i class="icon-calendar-2 text-16 text-blue-1"></i>
+                            </div>
+                            <div class="text-14">{{ item.reservation.dateAchat|date('d M, Y') }}</div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="d-flex items-center">
+                            <div class="size-35 flex-center bg-blue-1-05 rounded-4 mr-10">
+                              <i class="icon-user text-16 text-blue-1"></i>
+                            </div>
+                            <div class="text-14 fw-500">{{ item.reservation.nombre }}</div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="d-flex">
+                            <div class="size-35 flex-center bg-blue-1-05 rounded-4 mr-10">
+                              <i class="fa fa-tag text-16 text-blue-1"></i>
+                            </div>
+                            <div>
+                              <div class="text-14 fw-500">{{ item.reservation.prixTotal }} €</div>
+                              <div class="text-12 text-light-1">({{ item.reservation.prixUnite }} € / person)</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          {% if item.reservation.statuts == 'pending' %}
+                            <div class="rounded-100 py-4 px-15 text-center col-12 text-14 fw-500 bg-yellow-4 text-yellow-3">
+                              <i class="icon-clock text-12 mr-5"></i> Pending
+                            </div>
+                          {% elseif item.reservation.statuts == 'confirmed' %}
+                            <div class="rounded-100 py-4 px-15 text-center col-12 text-14 fw-500 bg-green-2 text-green-1">
+                              Confirmed
+                            </div>
+                          {% elseif item.reservation.statuts == 'cancelled' %}
+                            <div class="rounded-100 py-4 px-15 text-center col-12 text-14 fw-500 bg-red-3 text-red-2">
+                              Cancelled
+                            </div>
                           {% else %}
-                            <div class="size-40 rounded-4 flex-center bg-blue-1-05 text-blue-1 mr-10">
-                              <i class="icon-ticket text-20"></i>
+                            <div class="rounded-100 py-4 px-15 text-center col-12 text-14 fw-500 bg-blue-1-05 text-blue-1">
+                              {{ item.reservation.statuts }}
                             </div>
                           {% endif %}
-                          <div>
-                            <div class="text-14 lh-14 fw-500">{{ item.activity.activityName }}</div>
-                            <div class="text-12 lh-14 text-light-1">{{ item.activity.activityDestination }}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="text-14 lh-14">{{ item.reservation.dateAchat|date('Y-m-d') }}</div>
-                      </td>
-                      <td>
-                        <div class="text-14 lh-14 fw-500">{{ item.reservation.nombre }}</div>
-                      </td>
-                      <td>
-                        <div class="text-14 lh-14 fw-500">
-                          {{ item.reservation.prixTotal }} €
-                        </div>
-                        <div class="text-12 lh-14 text-light-1">
-                          ({{ item.reservation.prixUnite }} € / person)
-                        </div>
-                      </td>
-                      <td>
-                        {% if item.reservation.statuts == 'pending' %}
-                          <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-yellow-4 text-yellow-3">
-                            <i class="icon-clock text-10 mr-5"></i> Pending
-                          </div>
-                        {% elseif item.reservation.statuts == 'confirmed' %}
-                          <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-green-2 text-green-1">
-                            <i class="icon-check text-10 mr-5"></i> Confirmed
-                          </div>
-                        {% elseif item.reservation.statuts == 'cancelled' %}
-                          <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-red-3 text-red-2">
-                            <i class="icon-close text-10 mr-5"></i> Cancelled
-                          </div>
-                        {% else %}
-                          <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-blue-1-05 text-blue-1">
-                            {{ item.reservation.statuts }}
-                          </div>
-                        {% endif %}
-                      </td>
-                      <td>
-                        <div class="d-flex x-gap-5">
-                          {% if item.reservation.statuts != 'cancelled' %}
-                            <a href="{{ path('app_client_reservation_ticket', {'id': item.billet.id}) }}" class="btn btn-sm btn-success me-2" title="Download Ticket">
-                              <i class="icon-ticket text-14 mr-5"></i> Ticket
+                        </td>
+                        <td>
+                          <div class="d-flex">
+                            {% if item.reservation.statuts != 'cancelled' %}
+                              <a href="{{ path('app_client_reservation_ticket', {'id': item.billet.id}) }}" class="action-btn action-btn-blue" title="Download Ticket">
+                                <i class="icon-ticket"></i> Ticket
+                              </a>
+                              <a href="{{ path('app_reservation_cancel', {'id': item.reservation.id}) }}" 
+                                 onclick="return confirm('Are you sure you want to cancel this reservation?')"
+                                 class="action-btn action-btn-red" 
+                                 title="Cancel Reservation">
+                                <i class="icon-trash"></i> Cancel
+                              </a>
+                            {% endif %}
+                            <a href="{{ path('app_client_activity_detail', {'id': item.activity.id}) }}" class="action-btn action-btn-green" title="View Activity">
+                              <i class="icon-eye"></i> View
                             </a>
-                            <a href="{{ path('app_reservation_cancel', {'id': item.reservation.id}) }}" 
-                               onclick="return confirm('Are you sure you want to cancel this reservation?')"
-                               class="size-35 flex-center rounded-4 bg-red-3 text-white" 
-                               title="Cancel Reservation">
-                              <i class="icon-trash text-14"></i>
-                            </a>
-                          {% endif %}
-                          <a href="{{ path('app_client_activity_detail', {'id': item.activity.id}) }}" class="size-35 flex-center rounded-4 bg-blue-1 text-white" title="View Activity">
-                            <i class="icon-eye text-14"></i>
-                          </a>
-                        </div>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+                          </div>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
             </div>
           {% endif %}
         </div>
 
         <div class="tabs__pane -tab-item-2">
           {% set upcoming = false %}
-          {% for item in reservationData %}
-            {% if item.reservation.statuts != 'cancelled' %}
-              {% set upcoming = true %}
-              <div class="border-top-light pt-20 mt-20">
-                <div class="row x-gap-20 y-gap-30">
-                  <div class="col-md-auto">
-                    <div class="cardImage ratio ratio-1:1 w-200 md:w-1/1 rounded-4">
-                      <div class="cardImage__content">
-                        {% if item.activity.resources is defined and item.activity.resources|length > 0 %}
-                          <img src="{{ asset(item.activity.resources|first.path) }}" alt="{{ item.activity.activityName }}" class="rounded-4 object-cover">
-                        {% else %}
-                          <div class="rounded-4 flex-center bg-blue-1-05 text-blue-1 w-full h-full">
-                            <i class="icon-ticket text-60"></i>
-                          </div>
-                        {% endif %}
-                      </div>
+          
+          <div class="row">
+            {% for item in reservationData %}
+              {% if item.reservation.statuts != 'cancelled' %}
+                {% set upcoming = true %}
+                <div class="col-12 col-md-6 col-xl-4 mb-30">
+                  <div class="rounded-4 border-light shadow-4 reservation-card h-100 bg-white">
+                    <div class="position-relative">
+                      {% if item.activity.resources is defined and item.activity.resources|length > 0 %}
+                        <div style="height: 200px; overflow: hidden;">
+                          <img src="{{ asset(item.activity.resources|first.path) }}" alt="{{ item.activity.activityName }}" class="w-100 h-100 rounded-top-4 object-cover">
+                        </div>  
+                      {% else %}
+                        <div class="d-flex items-center justify-center bg-blue-1-05 h-200 rounded-top-4">
+                          <i class="icon-ticket text-60 text-blue-1"></i>
+                        </div>
+                      {% endif %}
+                      
+                      {% if item.reservation.statuts == 'pending' %}
+                        <div class="status-badge status-badge-pending">
+                          <i class="icon-clock text-14 mr-5"></i> Pending
+                        </div>
+                      {% elseif item.reservation.statuts == 'confirmed' %}
+                        <div class="status-badge status-badge-confirmed">
+                          <i class="icon-check text-14 mr-5"></i> Confirmed
+                        </div>
+                      {% else %}
+                        <div class="status-badge status-badge-other">
+                          <i class="icon-info-circle text-14 mr-5"></i> {{ item.reservation.statuts }}
+                        </div>
+                      {% endif %}
                     </div>
-                  </div>
-
-                  <div class="col-md">
-                    <div class="d-flex flex-column h-full justify-between">
-                      <div>
-                        <h3 class="text-18 lh-15 fw-500">{{ item.activity.activityName }}</h3>
-                        <div class="text-14 lh-15 mt-5">{{ item.activity.activityDestination }}</div>
-                        <div class="row x-gap-10 y-gap-10 items-center pt-10">
-                          <div class="col-auto">
-                            <div class="d-flex items-center">
-                              <div class="text-14 text-light-1">Booking Code: <span class="fw-500 text-dark-1">{{ item.billet.numero }}</span></div>
-                            </div>
-                          </div>
-                          <div class="col-auto">
-                            <div class="d-flex items-center">
-                              <div class="text-14 text-light-1">Participants: <span class="fw-500 text-dark-1">{{ item.reservation.nombre }}</span></div>
-                            </div>
-                          </div>
+                    
+                    <div class="p-20">
+                      <h3 class="text-18 lh-15 fw-500 mb-15">{{ item.activity.activityName }}</h3>
+                      
+                      <div class="d-flex items-center mb-10">
+                        <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
+                          <i class="icon-location text-14 text-blue-1"></i>
                         </div>
+                        <div class="text-14">{{ item.activity.activityDestination }}</div>
                       </div>
-
-                      <div class="row x-gap-10 y-gap-10 pt-15">
-                        <div class="col-auto">
-                          <div class="text-14 text-light-1">Date: <span class="fw-500 text-dark-1">{{ item.reservation.dateAchat|date('Y-m-d') }}</span></div>
+                      
+                      <div class="d-flex items-center mb-10">
+                        <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
+                          <i class="icon-calendar-2 text-14 text-blue-1"></i>
                         </div>
-                        <div class="col-auto">
-                          <div class="text-14 text-light-1">Total: <span class="fw-500 text-dark-1">{{ item.reservation.prixTotal }} €</span></div>
-                        </div>
-                        <div class="col-auto">
-                          <div class="text-14 text-light-1">Status: 
-                            {% if item.reservation.statuts == 'pending' %}
-                              <span class="fw-500 text-yellow-3">Pending</span>
-                            {% elseif item.reservation.statuts == 'confirmed' %}
-                              <span class="fw-500 text-green-1">Confirmed</span>
-                            {% else %}
-                              <span class="fw-500">{{ item.reservation.statuts }}</span>
-                            {% endif %}
-                          </div>
-                        </div>
+                        <div class="text-14">{{ item.reservation.dateAchat|date('d M, Y') }}</div>
                       </div>
-                    </div>
-                  </div>
-
-                  <div class="col-md-auto">
-                    <div class="d-flex items-center h-full">
-                      <div class="px-20 py-10 rounded-4 bg-green-1 text-white">
-                        <div class="d-flex items-center">
-                          <i class="icon-check text-14 mr-10"></i>
-                          <span class="fw-500 lh-15">Booking Confirmed</span>
+                      
+                      <div class="d-flex items-center mb-10">
+                        <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
+                          <i class="icon-user text-14 text-blue-1"></i>
                         </div>
+                        <div class="text-14">{{ item.reservation.nombre }} participants</div>
+                      </div>
+                      
+                      <div class="d-flex items-center mb-20">
+                        <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
+                          <i class="icon-tag text-14 text-blue-1"></i>
+                        </div>
+                        <div class="text-14">{{ item.reservation.prixTotal }} € <span class="text-12 text-light-1">({{ item.reservation.prixUnite }} € / person)</span></div>
+                      </div>
+                      
+                      <div class="d-flex border-top-light pt-20">
+                        <div class="text-14 fw-500 text-blue-1 mr-auto">Booking #{{ item.billet.numero }}</div>
+                      </div>
+                      
+                      <div class="d-flex justify-between pt-15">
+                        <a href="{{ path('app_client_reservation_ticket', {'id': item.billet.id}) }}" class="action-btn action-btn-blue">
+                          <i class="icon-ticket"></i> Ticket
+                        </a>
+                        <a href="{{ path('app_client_activity_detail', {'id': item.activity.id}) }}" class="action-btn action-btn-green">
+                          <i class="icon-eye"></i> View
+                        </a>
+                        <a href="{{ path('app_reservation_cancel', {'id': item.reservation.id}) }}" 
+                           onclick="return confirm('Are you sure you want to cancel this reservation?')"
+                           class="action-btn action-btn-red">
+                          <i class="icon-trash"></i> Cancel
+                        </a>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            {% endif %}
-          {% endfor %}
+              {% endif %}
+            {% endfor %}
+          </div>
           
           {% if not upcoming %}
             <div class="border-top-light pt-30">
-              <div class="alert alert-info">
-                <i class="icon-info-circle text-blue-1 mr-10"></i>
-                You don't have any upcoming reservations.
+              <div class="alert alert-info d-flex items-center">
+                <i class="icon-info-circle text-blue-1 text-24 mr-15"></i>
+                <div>
+                  <h5 class="text-16 fw-500 mb-5">No Upcoming Bookings</h5>
+                  <p class="text-14">You don't have any upcoming reservations. Explore our activities to start your adventure!</p>
+                  <a href="{{ path('app_client_activities') }}" class="button -md -dark-1 bg-blue-1 text-white mt-10">
+                    <i class="icon-search me-10"></i> Browse Activities
+                  </a>
+                </div>
               </div>
             </div>
           {% endif %}
@@ -215,78 +389,84 @@
 
         <div class="tabs__pane -tab-item-3">
           {% set past = false %}
-          {% for item in reservationData %}
-            {% if item.reservation.statuts == 'cancelled' %}
-              {% set past = true %}
-              <div class="border-top-light pt-20 mt-20">
-                <div class="row x-gap-20 y-gap-30">
-                  <div class="col-md-auto">
-                    <div class="cardImage ratio ratio-1:1 w-200 md:w-1/1 rounded-4">
-                      <div class="cardImage__content">
-                        {% if item.activity.resources is defined and item.activity.resources|length > 0 %}
-                          <img src="{{ asset(item.activity.resources|first.path) }}" alt="{{ item.activity.activityName }}" class="rounded-4 object-cover">
-                        {% else %}
-                          <div class="rounded-4 flex-center bg-blue-1-05 text-blue-1 w-full h-full">
-                            <i class="icon-ticket text-60"></i>
-                          </div>
-                        {% endif %}
+          
+          <div class="row">
+            {% for item in reservationData %}
+              {% if item.reservation.statuts == 'cancelled' %}
+                {% set past = true %}
+                <div class="col-12 col-md-6 col-xl-4 mb-30">
+                  <div class="rounded-4 border-light shadow-4 reservation-card h-100 bg-white">
+                    <div class="position-relative">
+                      {% if item.activity.resources is defined and item.activity.resources|length > 0 %}
+                        <div style="height: 200px; overflow: hidden;" class="desaturate-img">
+                          <img src="{{ asset(item.activity.resources|first.path) }}" alt="{{ item.activity.activityName }}" class="w-100 h-100 rounded-top-4 object-cover">
+                        </div>
+                      {% else %}
+                        <div class="d-flex items-center justify-center bg-light-2 h-200 rounded-top-4 desaturate-img">
+                          <i class="icon-ticket text-60 text-light-1"></i>
+                        </div>
+                      {% endif %}
+                      
+                      <div class="status-badge status-badge-cancelled">
+                        <i class="icon-close text-14 mr-5"></i> Cancelled
                       </div>
                     </div>
-                  </div>
-
-                  <div class="col-md">
-                    <div class="d-flex flex-column h-full justify-between">
-                      <div>
-                        <h3 class="text-18 lh-15 fw-500">{{ item.activity.activityName }}</h3>
-                        <div class="text-14 lh-15 mt-5">{{ item.activity.activityDestination }}</div>
-                        <div class="row x-gap-10 y-gap-10 items-center pt-10">
-                          <div class="col-auto">
-                            <div class="d-flex items-center">
-                              <div class="text-14 text-light-1">Booking Code: <span class="fw-500 text-dark-1">{{ item.billet.numero }}</span></div>
-                            </div>
-                          </div>
-                          <div class="col-auto">
-                            <div class="d-flex items-center">
-                              <div class="text-14 text-light-1">Participants: <span class="fw-500 text-dark-1">{{ item.reservation.nombre }}</span></div>
-                            </div>
-                          </div>
+                    
+                    <div class="p-20">
+                      <h3 class="text-18 lh-15 fw-500 mb-15">{{ item.activity.activityName }}</h3>
+                      
+                      <div class="d-flex items-center mb-10">
+                        <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
+                          <i class="icon-location text-14 text-light-1"></i>
                         </div>
+                        <div class="text-14 text-light-1">{{ item.activity.activityDestination }}</div>
                       </div>
-
-                      <div class="row x-gap-10 y-gap-10 pt-15">
-                        <div class="col-auto">
-                          <div class="text-14 text-light-1">Date: <span class="fw-500 text-dark-1">{{ item.reservation.dateAchat|date('Y-m-d') }}</span></div>
+                      
+                      <div class="d-flex items-center mb-10">
+                        <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
+                          <i class="icon-calendar-2 text-14 text-light-1"></i>
                         </div>
-                        <div class="col-auto">
-                          <div class="text-14 text-light-1">Total: <span class="fw-500 text-dark-1">{{ item.reservation.prixTotal }} €</span></div>
-                        </div>
-                        <div class="col-auto">
-                          <div class="text-14 text-light-1">Status: <span class="fw-500 text-red-2">Cancelled</span></div>
-                        </div>
+                        <div class="text-14 text-light-1">{{ item.reservation.dateAchat|date('d M, Y') }}</div>
                       </div>
-                    </div>
-                  </div>
-
-                  <div class="col-md-auto">
-                    <div class="d-flex items-center h-full">
-                      <div class="px-20 py-10 rounded-4 bg-red-3 text-white">
-                        <div class="d-flex items-center">
-                          <i class="icon-close text-14 mr-10"></i>
-                          <span class="fw-500 lh-15">Booking Cancelled</span>
+                      
+                      <div class="d-flex items-center mb-10">
+                        <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
+                          <i class="icon-user text-14 text-light-1"></i>
                         </div>
+                        <div class="text-14 text-light-1">{{ item.reservation.nombre }} participants</div>
+                      </div>
+                      
+                      <div class="d-flex items-center mb-20">
+                        <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
+                          <i class="icon-tag text-14 text-light-1"></i>
+                        </div>
+                        <div class="text-14 text-light-1">{{ item.reservation.prixTotal }} € <span class="text-12 text-light-1">({{ item.reservation.prixUnite }} € / person)</span></div>
+                      </div>
+                      
+                      <div class="d-flex border-top-light pt-20">
+                        <div class="text-14 fw-500 text-light-1 mr-auto">Booking #{{ item.billet.numero }}</div>
+                      </div>
+                      
+                      <div class="d-flex justify-center pt-15">
+                        <a href="{{ path('app_client_activity_detail', {'id': item.activity.id}) }}" class="action-btn action-btn-outline-blue">
+                          <i class="icon-eye"></i> View Activity
+                        </a>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            {% endif %}
-          {% endfor %}
+              {% endif %}
+            {% endfor %}
+          </div>
           
           {% if not past %}
             <div class="border-top-light pt-30">
-              <div class="alert alert-info">
-                <i class="icon-info-circle text-blue-1 mr-10"></i>
-                You don't have any past or cancelled reservations.
+              <div class="alert alert-info d-flex items-center">
+                <i class="icon-info-circle text-blue-1 text-24 mr-15"></i>
+                <div>
+                  <h5 class="text-16 fw-500 mb-5">No Past Bookings</h5>
+                  <p class="text-14">You don't have any past or cancelled reservations.</p>
+                </div>
               </div>
             </div>
           {% endif %}
@@ -295,27 +475,575 @@
     </div>
   </div>
 </section>
+
+<style>
+  /* Fix for user dropdown on this page */
+  .js-user-nav-dropdown.is-active,
+  .js-user-nav-dropdown.-is-el-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    z-index: 9999 !important;
+    display: block !important;
+  }
+  
+  /* Modern styles for reservation cards */
+  .reservation-card {
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border: 1px solid #eaeaea;
+  }
+  
+  .reservation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+  }
+  
+  .status-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 8px 15px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 500;
+    color: white;
+    z-index: 2;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    backdrop-filter: blur(5px);
+  }
+  
+  .status-badge-pending {
+    background-color: #ffc107;
+  }
+  
+  .status-badge-confirmed {
+    background-color: #28a745;
+  }
+  
+  .status-badge-cancelled {
+    background-color: #dc3545;
+  }
+  
+  .status-badge-other {
+    background-color: #17a2b8;
+  }
+  
+  /* Improved Button Styles */
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin: 0 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    border: none;
+    cursor: pointer;
+  }
+  
+  .action-btn i {
+    margin-right: 8px;
+    font-size: 16px;
+  }
+  
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  
+  .action-btn:active {
+    transform: translateY(0);
+  }
+  
+  .action-btn-blue {
+    background-color: #0071c2;
+    color: white;
+  }
+  
+  .action-btn-green {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .action-btn-red {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .action-btn-outline-blue {
+    background-color: transparent;
+    color: #0071c2;
+    border: 1px solid #0071c2;
+  }
+  
+  .action-btn-outline-blue:hover {
+    background-color: #0071c2;
+    color: white;
+  }
+  
+  .desaturate-img {
+    filter: grayscale(100%);
+    opacity: 0.7;
+  }
+  
+  .activity-image-container {
+    overflow: hidden;
+    border-radius: 4px;
+  }
+  
+  .activity-image-container img {
+    transition: transform 0.3s ease;
+  }
+  
+  .activity-image-container:hover img {
+    transform: scale(1.05);
+  }
+  
+  /* Modern Table Styles */
+  .table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+  }
+  
+  .table-modern thead tr {
+    background-color: #f5f5f5;
+    border: none;
+  }
+  
+  .table-header {
+    font-weight: 600;
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+    color: #333;
+    padding: 15px 25px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .table-header-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .table-modern th, .table-modern td {
+    padding: 15px 25px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+  
+  .table-modern tbody tr {
+    transition: all 0.2s ease;
+  }
+  
+  .table-modern tbody tr:hover {
+    background-color: rgba(3, 122, 255, 0.04);
+  }
+  
+  .booking-table {
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    overflow: auto;
+    max-width: 100%;
+  }
+  
+  .table-responsive {
+    min-width: 900px;
+    width: 100%;
+  }
+  
+  /* Responsive Improvements */
+  @media (max-width: 768px) {
+    .action-btn {
+      padding: 8px 12px;
+      font-size: 13px;
+      margin: 2px;
+    }
+    
+    .action-btn i {
+      margin-right: 5px;
+    }
+  }
+  
+  /* Empty State Styling */
+  .alert {
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+  
+  /* Enhanced search box styling */
+  .search-container {
+    position: relative;
+    margin-right: 10px;
+    flex: 1;
+    max-width: 300px;
+  }
+  
+  .search-box {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 50px;
+    padding: 0 15px;
+    height: 48px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .search-box:focus-within {
+    border-color: #0071c2;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-box input {
+    border: none;
+    flex: 1;
+    height: 100%;
+    padding: 0 10px;
+    font-size: 14px;
+    background: transparent;
+    outline: none;
+  }
+  
+  .search-box input::placeholder {
+    color: #999;
+  }
+  
+  .search-button {
+    background: transparent;
+    border: none;
+    color: #0071c2;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+  }
+  
+  .search-button:hover {
+    background-color: rgba(0, 113, 194, 0.1);
+  }
+  
+  .search-button i {
+    font-size: 18px;
+  }
+  
+  /* Animation effects */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .reservation-card {
+    animation: fadeIn 0.5s ease forwards;
+  }
+  /* Animated icon pulse */
+  .animate-pulse {
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+  
+  /* Tab button styles */
+  .tab-buttons-modern {
+    margin-bottom: 0;
+  }
+  
+  .tab-button {
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    color: #777;
+  }
+  
+  .tab-button i {
+    margin-right: 8px;
+    font-size: 18px;
+  }
+  
+  .tab-button.is-tab-el-active {
+    background-color: #0071c2;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 113, 194, 0.2);
+  }
+  
+  .tab-button:hover:not(.is-tab-el-active) {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+  
+  /* Sort button styling */
+  .sort-button {
+    display: flex;
+    align-items: center;
+    background-color: #f5f5f5;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .sort-button:hover {
+    background-color: #e5e5e5;
+  }
+  
+  /* Filter bar styling */
+  .filter-bar {
+    transition: all 0.3s ease;
+  }
+  
+  .filter-bar:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+  }
+  
+  /* Statistics cards styling */
+  .statistics-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    height: 100%;
+    border: 1px solid #eaeaea;
+  }
+  
+  .statistics-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  }
+  
+  .statistics-card-body {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .stat-content {
+    flex: 1;
+  }
+  
+  .stat-label {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  
+  .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  
+  .stat-subtitle {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .stat-icon-container {
+    margin-left: 15px;
+  }
+  
+  .stat-icon-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+  }
+  
+  .confirmed-card .stat-label {
+    color: #28a745;
+  }
+  
+  .upcoming-card .stat-label {
+    color: #0071c2;
+  }
+  
+  .confirmed-card .stat-icon-circle {
+    background-color: #28a745;
+  }
+  
+  .upcoming-card .stat-icon-circle {
+    background-color: #0071c2;
+  }
+  
+  /* Dropdown menu styling */
+  .dropdown-menu-custom {
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border: 1px solid #eaeaea;
+  }
+  
+  .dropdown-item-custom {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+  }
+  
+  .dropdown-item-custom:hover {
+    background-color: #f5f5f5;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .stat-card {
+      padding: 15px !important;
+    }
+    
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .form-search {
+      width: 150px;
+    }
+  }
+  
+  .rounded-12 {
+    border-radius: 12px;
+  }
+  
+  .rounded-full {
+    border-radius: 50%;
+  }
+</style>
 {% endblock %}
 
 {% block javascripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('searchBooking');
+    if (searchInput) {
+      searchInput.addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.reservation-row');
+        
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          if (text.includes(searchValue)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+    }
+    
+    // Sorting functionality
+    const sortButtons = document.querySelectorAll('.js-dropdown-link');
+    if (sortButtons) {
+      sortButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const sortValue = this.getAttribute('data-sort');
+          const rows = Array.from(document.querySelectorAll('.reservation-row'));
+          const table = document.querySelector('table tbody');
+          
+          rows.sort((a, b) => {
+            if (sortValue === 'date-desc') {
+              return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+            } else if (sortValue === 'date-asc') {
+              return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+            } else if (sortValue === 'price-desc') {
+              return parseFloat(b.getAttribute('data-price')) - parseFloat(a.getAttribute('data-price'));
+            } else if (sortValue === 'price-asc') {
+              return parseFloat(a.getAttribute('data-price')) - parseFloat(b.getAttribute('data-price'));
+            }
+            return 0;
+          });
+          
+          // Remove existing rows
+          rows.forEach(row => row.remove());
+          
+          // Add sorted rows
+          rows.forEach(row => table.appendChild(row));
+        });
+      });
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Fix user dropdown functionality
+    const userDropdownButtons = document.querySelectorAll('[data-el-toggle=".js-user-nav-dropdown"]');
+    const userDropdown = document.querySelector('.js-user-nav-dropdown');
+    
+    if (userDropdownButtons.length > 0 && userDropdown) {
+      userDropdownButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          userDropdown.classList.toggle('is-active');
+          userDropdown.classList.toggle('-is-el-visible');
+        });
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!userDropdown.contains(e.target) && !Array.from(userDropdownButtons).some(btn => btn.contains(e.target))) {
+          userDropdown.classList.remove('is-active');
+          userDropdown.classList.remove('-is-el-visible');
+        }
+      });
+    }
+    
     // Tab Navigation
     const tabButtons = document.querySelectorAll('.js-tabs-button');
     const tabContents = document.querySelectorAll('.tabs__pane');
     
     tabButtons.forEach(button => {
       button.addEventListener('click', () => {
-        // Remove active class from all buttons and contents
+        const targetTab = button.getAttribute('data-tab-target');
+        
+        // Remove active class from all buttons and tabs
         tabButtons.forEach(btn => btn.classList.remove('is-tab-el-active'));
-        tabContents.forEach(content => content.classList.remove('is-tab-el-active'));
+        tabContents.forEach(tab => tab.classList.remove('is-tab-el-active'));
         
-        // Add active class to clicked button
+        // Add active class to clicked button and corresponding tab
         button.classList.add('is-tab-el-active');
-        
-        // Get target tab content and activate it
-        const target = button.getAttribute('data-tab-target');
-        document.querySelector(target).classList.add('is-tab-el-active');
+        document.querySelector(targetTab).classList.add('is-tab-el-active');
       });
     });
   });

@@ -2,6 +2,11 @@
 
 {% block title %}Admin Dashboard{% endblock %}
 
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('assets/css/admin-dashboard.css') }}">
+{% endblock %}
+
 {% block body %}
 <div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
     <div class="col-auto">
@@ -9,6 +14,16 @@
         <div class="text-15 text-light-1">Welcome to GoTrip Admin Dashboard</div>
     </div>
     <div class="col-auto">
+        <div class="d-flex items-center">
+            <a href="{{ path('admin_activities') }}" class="button h-50 px-25 -dark-1 bg-blue-1 text-white mr-15">
+                <i class="icon-plus text-12 mr-10"></i>
+                <span>Add Activity</span>
+            </a>
+            <a href="{{ path('admin_destinations') }}" class="button h-50 px-25 -outline-blue-1 text-blue-1">
+                <i class="icon-plus text-12 mr-10"></i>
+                <span>Add Destination</span>
+            </a>
+        </div>
     </div>
 </div>
 
@@ -74,8 +89,47 @@
     </div>
 </div>
 
-<div class="row y-gap-30 pt-20">
-    <div class="col-xl-7 col-md-6">
+<div class="row y-gap-20 pt-20">
+    <!-- Quick Access Cards -->
+    <div class="col-12">
+        <h2 class="text-18 fw-500 mb-15">Quick Access</h2>
+        <div class="row y-gap-20">
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+                <a href="{{ path('admin_users') }}" class="dashCard -type-1 py-30 px-30 rounded-4 bg-white shadow-3 h-100">
+                    <div class="dashCard__icon bg-light-2 text-blue-1">
+                        <i class="icon-user text-20"></i>
+                    </div>
+                    <div class="dashCard__content">Users</div>
+                </a>
+            </div>
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+                <a href="{{ path('admin_activities') }}" class="dashCard -type-1 py-30 px-30 rounded-4 bg-white shadow-3 h-100">
+                    <div class="dashCard__icon bg-light-2 text-green-2">
+                        <i class="icon-route text-20"></i>
+                    </div>
+                    <div class="dashCard__content">Activities</div>
+                </a>
+            </div>
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+                <a href="{{ path('admin_destinations') }}" class="dashCard -type-1 py-30 px-30 rounded-4 bg-white shadow-3 h-100">
+                    <div class="dashCard__icon bg-light-2 text-yellow-1">
+                        <i class="icon-map-marker text-20"></i>
+                    </div>
+                    <div class="dashCard__content">Destinations</div>
+                </a>
+            </div>
+            <div class="col-xl-3 col-lg-4 col-sm-6">
+                <a href="{{ path('admin_bookings') }}" class="dashCard -type-1 py-30 px-30 rounded-4 bg-white shadow-3 h-100">
+                    <div class="dashCard__icon bg-light-2 text-red-2">
+                        <i class="icon-luggage text-20"></i>
+                    </div>
+                    <div class="dashCard__content">Bookings</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-7 col-md-6 pt-20">
         <div class="py-30 px-30 rounded-4 bg-white shadow-3">
             <div class="d-flex justify-between items-center">
                 <h2 class="text-18 lh-1 fw-500">
@@ -185,6 +239,100 @@
                         {% endif %}
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Content Row -->
+<div class="row y-gap-30 pt-20">
+    <!-- Recent Blog Posts -->
+    <div class="col-xl-6 col-md-6">
+        <div class="py-30 px-30 rounded-4 bg-white shadow-3 h-100">
+            <div class="d-flex justify-between items-center">
+                <h2 class="text-18 lh-1 fw-500">Recent Blog Posts</h2>
+                <div class="">
+                    <a href="{{ path('app_admin_blog_index') }}" class="text-14 text-blue-1 fw-500 underline">View All</a>
+                </div>
+            </div>
+            
+            <div class="overflow-scroll scroll-bar-1 pt-30" style="max-height: 350px;">
+                {% if recentPosts is defined and recentPosts is not empty %}
+                    <table class="table-2 col-12">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for post in recentPosts %}
+                                <tr>
+                                    <td>
+                                        <div class="text-truncate" style="max-width: 200px;">{{ post.title }}</div>
+                                    </td>
+                                    <td>
+                                        {% if post.user is defined and post.user is not null %}
+                                            {{ post.user.name ~ ' ' ~ post.user.lastname }}
+                                        {% else %}
+                                            <span class="text-light-1">Unknown User</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ post.date|date('d/m/Y') }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="text-center mt-30 text-15 text-light-1">No recent blog posts</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Upgrade Requests -->
+    <div class="col-xl-6 col-md-6">
+        <div class="py-30 px-30 rounded-4 bg-white shadow-3 h-100">
+            <div class="d-flex justify-between items-center">
+                <h2 class="text-18 lh-1 fw-500">
+                    Pending Upgrade Requests
+                    {% if pendingUpgrades is defined and pendingUpgrades > 0 %}
+                        <span class="rounded-100 py-4 px-10 text-center text-14 fw-500 bg-blue-1 text-white ml-10">{{ pendingUpgrades }}</span>
+                    {% endif %}
+                </h2>
+                <div class="">
+                    <a href="{{ path('admin_upgrade_requests') }}" class="text-14 text-blue-1 fw-500 underline">View All</a>
+                </div>
+            </div>
+            
+            <div class="overflow-scroll scroll-bar-1 pt-30" style="max-height: 350px;">
+                {% if recentUpgradeRequests is defined and recentUpgradeRequests is not empty %}
+                    <table class="table-2 col-12">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Current Role</th>
+                                <th>Requested Role</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in recentUpgradeRequests %}
+                                <tr>
+                                    <td>{{ request.user.name ~ ' ' ~ request.user.lastname }}</td>
+                                    <td>{{ request.user.role|replace({'ROLE_': ''}) }}</td>
+                                    <td>
+                                        <div class="rounded-100 py-4 text-center col-12 text-14 fw-500 bg-blue-1-05 text-blue-1">Upgrade Request</div>
+                                    </td>
+                                    <td>{{ request.requestDate|date('d/m/Y') }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="text-center mt-30 text-15 text-light-1">No pending upgrade requests</div>
+                {% endif %}
             </div>
         </div>
     </div>

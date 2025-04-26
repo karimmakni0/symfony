@@ -2,6 +2,11 @@
 
 {% block title %}Travel Activities{% endblock %}
 
+{% block stylesheets %}
+  {{ parent() }}
+  <link rel="stylesheet" href="{{ asset('assets/css/activities-filter.css') }}">
+{% endblock %}
+
 {% block body %}
 <br>
 <br>
@@ -11,106 +16,92 @@
     <div class="container">
       <div class="row y-gap-30">
         <div class="col-xl-3 col-lg-4 lg:d-none">
-          <aside class="sidebar y-gap-40">
-            <div class="sidebar__item -no-border">
-              <div class="px-20 py-20 bg-light-2 rounded-4">
-                <h5 class="text-18 fw-500 mb-10">Search Activity</h5>
-                <form action="{{ path('app_activities_filter') }}" method="GET" id="activityFilterForm">
-                <div class="row y-gap-20 pt-20">
+          <!-- Mobile filter toggle button -->
+          <div class="filter-sidebar-toggle d-lg-none">
+            <i class="icon-filter text-20 mr-10"></i> Filter Activities
+          </div>
+          
+          <aside class="sidebar y-gap-40 filter-sidebar">
+            <!-- Mobile close button -->
+            <div class="d-lg-none filter-sidebar-close">
+              <i class="icon-close"></i>
+            </div>
+            
+            <div class="filter-header">
+              <h5 class="text-18 fw-500">Activity Search</h5>
+            </div>
+            
+            <form action="{{ path('app_activities_filter') }}" method="GET" id="activityFilterForm">
+              <!-- Location filter -->
+              <div class="filter-section">
+                <div class="filter-section-title">Destination</div>
+                <div class="form-group">
+                  <select name="destination" class="form-select js-search-destination">
+                    <option value="">All Destinations</option>
+                    {% for destination in destinations|default([]) %}
+                      <option value="{{ destination }}" {% if app.request.query.get('destination') == destination %}selected{% endif %}>{{ destination }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <!-- Date Range filter -->
+              <div class="filter-section">
+                <div class="filter-section-title">Date Range</div>
+                <div class="row y-gap-10">
                   <div class="col-12">
-                    <div class="px-20 py-10 bg-white rounded-4">
-                      <div class="searchMenu-loc">
-                        <h4 class="text-15 fw-500 ls-2 lh-16">Location</h4>
-                        <select name="destination" class="form-select js-search-destination">
-                          <option value="">All Destinations</option>
-                          {% for destination in destinations|default([]) %}
-                            <option value="{{ destination }}" {% if app.request.query.get('destination') == destination %}selected{% endif %}>{{ destination }}</option>
-                          {% endfor %}
-                        </select>
-                      </div>
+                    <div class="form-datepicker">
+                      <input 
+                        type="text" 
+                        class="form-control" 
+                        name="startDate" 
+                        placeholder="Start Date"
+                        value="{{ app.request.query.get('startDate') }}"
+                        autocomplete="off"
+                      >
                     </div>
                   </div>
-
-                  <div class="col-12">
-                    <div class="px-20 py-10 bg-white rounded-4">
-                      <div class="searchMenu-date">
-                        <h4 class="text-15 fw-500 ls-2 lh-16">Date Range</h4>
-                        <div class="d-flex">
-                          <div class="form-datepicker mr-5">
-                            <input 
-                              type="text" 
-                              class="form-control" 
-                              name="startDate" 
-                              placeholder="Start Date"
-                              value="{{ app.request.query.get('startDate') }}"
-                              autocomplete="off"
-                            >
-                          </div>
-                          <div class="form-datepicker">
-                            <input 
-                              type="text" 
-                              class="form-control" 
-                              name="endDate" 
-                              placeholder="End Date"
-                              value="{{ app.request.query.get('endDate') }}"
-                              autocomplete="off"
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-12">
-                    <div class="px-20 py-10 bg-white rounded-4">
-                      <div class="searchMenu-price">
-                        <h4 class="text-15 fw-500 ls-2 lh-16">Price Range</h4>
-                        <div class="row x-gap-10 y-gap-10 pt-10">
-                          <div class="col-6">
-                            <div class="form-input">
-                              <input type="number" name="minPrice" placeholder="Min Price" value="{{ app.request.query.get('minPrice') }}">
-                            </div>
-                          </div>
-                          <div class="col-6">
-                            <div class="form-input">
-                              <input type="number" name="maxPrice" placeholder="Max Price" value="{{ app.request.query.get('maxPrice') }}">
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-12">
-                    <div class="d-flex justify-content-between">
-                      <button type="submit" class="button -dark-1 py-15 px-35 h-60 col-7 rounded-4 bg-blue-1 text-white">
-                        <i class="icon-search text-20 mr-10"></i>
-                        Apply Filters
-                      </button>
-                      <a href="{{ path('app_activities') }}" class="button py-15 px-35 h-60 col-4 rounded-4 bg-light-2 text-dark-1">
-                        Reset
-                      </a>
+                  <div class="col-12 mt-10">
+                    <div class="form-datepicker">
+                      <input 
+                        type="text" 
+                        class="form-control" 
+                        name="endDate" 
+                        placeholder="End Date"
+                        value="{{ app.request.query.get('endDate') }}"
+                        autocomplete="off"
+                      >
                     </div>
                   </div>
                 </div>
-                </form>
               </div>
-            </div>
 
-            <div class="sidebar__item -no-border">
-              <h5 class="text-18 fw-500 mb-10">Activity type</h5>
-              <div class="sidebar-checkbox">
+              <!-- Price Range filter -->
+              <div class="filter-section">
+                <div class="filter-section-title">Price Range</div>
+                <div class="filter-price-inputs">
+                  <div class="form-input">
+                    <input type="number" name="minPrice" placeholder="Min Price" value="{{ app.request.query.get('minPrice') }}">
+                  </div>
+                  <div class="form-input">
+                    <input type="number" name="maxPrice" placeholder="Max Price" value="{{ app.request.query.get('maxPrice') }}">
+                  </div>
+                </div>
+              </div>
 
-                <form id="activityTypeForm">
-                {% for activityType, count in activityTypes|default({'Adventure': 92, 'City Tours': 45, 'Cultural': 21, 'Sports': 78, 'Beach & Sun': 679}) %}
-                <div class="row y-gap-10 items-center justify-between">
-                  <div class="col-auto">
+              <!-- Activity type filter -->
+              <div class="filter-section">
+                <div class="filter-section-title">Activity Type</div>
+                <div class="sidebar-checkbox">
+                  {% for activityType, count in activityTypes|default({'Adventure': 92, 'City Tours': 45, 'Cultural': 21, 'Sports': 78, 'Beach & Sun': 679}) %}
+                  <div class="filter-checkbox-row">
                     <div class="d-flex items-center">
                       <div class="form-checkbox">
                         <input 
                           type="checkbox" 
                           name="activityType[]" 
                           value="{{ activityType }}"
+                          id="activity-{{ loop.index }}"
                           {% if app.request.query.has('activityType') and activityType in app.request.query.all('activityType') %}checked{% endif %}
                           onchange="addFilterToForm('activityType[]', '{{ activityType }}');"
                         >
@@ -118,32 +109,27 @@
                           <div class="form-checkbox__icon icon-check"></div>
                         </div>
                       </div>
-
-                      <div class="text-15 ml-10">{{ activityType }}</div>
+                      <label for="activity-{{ loop.index }}" class="text-15 ml-10 cursor-pointer">{{ activityType }}</label>
                     </div>
-                  </div>
-
-                  <div class="col-auto">
                     <div class="text-15 text-light-1">{{ count }}</div>
                   </div>
+                  {% endfor %}
                 </div>
-                {% endfor %}
-                </form>
               </div>
-            </div>
 
-            <div class="sidebar__item">
-              <h5 class="text-18 fw-500 mb-10">Duration</h5>
-              <div class="sidebar-checkbox">
-                {% for duration, count in durations|default({'Less than 1 hour': 92, '1 to 4 hours': 45, '4 hours to 1 day': 21, '1 to 3 days': 78}) %}
-                <div class="row y-gap-10 items-center justify-between">
-                  <div class="col-auto">
+              <!-- Duration filter -->
+              <div class="filter-section">
+                <div class="filter-section-title">Duration</div>
+                <div class="sidebar-checkbox">
+                  {% for duration, count in durations|default({'Less than 1 hour': 92, '1 to 4 hours': 45, '4 hours to 1 day': 21, '1 to 3 days': 78}) %}
+                  <div class="filter-checkbox-row">
                     <div class="d-flex items-center">
                       <div class="form-checkbox">
                         <input 
                           type="checkbox" 
                           name="duration[]" 
                           value="{{ duration }}"
+                          id="duration-{{ loop.index }}"
                           {% if app.request.query.has('duration') and duration in app.request.query.all('duration') %}checked{% endif %}
                           onchange="addFilterToForm('duration[]', '{{ duration }}');"
                         >
@@ -151,18 +137,27 @@
                           <div class="form-checkbox__icon icon-check"></div>
                         </div>
                       </div>
-
-                      <div class="text-15 ml-10">{{ duration }}</div>
+                      <label for="duration-{{ loop.index }}" class="text-15 ml-10 cursor-pointer">{{ duration }}</label>
                     </div>
-                  </div>
-
-                  <div class="col-auto">
                     <div class="text-15 text-light-1">{{ count }}</div>
                   </div>
+                  {% endfor %}
                 </div>
-                {% endfor %}
               </div>
-            </div>
+
+              <!-- Filter buttons -->
+              <div class="filter-section">
+                <div class="filter-buttons">
+                  <button type="submit" class="filter-apply-btn">
+                    <i class="icon-search text-16 mr-7"></i>
+                    Apply Filters
+                  </button>
+                  <a href="{{ path('app_activities') }}" class="filter-reset-btn">
+                    Reset
+                  </a>
+                </div>
+              </div>
+            </form>
           </aside>
         </div>
 
@@ -258,6 +253,12 @@
               </div>
             {% endif %}
           </div>
+          
+          {# Include pagination #}
+          {% include 'client/pagination.html.twig' with {
+              'current_page': current_page|default(1),
+              'max_pages': max_pages|default(1)
+          } %}
         </div>
       </div>
     </div>
@@ -278,29 +279,56 @@
       });
     }
     
+    // Mobile filter sidebar toggle
+    const filterToggle = document.querySelector('.filter-sidebar-toggle');
+    const filterSidebar = document.querySelector('.filter-sidebar');
+    const filterClose = document.querySelector('.filter-sidebar-close');
+    
+    if (filterToggle && filterSidebar) {
+      filterToggle.addEventListener('click', function() {
+        filterSidebar.classList.add('is-active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+      });
+    }
+    
+    if (filterClose && filterSidebar) {
+      filterClose.addEventListener('click', function() {
+        filterSidebar.classList.remove('is-active');
+        document.body.style.overflow = ''; // Re-enable scrolling
+      });
+    }
+    
     // Function to add a filter to the main form
     window.addFilterToForm = function(name, value) {
+      // Get the form
       const form = document.getElementById('activityFilterForm');
+      const event = window.event || {}; // Get event for the checkbox change
       
-      // Check if input already exists
-      let input = form.querySelector('input[name="' + name + '"][value="' + value + '"]');
-      if (!input) {
-        // Create a hidden input and add it to the form
-        input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = name;
-        input.value = value;
-        form.appendChild(input);
-      } else {
-        // Remove the input if the checkbox is unchecked
+      // If this was triggered by a checkbox
+      if (event.target && event.target.type === 'checkbox') {
         const checkbox = event.target;
-        if (!checkbox.checked) {
-          input.remove();
+        
+        // Only handle auto-submit on desktop, not mobile
+        if (window.innerWidth >= 992) {
+          // Add or remove the hidden input based on checkbox state
+          let hiddenInput = form.querySelector('input[type="hidden"][name="' + name + '"][value="' + value + '"]');
+          
+          if (checkbox.checked) {
+            if (!hiddenInput) {
+              hiddenInput = document.createElement('input');
+              hiddenInput.type = 'hidden';
+              hiddenInput.name = name;
+              hiddenInput.value = value;
+              form.appendChild(hiddenInput);
+            }
+          } else if (hiddenInput) {
+            hiddenInput.remove();
+          }
+          
+          // Only auto-submit on desktop
+          form.submit();
         }
       }
-      
-      // Submit the form
-      form.submit();
     };
     
     // Handle activity type checkbox changes 
@@ -321,20 +349,42 @@
     document.getElementById('activityFilterForm').addEventListener('submit', function(e) {
       // Get all checked activity type checkboxes
       document.querySelectorAll('input[name="activityType[]"]:checked').forEach(function(checkbox) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'activityType[]';
-        input.value = checkbox.value;
-        this.appendChild(input);
+        // Check if hidden input already exists
+        let exists = false;
+        this.querySelectorAll('input[type="hidden"][name="activityType[]"]').forEach(function(input) {
+          if (input.value === checkbox.value) {
+            exists = true;
+          }
+        });
+        
+        // Only add if it doesn't exist
+        if (!exists) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'activityType[]';
+          input.value = checkbox.value;
+          this.appendChild(input);
+        }
       }, this);
       
       // Get all checked duration checkboxes
       document.querySelectorAll('input[name="duration[]"]:checked').forEach(function(checkbox) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'duration[]';
-        input.value = checkbox.value;
-        this.appendChild(input);
+        // Check if hidden input already exists
+        let exists = false;
+        this.querySelectorAll('input[type="hidden"][name="duration[]"]').forEach(function(input) {
+          if (input.value === checkbox.value) {
+            exists = true;
+          }
+        });
+        
+        // Only add if it doesn't exist
+        if (!exists) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'duration[]';
+          input.value = checkbox.value;
+          this.appendChild(input);
+        }
       }, this);
     });
   });

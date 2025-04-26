@@ -1,8 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log In{% endblock %}
+{% block title %}Log in!{% endblock %}
 
 {% block body %}
+<!-- Add FontAwesome for better icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<!-- Add hCaptcha script -->
+<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+<!-- Add SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <section class="layout-pt-lg layout-pb-lg bg-blue-2">
   <div class="container">
     <div class="row justify-center">
@@ -11,8 +17,7 @@
           <div class="row y-gap-20">
             <div class="col-12 text-center">
               <h1 class="text-30 fw-600">Welcome Back</h1>
-              <p class="mt-10">Don't have an account yet? <a href="{{ path('app_register') }}" class="text-blue-1 fw-500">Sign up for free</a></p>
-              <p class="mt-5 text-15 text-light-1">This account is protected with two-factor authentication</p>
+              <p class="mt-10">Don't have an account yet? <a href="{{ path('app_register') }}" class="text-blue-1 fw-500"><i class="fa fa-user-plus me-1"></i> Sign up for free</a></p>
             </div>
 
             {% if error %}
@@ -32,6 +37,7 @@
             {% endif %}
 
             {% for message in app.flashes('success') %}
+                <!-- Success messages will be shown via SweetAlert and as fallback here -->
                 <div class="col-12">
                     <div class="alert alert-success rounded-4 py-10 px-15 bg-green-1 text-white">
                         {{ message }}
@@ -55,54 +61,77 @@
                 </div>
 
                 <div class="col-12">
-                    <div class="d-flex align-items-center">
-                        <div class="icon-security text-18 text-blue-1 mr-10"></div>
-                        <div class="text-15 lh-15">After entering your password, you'll be asked for a verification code from your Google Authenticator app</div>
-                    </div>
-                </div>
-
-                <div class="col-12">
                     <div class="d-flex items-center justify-between">
                         <div class="form-checkbox">
                             <input type="checkbox" name="_remember_me" id="remember_me">
                             <div class="form-checkbox__mark">
-                                <div class="form-checkbox__icon icon-check"></div>
+                                <div class="form-checkbox__icon"><i class="fa fa-check"></i></div>
                             </div>
                             <div class="text-15 lh-11 text-light-1 ml-10">Remember me</div>
                         </div>
 
-                        <a href="#" class="text-14 text-blue-1 fw-500">Forgot password?</a>
+                        <a href="{{ path('app_reset_password_request') }}" class="text-14 text-blue-1 fw-500"><i class="fa fa-key me-1"></i> Forgot password?</a>
                     </div>
                 </div>
 
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                
+                <!-- Add hCaptcha widget -->
+                <div class="col-12 d-flex justify-center mt-15">
+                    <div class="h-captcha" data-sitekey="579e1b04-d52c-4bf4-be44-9704c79a23a0"></div>
+                </div>
 
                 <div class="col-12 d-flex justify-center mt-15">
-                    <button type="submit" class="button py-20 -dark-1 bg-blue-1 text-white w-100" style="max-width: 80%; min-width: 300px;">
-                        <span class="fw-500 text-16">Sign In</span>
-                        <div class="icon-arrow-top-right ml-15"></div>
+                    <button type="submit" class="button py-20 -dark-1 bg-blue-1 text-white w-100 rounded-pill" style="max-width: 80%; min-width: 300px;">
+                        <i class="fa fa-sign-in-alt me-2"></i> <span class="fw-500 text-16">Sign In</span>
                     </button>
                 </div>
             </form>
 
-            <div class="row y-gap-20 pt-30">
-                <div class="col-12">
-                    <div class="text-center">or sign in with</div>
 
-                    <button class="button col-12 -outline-red-1 text-red-1 py-15 rounded-8 mt-15" style="max-width: 80%; min-width: 300px; margin: 15px auto 0;">
-                        <i class="icon-google text-15 mr-10"></i>
-                        <span class="fw-500">Google</span>
-                    </button>
-
-                </div>
-
-                <div class="col-12">
-                    <div class="text-center px-30">By creating an account, you agree to our Terms of Service and Privacy Statement.</div>
-                </div>
-            </div>
         </div>
       </div>
     </div>
   </div>
 </section>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check URL for password_reset=success parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('password_reset') === 'success') {
+            Swal.fire({
+                title: 'Password Reset Successful!',
+                text: 'Your password has been successfully reset. You can now log in with your new password.',
+                icon: 'success',
+                confirmButtonColor: '#3554D1',
+                confirmButtonText: 'OK'
+            });
+        }
+        
+        // Handle flash messages with SweetAlert
+        {% for message in app.flashes('success') %}
+            Swal.fire({
+                title: 'Success!',
+                text: "{{ message }}",
+                icon: 'success',
+                confirmButtonColor: '#3554D1',
+                confirmButtonText: 'OK'
+            });
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            Swal.fire({
+                title: 'Error!',
+                text: "{{ message }}",
+                icon: 'error',
+                confirmButtonColor: '#3554D1',
+                confirmButtonText: 'OK'
+            });
+        {% endfor %}
+    });
+</script>
+{{ parent() }}
 {% endblock %}

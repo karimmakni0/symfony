@@ -1,0 +1,100 @@
+/**
+ * Admin Pagination Styles
+ * Consistent with the UI design across admin panels
+ */
+
+:root {
+  --color-primary: #3554d1;
+  --color-primary-light: #EDF3FF;
+  --color-text: #697488;
+  --color-text-dark: #051036;
+  --color-border: #EAEEF3;
+  --color-bg-light: #F5F9FE;
+  --border-radius: 8px;
+  --border-radius-sm: 6px;
+  --transition: all 0.2s ease;
+}
+
+/* Pagination container */
+.pagination-container {
+  width: 100%;
+  clear: both;
+  margin-top: 20px;
+  padding: 10px 0;
+}
+
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  margin-top: 0;
+  border-top: 1px solid var(--color-border);
+  width: 100%;
+  clear: both;
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+/* Pagination links */
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 5px;
+}
+
+.page-item {
+  margin: 0;
+}
+
+.page-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+  color: var(--color-text-dark);
+  background-color: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.page-link:hover {
+  background-color: var(--color-bg-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary-light);
+}
+
+.page-item.active .page-link {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.page-item.disabled .page-link {
+  color: #ccc;
+  background-color: #f8f8f8;
+  border-color: #eee;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .admin-pagination {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .page-link {
+    width: 32px;
+    height: 32px;
+  }
+}

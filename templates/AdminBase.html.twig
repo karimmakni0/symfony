@@ -247,6 +247,7 @@
 
     <div class="dashboard__main">
       <div class="dashboard__content bg-light-2">
+        {# Flash messages will now be handled by SweetAlert instead of being displayed directly #}
         {% block body %}{% endblock %}
 
         <footer class="footer -dashboard mt-60">
@@ -289,6 +290,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js" integrity="sha512-QSkVNOCYLtj73J4hbmVoOV6KVZuMluZlioC+trLpewV8qMjsWqlIQvkn1KGX2StWvPMdWGBqim1xlC8krl1EKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAAz77U5XQuEME6TpftaMdX0bBelQxXRlM"></script>
   <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 
   <script src="{{ asset('assets/js/vendors.js') }}"></script>
   <script src="{{ asset('assets/js/main.js') }}"></script>
@@ -296,6 +301,22 @@
   {% block javascripts %}
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Display flash messages using SweetAlert
+      {% for label, messages in app.flashes %}
+        {% for message in messages %}
+          Swal.fire({
+            title: '{{ label|capitalize }}',
+            text: "{{ message }}",
+            icon: '{{ label == 'success' ? 'success' : (label == 'error' ? 'error' : 'info') }}',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+          });
+        {% endfor %}
+      {% endfor %}
+      
       // Manual dropdown toggle implementation
       const userDropdown = document.getElementById('userDropdown');
       const dropdownMenu = userDropdown.nextElementSibling;

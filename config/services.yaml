@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     posts_directory: '%kernel.project_dir%/public/uploads/posts'
+    hcaptcha_sitekey: '%env(HCAPTCHA_SITEKEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -23,3 +24,15 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    
+    App\Service\ResetPasswordService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            
+    App\Service\HCaptchaService:
+        arguments:
+            $hcaptchaSecret: '%env(HCAPTCHA_SECRET)%'
+    
+    App\Controller\ResetPasswordController:
+        arguments:
+            $hcaptchaSitekey: '%hcaptcha_sitekey%'

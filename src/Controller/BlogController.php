@@ -2,73 +2,73 @@
 
 namespace App\Controller;
 
-use App\Entity\Post;
 use App\Entity\Comment;
-use App\Form\PostFormType;
+use App\Entity\Post;
+use App\Entity\BlogRating;
 use App\Form\CommentFormType;
-use App\Repository\PostRepository;
-use App\Repository\UsersRepository;
-use App\Repository\CommentRepository;
-use App\Repository\BlogRatingRepository;
+use App\Form\PostFormType;
 use App\Repository\ActivitiesRepository;
+use App\Repository\CommentRepository;
+use App\Repository\PostRepository;
+use App\Repository\BlogRatingRepository;
+use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Psr\Log\LoggerInterface;
 
-#[Route('/blog')]
 class BlogController extends AbstractController
 {
     private $entityManager;
     private $postRepository;
+    private $activitiesRepository;
     private $commentRepository;
     private $usersRepository;
-    private $activitiesRepository;
     private $blogRatingRepository;
     private $security;
     private $httpClient;
-    private $params;
     private $logger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         PostRepository $postRepository,
+        ActivitiesRepository $activitiesRepository,
         CommentRepository $commentRepository,
         UsersRepository $usersRepository,
-        ActivitiesRepository $activitiesRepository,
         BlogRatingRepository $blogRatingRepository,
         Security $security,
-        HttpClientInterface $httpClient,
-        ParameterBagInterface $params,
-        LoggerInterface $logger
+        HttpClientInterface $httpClient = null,
+        LoggerInterface $logger = null
     ) {
         $this->entityManager = $entityManager;
         $this->postRepository = $postRepository;
+        $this->activitiesRepository = $activitiesRepository;
         $this->commentRepository = $commentRepository;
         $this->usersRepository = $usersRepository;
-        $this->activitiesRepository = $activitiesRepository;
         $this->blogRatingRepository = $blogRatingRepository;
         $this->security = $security;
         $this->httpClient = $httpClient;
-        $this->params = $params;
         $this->logger = $logger;
     }
 
-    #[Route('/', name: 'app_blog_index')]
+    #[Route('/blog', name: 'app_blog_index')]
     public function index(Request $request): Response
     {
         // Get filters
         $activityId = $request->query->get('activityId');
-        $myBlogsOnly = $request->query->getBoolean('myBlogs', false);
+        
+        // Get pagination parameters
+        $page = $request->query->getInt('page', 1);
+        $limit = 6; // Number of blog posts per page
         
         $currentUser = $this->security->getUser();
         $userId = $currentUser ? $currentUser->getId() : null;
@@ -80,16 +80,17 @@ class BlogController extends AbstractController
             $criteria['activityId'] = $activityId;
         }
         
-        if ($myBlogsOnly && $userId) {
-            $criteria['userId'] = $userId;
-        }
+        // Count total posts for pagination
+        $totalPosts = $this->postRepository->count($criteria);
+        $maxPages = ceil($totalPosts / $limit);
         
-        // Get filtered posts
-        if (!empty($criteria)) {
-            $posts = $this->postRepository->findBy($criteria, ['date' => 'DESC']);
-        } else {
-            $posts = $this->postRepository->findBy([], ['date' => 'DESC']);
-        }
+        // Get filtered posts with pagination
+        $posts = $this->postRepository->findBy(
+            $criteria, 
+            ['date' => 'DESC'],
+            $limit,
+            ($page - 1) * $limit
+        );
 
         // Get users for displaying author names
         $userIds = array_map(function($post) {
@@ -102,33 +103,154 @@ class BlogController extends AbstractController
             $usersById[$user->getId()] = $user;
         }
 
-        // Get activities for displaying activity details and filter dropdown
-        $activities = $this->activitiesRepository->findAll();
+        // Extract activity IDs from posts, making sure to filter out nulls and zeros
+        $postActivityIds = array_filter(array_map(function($post) {
+            $id = $post->getActivityId();
+            return ($id !== null && $id > 0) ? $id : null;
+        }, $posts));
+        
+        // First get all activities for the filter dropdown
+        $allActivities = $this->activitiesRepository->findAll();
+        
+        // Create indexed arrays of activities
+        $activitiesById = [];
+        $activitiesByIdString = []; // For string keys since Twig might convert integers to strings
+        
+        // First add all activities to the arrays
+        foreach ($allActivities as $activity) {
+            $id = $activity->getId();
+            $activitiesById[$id] = $activity;
+            $activitiesByIdString[(string)$id] = $activity;
+        }
+        
+        // Now ensure we have all activities referenced by posts
+        if (!empty($postActivityIds)) {
+            $postRelatedActivities = $this->activitiesRepository->findBy(['id' => array_values($postActivityIds)]);
+            foreach ($postRelatedActivities as $activity) {
+                $id = $activity->getId();
+                $activitiesById[$id] = $activity;
+                $activitiesByIdString[(string)$id] = $activity;
+            }
+        }
+        
+        // Create an array with direct activity destinations for each post
+        $postDestinations = [];
+        foreach ($posts as $post) {
+            $activityId = $post->getActivityId();
+            if ($activityId && isset($activitiesById[$activityId])) {
+                $postDestinations[$post->getId()] = $activitiesById[$activityId]->getActivityDestination();
+            } else {
+                $postDestinations[$post->getId()] = null;
+            }
+        }
+        
+        // Get rating statistics for all posts
+        $ratingStats = [];
+        foreach ($posts as $post) {
+            $ratings = $this->blogRatingRepository->findBy(['postId' => $post->getId()]);
+            $likes = 0;
+            $dislikes = 0;
+            foreach ($ratings as $rating) {
+                if ($rating->isLike()) {
+                    $likes++;
+                } else {
+                    $dislikes++;
+                }
+            }
+            $ratingStats[$post->getId()] = [
+                'likes' => $likes,
+                'dislikes' => $dislikes
+            ];
+        }
+
+        return $this->render('client/Blog/index.html.twig', [
+            'posts' => $posts,
+            'users' => $usersById,
+            'activities' => $allActivities,
+            'activitiesById' => $activitiesById,
+            'activitiesByIdString' => $activitiesByIdString,
+            'postDestinations' => $postDestinations,
+            'ratingStats' => $ratingStats,
+            'selectedActivityId' => $activityId,
+            'currentUserId' => $userId,
+            'current_page' => $page,
+            'max_pages' => $maxPages,
+            'total_items' => $totalPosts,
+            'items_per_page' => $limit
+        ]);
+    }
+
+    #[Route('/publicator/blog', name: 'app_publicator_blog_index')]
+    public function publicatorBlogIndex(Request $request): Response
+    {
+        // Check if user is logged in and has Publicitaire role
+        $user = $this->security->getUser();
+        if (!$user || $user->getRole() !== 'Publicitaire') {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Get pagination parameters
+        $page = $request->query->getInt('page', 1);
+        $limit = 10; // Number of blog posts per page in admin view
+        
+        // Get only blog posts created by this publicator
+        $criteria = ['userId' => $user->getId()];
+        
+        // Count total posts for pagination
+        $totalPosts = $this->postRepository->count($criteria);
+        $maxPages = ceil($totalPosts / $limit);
+        
+        // Get filtered posts with pagination
+        $posts = $this->postRepository->findBy(
+            $criteria, 
+            ['date' => 'DESC'],
+            $limit,
+            ($page - 1) * $limit
+        );
+
+        // Get activities for displaying activity details
+        $activityIds = array_map(function($post) {
+            return $post->getActivityId();
+        }, $posts);
+        
+        $activities = $this->activitiesRepository->findBy(['id' => array_unique($activityIds)]);
         $activitiesById = [];
         foreach ($activities as $activity) {
             $activitiesById[$activity->getId()] = $activity;
         }
         
-        // Get rating statistics for all posts
-        $postIds = array_map(function($post) {
-            return $post->getId();
-        }, $posts);
+        // Get comment counts for each post
+        $commentCounts = [];
+        foreach ($posts as $post) {
+            $commentCounts[$post->getId()] = $this->commentRepository->count(['postId' => $post->getId()]);
+        }
         
-        $ratingStats = $this->blogRatingRepository->getRatingStatsForPosts($postIds);
-
-        return $this->render('client/Blog/index.html.twig', [
+        // Get total likes for all of the publicator's posts
+        $totalLikes = 0;
+        $allUserPosts = $this->postRepository->findBy(['userId' => $user->getId()]);
+        foreach ($allUserPosts as $post) {
+            $ratings = $this->blogRatingRepository->findBy(['postId' => $post->getId()]);
+            foreach ($ratings as $rating) {
+                if ($rating->isLike()) {
+                    $totalLikes++;
+                }
+            }
+        }
+        
+        // Return the dashboard template
+        return $this->render('publicator/blog/list.html.twig', [
             'posts' => $posts,
-            'users' => $usersById,
-            'activities' => $activities,
-            'activitiesById' => $activitiesById,
-            'selectedActivityId' => $activityId,
-            'myBlogsOnly' => $myBlogsOnly,
-            'currentUserId' => $userId,
-            'ratingStats' => $ratingStats
+            'activities' => $activitiesById,
+            'commentCounts' => $commentCounts,
+            'totalLikes' => $totalLikes,
+            'current_page' => $page,
+            'max_pages' => $maxPages,
+            'total_items' => $totalPosts,
+            'items_per_page' => $limit
         ]);
     }
 
-    #[Route('/details/{id}', name: 'app_blog_details')]
+    #[Route('/blog/details/{id}', name: 'app_blog_details')]
     public function details(Request $request, int $id): Response
     {
         $post = $this->postRepository->find($id);
@@ -147,11 +269,21 @@ class BlogController extends AbstractController
         if ($activity) {
             $resources = $activity->getResources();
         }
-
-        // Get comments for this post
-        $comments = $this->commentRepository->findBy(['postId' => $id], ['date' => 'ASC']);
         
-        // Get users for displaying comment author names
+        // Check if current user is the author of the post
+        $currentUser = $this->security->getUser();
+        $isAuthor = false;
+        if ($currentUser && $currentUser->getId() === $post->getUserId()) {
+            $isAuthor = true;
+        }
+        
+        // Get post comments
+        $comments = $this->commentRepository->findBy(
+            ['postId' => $post->getId()],
+            ['date' => 'DESC']
+        );
+        
+        // Get user info for each comment
         $commentUserIds = array_map(function($comment) {
             return $comment->getUserId();
         }, $comments);
@@ -161,71 +293,70 @@ class BlogController extends AbstractController
         foreach ($commentUsers as $user) {
             $commentUsersById[$user->getId()] = $user;
         }
-
-        // Create form for new comment
-        $newComment = new Comment();
-        $newComment->setPostId($id);
-        $commentForm = $this->createForm(CommentFormType::class, $newComment);
-        $commentForm->handleRequest($request);
         
-        // Handle comment form submission
-        if ($commentForm->isSubmitted() && $commentForm->isValid()) {
-            $user = $this->security->getUser();
-            if (!$user) {
-                return $this->redirectToRoute('app_login');
-            }
-            
-            $newComment->setUserId($user->getId());
-            $newComment->setDate(new \DateTime());
-            
-            $this->entityManager->persist($newComment);
-            $this->entityManager->flush();
-            
-            $this->addFlash('success', 'Comment added successfully!');
-            return $this->redirectToRoute('app_blog_details', ['id' => $id]);
-        }
-        
-        // Create forms for editing comments
+        // Create edit forms for comments
         $editForms = [];
         foreach ($comments as $comment) {
-            $form = $this->createForm(CommentFormType::class, $comment, [
-                'action' => $this->generateUrl('app_blog_comment_edit', ['id' => $comment->getId()]),
+            $editForm = $this->createForm(CommentFormType::class, $comment, [
+                'action' => $this->generateUrl('app_comment_edit', ['id' => $comment->getId()]),
+                'method' => 'POST',
             ]);
-            $editForms[$comment->getId()] = $form->createView();
+            $editForms[$comment->getId()] = $editForm->createView();
         }
-
-        // Check if current user is the author of the post
-        $currentUser = $this->security->getUser();
-        $isAuthor = $currentUser && $post->getUserId() === $currentUser->getId();
         
-        // Get blog rating information
-        $likesCount = $this->blogRatingRepository->countLikesByPostId($id);
-        $dislikesCount = $this->blogRatingRepository->countDislikesByPostId($id);
-        
-        // Get user's current rating if authenticated
-        $userRating = null;
+        // Create comment form for adding new comment
+        $comment = new Comment();
+        $comment->setPostId($post->getId());
         if ($currentUser) {
-            $existingRating = $this->blogRatingRepository->findByUserAndPost($currentUser->getId(), $id);
-            if ($existingRating) {
-                $userRating = $existingRating->isLike() ? 'like' : 'dislike';
+            $comment->setUserId($currentUser->getId());
+        }
+        
+        $commentForm = $this->createForm(CommentFormType::class, $comment, [
+            'action' => $this->generateUrl('app_comment_new', ['postId' => $post->getId()]),
+            'method' => 'POST',
+        ]);
+        
+        // Get related posts (same activity)
+        $relatedPosts = $this->postRepository->findBy(
+            [
+                'activityId' => $post->getActivityId(),
+            ],
+            ['date' => 'DESC'],
+            3  // Limit to 3 related posts
+        );
+        
+        // Remove current post from related posts list
+        foreach ($relatedPosts as $key => $relatedPost) {
+            if ($relatedPost->getId() === $post->getId()) {
+                unset($relatedPosts[$key]);
+                break;
             }
         }
         
-        // Get related posts (same activity or same author)
-        $relatedPosts = $this->postRepository->findBy([
-            'activityId' => $post->getActivityId()
-        ], ['date' => 'DESC'], 3);
+        // Get rating statistics
+        $ratings = $this->blogRatingRepository->findBy(['postId' => $post->getId()]);
+        $likesCount = 0;
+        $dislikesCount = 0;
+        $userRating = null;
         
-        // Remove the current post from related posts
-        $relatedPosts = array_filter($relatedPosts, function($relatedPost) use ($post) {
-            return $relatedPost->getId() !== $post->getId();
-        });
-
+        foreach ($ratings as $rating) {
+            if ($rating->isLike()) {
+                $likesCount++;
+            } else {
+                $dislikesCount++;
+            }
+            
+            // Check if current user has rated this post
+            if ($currentUser && $rating->getUserId() === $currentUser->getId()) {
+                $userRating = $rating->isLike() ? 'like' : 'dislike';
+            }
+        }
+        
         return $this->render('client/Blog/details.html.twig', [
             'post' => $post,
             'author' => $author,
             'activity' => $activity,
-            'resources' => $resources ?? [],
+            'resources' => $resources,
             'comments' => $comments,
             'commentUsers' => $commentUsersById,
             'commentForm' => $commentForm->createView(),
@@ -238,14 +369,24 @@ class BlogController extends AbstractController
         ]);
     }
 
-    #[Route('/add', name: 'app_blog_add')]
+    #[Route('/publicator/blog/add', name: 'app_blog_add')]
     public function addBlog(Request $request, SluggerInterface $slugger): Response
     {
-        // Check if user is logged in
+        // Check if user is logged in and has Publicitaire role
         $user = $this->security->getUser();
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
+        
+        // Check if user has Publicitaire role
+        if ($user->getRole() !== 'Publicitaire') {
+            $this->addFlash('error', 'Only Publicitaire users can create blog posts.');
+            return $this->redirectToRoute('app_blog_index');
+        }
+        
+        // Check the referer to determine if we should use the dashboard template
+        $referer = $request->headers->get('referer');
+        $useDashboardTemplate = $referer && strpos($referer, '/publicator') !== false;
         
         // Create a new post
         $post = new Post();
@@ -294,19 +435,19 @@ class BlogController extends AbstractController
             $this->entityManager->persist($post);
             $this->entityManager->flush();
             
-            $this->addFlash('success', 'Your blog post has been published successfully!');
-            return $this->redirectToRoute('app_blog_details', [
-                'id' => $post->getId()
-            ]);
+            // Set a success flag in the session for SweetAlert
+            $request->getSession()->set('blog_created', true);
+            return $this->redirectToRoute('app_publicator_blog_index');
         }
         
-        return $this->render('client/Blog/addBlog.html.twig', [
+        // Always use the dashboard-style template for a consistent experience
+        return $this->render('publicator/blog/add.html.twig', [
             'form' => $form->createView(),
-            'activities' => $activities,
+            'activities' => $activities
         ]);
     }
 
-    #[Route('/edit/{id}', name: 'app_blog_edit')]
+    #[Route('/publicator/blog/edit/{id}', name: 'app_blog_edit')]
     public function editBlog(Request $request, int $id, SluggerInterface $slugger): Response
     {
         // Check if user is logged in
@@ -323,7 +464,7 @@ class BlogController extends AbstractController
         
         // Check if the current user is the author
         if ($post->getUserId() !== $user->getId()) {
-            $this->addFlash('error', 'You do not have permission to edit this post');
+            $this->addFlash('error', 'You can only edit your own posts.');
             return $this->redirectToRoute('app_blog_details', ['id' => $id]);
         }
         
@@ -337,13 +478,13 @@ class BlogController extends AbstractController
         // Create form
         $form = $this->createForm(PostFormType::class, $post, [
             'activities_choices' => $activitiesChoices,
-            'image_required' => false, // Image not required for edit
+            'image_required' => false,
         ]);
         
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
-            // Handle file upload only if a new file is provided
+            // Handle file upload
             $pictureFile = $form->get('picture')->getData();
             
             if ($pictureFile) {
@@ -357,12 +498,12 @@ class BlogController extends AbstractController
                         $newFilename
                     );
                     
-                    // Delete old image if it exists
-                    $oldImage = $post->getPicture();
-                    if ($oldImage) {
-                        $oldImagePath = $this->getParameter('posts_directory').'/'.$oldImage;
-                        if (file_exists($oldImagePath)) {
-                            unlink($oldImagePath);
+                    // Delete old picture if exists
+                    $oldPicture = $post->getPicture();
+                    if ($oldPicture) {
+                        $oldPicturePath = $this->getParameter('posts_directory').'/'.$oldPicture;
+                        if (file_exists($oldPicturePath)) {
+                            unlink($oldPicturePath);
                         }
                     }
                     
@@ -376,21 +517,20 @@ class BlogController extends AbstractController
             // Save to database
             $this->entityManager->flush();
             
-            $this->addFlash('success', 'Your blog post has been updated successfully!');
-            return $this->redirectToRoute('app_blog_details', [
-                'id' => $post->getId()
-            ]);
+            // Set a success flag in the session for SweetAlert
+            $request->getSession()->set('blog_updated', true);
+            return $this->redirectToRoute('app_publicator_blog_index');
         }
         
-        return $this->render('client/Blog/editBlog.html.twig', [
+        // Use the dashboard-style template for a consistent experience
+        return $this->render('publicator/blog/edit.html.twig', [
             'form' => $form->createView(),
             'post' => $post,
             'activities' => $activities,
-            'posts_directory' => 'uploads/posts'
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'app_blog_delete')]
+    #[Route('/publicator/blog/delete/{id}', name: 'app_blog_delete')]
     public function deleteBlog(int $id): Response
     {
         // Check if user is logged in
@@ -406,14 +546,20 @@ class BlogController extends AbstractController
         
         // Check if the current user is the author
         if ($post->getUserId() !== $user->getId()) {
-            $this->addFlash('error', 'You do not have permission to delete this post');
+            $this->addFlash('error', 'You can only delete your own posts.');
             return $this->redirectToRoute('app_blog_details', ['id' => $id]);
         }
-        
-        // Delete all comments related to this post
+
+        // Delete post comments
         $comments = $this->commentRepository->findBy(['postId' => $id]);
         foreach ($comments as $comment) {
             $this->entityManager->remove($comment);
+        }
+
+        // Delete post ratings
+        $ratings = $this->blogRatingRepository->findBy(['postId' => $id]);
+        foreach ($ratings as $rating) {
+            $this->entityManager->remove($rating);
         }
 
         // Delete post picture if it exists
@@ -428,112 +574,99 @@ class BlogController extends AbstractController
         // Delete the post
         $this->entityManager->remove($post);
         $this->entityManager->flush();
-
-        $this->addFlash('success', 'Post deleted successfully!');
-        return $this->redirectToRoute('app_blog_index');
+        
+        // Set a session flag for SweetAlert instead of flash message
+        $this->get('session')->set('blog_deleted', true);
+    
+    // Redirect to publicator blog index if the user is a publicator
+    if ($user->getRole() === 'Publicitaire') {
+        return $this->redirectToRoute('app_publicator_blog_index');
+    }
+    
+    return $this->redirectToRoute('app_blog_index');
     }
 
-    #[Route('/comment/add/{postId}', name: 'app_blog_comment_add', methods: ['POST'])]
-    public function addComment(Request $request, int $postId): Response
+    #[Route('/blog/rate/{id}/{type}', name: 'app_blog_rate')]
+    public function rateBlog(int $id, string $type, Request $request): Response
     {
+        // Check if user is logged in
         $user = $this->security->getUser();
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
-
-        $post = $this->postRepository->find($postId);
+        
+        // Check if post exists
+        $post = $this->postRepository->find($id);
         if (!$post) {
             throw $this->createNotFoundException('Post not found');
         }
-
-        // Create new comment and form
-        $comment = new Comment();
-        $comment->setPostId($postId);
-        $comment->setUserId($user->getId());
-        $comment->setDate(new \DateTime());
         
-        $form = $this->createForm(CommentFormType::class, $comment);
-        $form->handleRequest($request);
+        // Validate rating type
+        if (!in_array($type, ['like', 'dislike'])) {
+            throw $this->createNotFoundException('Invalid rating type');
+        }
         
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->persist($comment);
-            $this->entityManager->flush();
-
-            $this->addFlash('success', 'Comment added successfully!');
-        } elseif ($form->isSubmitted()) {
-            // Get form errors and add them as flash messages
-            foreach ($form->getErrors(true) as $error) {
-                $this->addFlash('error', $error->getMessage());
+        // Check if user has already rated this post
+        $existingRating = $this->blogRatingRepository->findOneBy([
+            'userId' => $user->getId(),
+            'postId' => $id
+        ]);
+        
+        $isLike = ($type === 'like');
+        
+        if ($existingRating) {
+            // User already rated, update rating
+            if ($existingRating->isLike() === $isLike) {
+                // User clicked same rating again, remove rating
+                $this->entityManager->remove($existingRating);
+            } else {
+                // User changed rating
+                $existingRating->setIsLike($isLike);
+                $existingRating->setUpdatedAt(new \DateTime());
             }
+        } else {
+            // User has not rated, create new rating
+            $rating = new BlogRating();
+            $rating->setUserId($user->getId());
+            $rating->setPostId($id);
+            $rating->setIsLike($isLike);
+            
+            $this->entityManager->persist($rating);
         }
         
-        return $this->redirectToRoute('app_blog_details', ['id' => $postId]);
-    }
-
-    #[Route('/comment/edit/{id}', name: 'app_blog_comment_edit', methods: ['POST'])]
-    public function editComment(Request $request, int $id): Response
-    {
-        $user = $this->security->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        $comment = $this->commentRepository->find($id);
-        if (!$comment) {
-            throw $this->createNotFoundException('Comment not found');
-        }
-
-        // Only the author can edit the comment
-        if ($comment->getUserId() !== $user->getId()) {
-            $this->addFlash('error', 'You do not have permission to edit this comment');
-            return $this->redirectToRoute('app_blog_details', ['id' => $comment->getPostId()]);
-        }
-
-        // Use CommentFormType for validation
-        $form = $this->createForm(CommentFormType::class, $comment);
-        $form->handleRequest($request);
-        
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->flush();
-            $this->addFlash('success', 'Comment updated successfully!');
-        } elseif ($form->isSubmitted()) {
-            // Get form errors and add them as flash messages
-            foreach ($form->getErrors(true) as $error) {
-                $this->addFlash('error', $error->getMessage());
-            }
-        }
-
-        return $this->redirectToRoute('app_blog_details', ['id' => $comment->getPostId()]);
-    }
-
-    #[Route('/comment/delete/{id}', name: 'app_blog_comment_delete')]
-    public function deleteComment(int $id): Response
-    {
-        $user = $this->security->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        $comment = $this->commentRepository->find($id);
-        if (!$comment) {
-            throw $this->createNotFoundException('Comment not found');
-        }
-
-        // Only the author can delete the comment
-        if ($comment->getUserId() !== $user->getId()) {
-            $this->addFlash('error', 'You do not have permission to delete this comment');
-            return $this->redirectToRoute('app_blog_details', ['id' => $comment->getPostId()]);
-        }
-
-        $postId = $comment->getPostId();
-        $this->entityManager->remove($comment);
         $this->entityManager->flush();
-
-        $this->addFlash('success', 'Comment deleted successfully!');
-        return $this->redirectToRoute('app_blog_details', ['id' => $postId]);
+        
+        // Handle AJAX requests
+        if ($request->isXmlHttpRequest()) {
+            // Get updated counts
+            $ratings = $this->blogRatingRepository->findBy(['postId' => $id]);
+            $likesCount = 0;
+            $dislikesCount = 0;
+            $userRating = null;
+            
+            foreach ($ratings as $rating) {
+                if ($rating->isLike()) {
+                    $likesCount++;
+                } else {
+                    $dislikesCount++;
+                }
+                
+                if ($rating->getUserId() === $user->getId()) {
+                    $userRating = $rating->isLike() ? 'like' : 'dislike';
+                }
+            }
+            
+            return new JsonResponse([
+                'likes' => $likesCount,
+                'dislikes' => $dislikesCount,
+                'userRating' => $userRating
+            ]);
+        }
+        // Redirect back to post details page
+        return $this->redirectToRoute('app_blog_details', ['id' => $id]);
     }
 
-    #[Route('/generate-content', name: 'app_blog_generate_content', methods: ['POST'])]
+    #[Route('/publicator/blog/generate-content', name: 'app_blog_generate_content', methods: ['POST'])]
     public function generateContent(Request $request): JsonResponse
     {
         // Check if user is logged in
@@ -545,146 +678,217 @@ class BlogController extends AbstractController
         // Get the activity ID from the request
         $activityId = $request->request->get('activityId');
         if (!$activityId) {
-            return new JsonResponse(['error' => 'Activity must be selected'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'Activity ID is required'], Response::HTTP_BAD_REQUEST);
         }
         
-        // Get activity details
+        // Get the activity
         $activity = $this->activitiesRepository->find($activityId);
         if (!$activity) {
             return new JsonResponse(['error' => 'Activity not found'], Response::HTTP_NOT_FOUND);
         }
         
-        // Get the uploaded image
-        $imageFile = $request->files->get('image');
-        if (!$imageFile) {
-            return new JsonResponse(['error' => 'Image must be uploaded'], Response::HTTP_BAD_REQUEST);
-        }
-        
-        // Convert image to base64
-        $imageData = base64_encode(file_get_contents($imageFile->getPathname()));
-        
-        // Build a more structured prompt with detailed instructions
-        $activityName = $activity->getActivityName();
-        $activityDestination = $activity->getActivityDestination();
-        $prompt = "Create an engaging and vivid travel blog post about {$activityName} in {$activityDestination} based on the uploaded image.
-
-IMPORTANT: Respond ONLY with the blog content. Do not include any introductions or explanations.
-
-Your blog post should:
-1. Have a catchy title in bold (using Markdown **Title**)
-2. Be 2-3 paragraphs long (200-300 words)
-3. Include specific details about {$activityName} that are visible in the image
-4. Incorporate the location ({$activityDestination}) naturally in the narrative
-5. Use an enthusiastic, first-person perspective
-6. Evoke emotions and sensory details (sights, sounds, feelings)
-7. End with a compelling reason for readers to try this activity
-
-REMEMBER: Return ONLY the formatted blog content without any introductory text like 'Here's a blog post' or 'Okay, here's a description.'";
-        
-        // Try three different model endpoints to see which one works - using latest v1beta API
-        $modelEndpoints = [
-            'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent',
-            'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
-            'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-vision:generateContent'
+        // Try different AI services for content generation
+        $contentServices = [
+            'openai' => function() use ($activity) {
+                return $this->generateWithOpenAI($activity);
+            },
+            'huggingface' => function() use ($activity) {
+                return $this->generateWithHuggingFace($activity);
+            },
+            'localai' => function() use ($activity) {
+                return $this->generateWithLocalAI($activity);
+            }
         ];
         
-        $apiResponse = null;
+        $generatedContent = null;
         $lastError = null;
         
-        // Try each endpoint until one works
-        foreach ($modelEndpoints as $endpoint) {
-            try {
-                $this->logger->info('Trying Gemini endpoint', ['endpoint' => $endpoint]);
-                
-                $apiKey = $_ENV['GEMINI_API_KEY']; // Read API key from environment
-                
-                // Log the request details for debugging (without sensitive data)
-                $this->logger->info('Sending request to Gemini API', [
-                    'model' => 'gemini-pro-vision',
-                    'imageType' => $imageFile->getMimeType(),
-                    'prompt' => $prompt
-                ]);
-                
-                $response = $this->httpClient->request('POST', $endpoint, [
-                    'query' => [
-                        'key' => $apiKey
-                    ],
-                    'json' => [
-                        'contents' => [
-                            [
-                                'parts' => [
-                                    [
-                                        'text' => $prompt
-                                    ],
-                                    [
-                                        'inline_data' => [
-                                            'mime_type' => $imageFile->getMimeType(),
-                                            'data' => $imageData
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ],
-                        'generation_config' => [
-                            'temperature' => 0.4,
-                            'max_output_tokens' => 800
-                        ]
-                    ]
-                ]);
-                
-                $statusCode = $response->getStatusCode();
-                if ($statusCode === 200) {
-                    $apiResponse = $response;
-                    $this->logger->info('Successful endpoint found', ['endpoint' => $endpoint]);
-                    break;
-                } else {
-                    $lastError = "Received status code {$statusCode} from {$endpoint}";
-                    $this->logger->warning('API returned non-200 status', [
-                        'endpoint' => $endpoint,
-                        'status' => $statusCode,
-                        'response' => $response->getContent(false)
+        // Try each service until one succeeds
+        foreach ($contentServices as $serviceName => $serviceFunction) {
+            if ($this->httpClient) {
+                try {
+                    $generatedContent = $serviceFunction();
+                    if ($generatedContent) {
+                        break;
+                    }
+                } catch (\Exception $e) {
+                    $lastError = $e->getMessage();
+                    $this->logger?->warning("Error with $serviceName service", [
+                        'error' => $lastError,
+                        'activity' => $activity->getActivityName()
                     ]);
                 }
-            } catch (\Exception $e) {
-                $lastError = $e->getMessage();
-                $this->logger->warning('Exception when trying endpoint', [
-                    'endpoint' => $endpoint,
-                    'error' => $e->getMessage()
-                ]);
             }
         }
         
-        // If no successful response was found
-        if (!$apiResponse) {
-            return new JsonResponse([
-                'error' => "API Error: Could not connect to any Gemini endpoint. Last error: {$lastError}"
-            ], Response::HTTP_BAD_GATEWAY);
-        }
-        
-        $response = $apiResponse;
-        
-        $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
-            $this->logger->error('Gemini API returned non-200 status code', [
-                'status' => $statusCode,
-                'response' => $response->getContent(false)
-            ]);
-            return new JsonResponse(['error' => "API Error: Received status code {$statusCode}"], Response::HTTP_BAD_GATEWAY);
-        }
-        
-        $data = $response->toArray();
-        
-        // Add debugging output
-        $this->logger->info('Gemini API Response', ['data' => $data]);
-        
-        // Extract and return the generated content from the new API structure
-        if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-            $generatedContent = $data['candidates'][0]['content']['parts'][0]['text'];
+        if ($generatedContent) {
             return new JsonResponse(['content' => $generatedContent]);
-        } else {
-            // Log the full response for debugging
-            $this->logger->error('Unexpected Gemini API response structure', ['data' => $data]);
-            return new JsonResponse(['error' => 'Could not generate content from image. Unexpected response format.'], Response::HTTP_BAD_REQUEST);
         }
+        
+        // If all services failed
+        return new JsonResponse([
+            'error' => 'Failed to generate content',
+            'details' => $lastError
+        ], Response::HTTP_SERVICE_UNAVAILABLE);
+    }
+    
+    // Helper methods for AI content generation
+    private function generateWithOpenAI($activity)
+    {
+        if (!$this->httpClient) {
+            return null;
+        }
+        
+        $apiKey = $this->getParameter('openai_api_key');
+        if (!$apiKey) {
+            $this->logger?->warning('OpenAI API key not configured');
+            return null;
+        }
+        
+        $endpoint = 'https://api.openai.com/v1/chat/completions';
+        
+        try {
+            $response = $this->httpClient->request('POST', $endpoint, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'model' => 'gpt-3.5-turbo',
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => 'You are a travel blogger writing about activities and destinations.'
+                        ],
+                        [
+                            'role' => 'user',
+                            'content' => 'Write a detailed blog post about a ' . $activity->getActivityName() . ' experience. Include what makes this activity special, what to expect, and some tips for travelers. Format the response in HTML with appropriate headings, paragraphs, and occasional emphasis.'
+                        ]
+                    ],
+                    'temperature' => 0.7,
+                    'max_tokens' => 1000
+                ]
+            ]);
+            
+            $statusCode = $response->getStatusCode();
+            if ($statusCode === 200) {
+                $data = $response->toArray();
+                if (isset($data['choices'][0]['message']['content'])) {
+                    return $data['choices'][0]['message']['content'];
+                }
+            } else {
+                $this->logger?->warning('OpenAI returned non-200 status', [
+                    'endpoint' => $endpoint,
+                    'status' => $statusCode,
+                    'response' => $response->getContent(false)
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->logger?->warning('Exception when calling OpenAI', [
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+        
+        return null;
+    }
+    
+    private function generateWithHuggingFace($activity)
+    {
+        if (!$this->httpClient) {
+            return null;
+        }
+        
+        $apiKey = $this->getParameter('huggingface_api_key');
+        if (!$apiKey) {
+            $this->logger?->warning('HuggingFace API key not configured');
+            return null;
+        }
+        
+        $endpoint = 'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2';
+        
+        try {
+            $response = $this->httpClient->request('POST', $endpoint, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'inputs' => 'Write a detailed blog post about a ' . $activity->getActivityName() . ' experience. Include what makes this activity special, what to expect, and some tips for travelers. Format the response in HTML with appropriate headings, paragraphs, and occasional emphasis.',
+                    'parameters' => [
+                        'max_new_tokens' => 1000,
+                        'temperature' => 0.7
+                    ]
+                ]
+            ]);
+            
+            $statusCode = $response->getStatusCode();
+            if ($statusCode === 200) {
+                $data = $response->toArray();
+                if (isset($data[0]['generated_text'])) {
+                    return $data[0]['generated_text'];
+                }
+            } else {
+                $this->logger?->warning('HuggingFace returned non-200 status', [
+                    'endpoint' => $endpoint,
+                    'status' => $statusCode,
+                    'response' => $response->getContent(false)
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->logger?->warning('Exception when calling HuggingFace', [
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+        
+        return null;
+    }
+    
+    private function generateWithLocalAI($activity)
+    {
+        if (!$this->httpClient) {
+            return null;
+        }
+        
+        $endpoint = $this->getParameter('localai_endpoint');
+        if (!$endpoint) {
+            $this->logger?->warning('LocalAI endpoint not configured');
+            return null;
+        }
+        
+        try {
+            $response = $this->httpClient->request('POST', $endpoint, [
+                'json' => [
+                    'model' => 'mistral',
+                    'prompt' => 'Write a detailed blog post about a ' . $activity->getActivityName() . ' experience. Include what makes this activity special, what to expect, and some tips for travelers. Format the response in HTML with appropriate headings, paragraphs, and occasional emphasis.',
+                    'max_tokens' => 1000,
+                    'temperature' => 0.7
+                ]
+            ]);
+            
+            $statusCode = $response->getStatusCode();
+            if ($statusCode === 200) {
+                $data = $response->toArray();
+                if (isset($data['choices'][0]['text'])) {
+                    return $data['choices'][0]['text'];
+                }
+            } else {
+                $lastError = "Received status code {$statusCode} from {$endpoint}";
+                $this->logger?->warning('API returned non-200 status', [
+                    'endpoint' => $endpoint,
+                    'status' => $statusCode,
+                    'response' => $response->getContent(false)
+                ]);
+            }
+        } catch (\Exception $e) {
+            $lastError = $e->getMessage();
+            $this->logger?->warning('Exception when calling LocalAI', [
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+        
+        return null;
     }
 }

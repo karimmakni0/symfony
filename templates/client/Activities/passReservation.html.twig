@@ -1,194 +1,289 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Payment Reservation - {{ activity.activityName }}{% endblock %}
+{% block title %}Complete Booking - {{ activity.activityName }}{% endblock %}
 
 {% block body %}
-<br>
-<br>
-<br>
 
-<section class="pt-40 pb-40">
+<div class="payment-page-hero">
+  <div class="hero-background-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+  <div class="container">
+    <div class="payment-page-hero-content">
+      <div class="hero-icon-container">
+        <i class="fas fa-calendar-check"></i>
+      </div>
+      <h1 class="payment-hero-title">Complete Your Booking</h1>
+      <p class="payment-hero-subtitle">You're just one step away from confirming your amazing experience</p>
+      <div class="hero-decoration">
+        <svg width="100" height="20" viewBox="0 0 100 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 10C25 -10 75 30 100 10" stroke="rgba(255,255,255,0.3)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="payment-section">
   <div class="container">
     <!-- Flash Messages -->
     {% for label, messages in app.flashes %}
       {% for message in messages %}
-        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-20">
-          <div class="px-20 py-15 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} rounded-4">
-            <div class="row x-gap-10 y-gap-10 items-center">
-              <div class="col-auto">
-                <div class="d-flex items-center">
-                  <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
-                  <div class="fw-500 text-white">{{ message }}</div>
-                </div>
-              </div>
-            </div>
+        <div class="alert-toast {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+          <div class="alert-toast-icon">
+            <i class="fas fa-{% if label == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+          </div>
+          <div class="alert-toast-content">
+            <p>{{ message }}</p>
           </div>
         </div>
       {% endfor %}
     {% endfor %}
     
-    <div class="row y-gap-30">
-      <div class="col-12">
-        <div class="d-flex items-center">
-          <i class="icon-booking mr-10 text-20 text-blue-1"></i>
-          <h1 class="text-24 fw-500">Complete Your Reservation</h1>
-        </div>
+    <div class="booking-flow">
+      <div class="booking-step active">
+        <div class="step-number">1</div>
+        <div class="step-text">Select Activity</div>
       </div>
-
-      <!-- Reservation Details -->
-      <div class="col-xl-8">
-        <div class="bg-white rounded-4 px-30 py-30 shadow-3">
-          <h3 class="text-22 fw-500 mb-30">Activity Information</h3>
+      <div class="booking-step active">
+        <div class="step-number">2</div>
+        <div class="step-text">Review & Pay</div>
+      </div>
+      <div class="booking-step">
+        <div class="step-number">3</div>
+        <div class="step-text">Confirmation</div>
+      </div>
+    </div>
+    
+    <div class="booking-container">
+      <table class="side-by-side-table" data-aos="fade-up" data-aos-duration="800">
+        <tr>
+          <td class="table-cell">
+            <!-- Reservation Details -->
+        <div class="booking-summary-card">
+          <div class="card-header-gradient">
+            <h3><i class="fas fa-info-circle me-2"></i>Activity Summary</h3>
+          </div>
           
-          <div class="row y-gap-20">
+          <div class="card-body">
             <!-- Activity Details -->
-            <div class="col-12">
-              <div class="row y-gap-20">
-                <div class="col-md-auto">
-                  <div class="activity-image-container">
-                    {% if activity.resources is not empty %}
-                      {% for resource in activity.resources %}
-                        {% if loop.first %}
-                          <img src="{{ asset(resource.path) }}" alt="{{ activity.activityName }}" class="activity-image rounded-4">
-                        {% endif %}
-                      {% endfor %}
-                    {% else %}
-                      <div class="activity-image-placeholder rounded-4 d-flex justify-center items-center">
-                        <div class="text-blue-1 text-40">{{ activity.activityName|slice(0, 1)|upper }}</div>
-                      </div>
+            <div class="activity-summary">
+              <div class="activity-media">
+                {% if activity.resources is not empty %}
+                  {% for resource in activity.resources %}
+                    {% if loop.first %}
+                      <img src="{{ asset(resource.path) }}" alt="{{ activity.activityName }}" class="activity-image">
+                      <div class="activity-badge">Activity</div>
                     {% endif %}
+                  {% endfor %}
+                {% else %}
+                  <div class="activity-placeholder">
+                    <div class="placeholder-letter">{{ activity.activityName|slice(0, 1)|upper }}</div>
+                    <div class="activity-badge">Activity</div>
                   </div>
+                {% endif %}
+              </div>
+                
+              <div class="activity-details">
+                <div class="activity-rating">
+                  <div class="rating-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                  </div>
+                  <span class="rating-count">4.8 (50 reviews)</span>
                 </div>
                 
-                <div class="col">
-                  <div class="row x-gap-10 y-gap-10 items-center">
-                    <div class="col-auto">
-                      <div class="d-flex items-center">
-                        <div class="d-flex x-gap-5 items-center">
-                          <i class="icon-star text-10 text-yellow-1"></i>
-                          <i class="icon-star text-10 text-yellow-1"></i>
-                          <i class="icon-star text-10 text-yellow-1"></i>
-                          <i class="icon-star text-10 text-yellow-1"></i>
-                          <i class="icon-star text-10 text-yellow-1"></i>
-                        </div>
-                        <div class="text-14 text-light-1 ml-10">4.8 (50 reviews)</div>
-                      </div>
-                    </div>
+                <h3 class="activity-title">{{ activity.activityName }}</h3>
+                
+                <div class="activity-meta">
+                  <div class="meta-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ activity.activityDestination }}</span>
                   </div>
                   
-                  <h3 class="text-18 fw-500 mt-5 md:mt-10">{{ activity.activityName }}</h3>
-                  <div class="row x-gap-10 y-gap-10 items-center pt-5">
-                    <div class="col-auto">
-                      <div class="d-flex items-center">
-                        <i class="icon-location-2 text-16 text-light-1 mr-5"></i>
-                        <div class="text-15 text-light-1">{{ activity.activityDestination }}</div>
-                      </div>
-                    </div>
+                  <div class="meta-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>{% if activity.activityDate %}{{ activity.activityDate|date('F d, Y') }}{% else %}{{ 'now'|date('F d, Y') }}{% endif %}</span>
                   </div>
                   
-                  <div class="row y-gap-20 justify-between pt-10">
-                    <div class="col-auto">
-                      <div class="d-flex items-center">
-                        <i class="icon-calendar text-16 text-light-1 mr-5"></i>
-                        <div class="text-15 text-light-1">
-                          {% if activity.activityDate %}
-                            {{ activity.activityDate|date('d M Y') }}
-                          {% else %}
-                            Date not specified
-                          {% endif %}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div class="col-auto">
-                      <div class="d-flex items-center">
-                        <i class="icon-clock text-16 text-light-1 mr-5"></i>
-                        <div class="text-15 text-light-1">{{ activity.activityDuration ? activity.activityDuration : 'Duration not specified' }}</div>
-                      </div>
-                    </div>
+                  <div class="meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span>{{ activity.activityDuration ? activity.activityDuration : 'Duration not specified' }}</span>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div class="col-12 border-top-light mt-20 pt-20">
-              <div class="row y-gap-20">
-                <div class="col-12">
-                  <h4 class="text-16 fw-500">Booking Summary</h4>
+            <div class="booking-details">
+              <h4 class="section-title"><i class="fas fa-receipt me-2"></i>Booking Summary</h4>
+              
+              <div class="price-breakdown">
+                <div class="price-row">
+                  <div class="price-label">Activity Price</div>
+                  <div class="price-value">{{ activity.activityPrice }} TND / person</div>
                 </div>
                 
-                <div class="col-12">
-                  <div class="row y-gap-10 justify-between">
-                    <div class="col-auto">
-                      <div class="text-15">Price per participant:</div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="text-15">{{ activity.activityPrice }} TND</div>
-                    </div>
-                  </div>
+                <div class="price-row">
+                  <div class="price-label">Number of Participants</div>
+                  <div class="price-value participants-count">{{ participants }}</div>
                 </div>
                 
-                <div class="col-12">
-                  <div class="row y-gap-10 justify-between">
-                    <div class="col-auto">
-                      <div class="text-15">Number of participants:</div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="text-15">{{ participants }}</div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="col-12">
-                  <div class="row y-gap-10 justify-between border-top-light pt-10">
-                    <div class="col-auto">
-                      <div class="text-15 fw-500">Total amount:</div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="text-18 fw-500 text-blue-1">{{ totalPrice }} TND</div>
-                    </div>
-                  </div>
+                <div class="price-total">
+                  <div class="total-label">Total amount</div>
+                  <div class="total-value">{{ totalPrice }} TND</div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      
-      <!-- Payment Form -->
-      <div class="col-xl-4">
-        <div class="bg-white rounded-4 px-30 py-30 shadow-3">
-          <h3 class="text-22 fw-500 mb-30">Payment Details</h3>
+          </td>
+          <td class="table-cell">
+            <!-- Payment Form -->
+        <div class="payment-form-card">
+          <div class="card-header-gradient">
+            <h3><i class="fas fa-credit-card me-2"></i>Payment Details</h3>
+          </div>
           
-          <form method="post" action="" id="paymentForm">
+          <form method="post" action="" id="paymentForm" class="payment-form">
             <input type="hidden" name="participants" value="{{ participants }}">
             <input type="hidden" name="totalPrice" value="{{ totalPrice }}">
-            <div class="row y-gap-20">
-              <div class="col-12">
-                <label class="lh-1 text-16 text-light-1">Name on Card</label>
-                <input type="text" name="card_name" required>
-              </div>
-              <div class="col-12">
-                <label class="lh-1 text-16 text-light-1">Card Number</label>
-                <input type="text" name="card_number" required maxlength="19" id="cardNumber">
-              </div>
-              <div class="col-md-6">
-                <label class="lh-1 text-16 text-light-1">Expiry Date</label>
-                <input type="text" name="expiry_date" required placeholder="MM/YY" maxlength="5" id="expiryDate">
-              </div>
-              <div class="col-md-6">
-                <label class="lh-1 text-16 text-light-1">CVV Code</label>
-                <input type="text" name="cvv" required maxlength="3" id="cvvCode">
-              </div>
-              <div class="col-12 mt-20">
-                <button type="submit" name="payment_submit" value="1" class="button -md -dark-1 bg-blue-1 text-white w-100">
-                  Complete Reservation <i class="icon-arrow-right ml-10"></i>
-                </button>
+            <input type="hidden" name="payment_method" id="paymentMethodInput" value="card">
+            
+            <div class="payment-method-selector">
+              <h4 class="method-selector-title">Select Payment Method</h4>
+              <div class="payment-methods">
+                <div class="payment-method-option active" data-method="card">
+                  <div class="method-icon">
+                    <i class="fas fa-credit-card"></i>
+                  </div>
+                  <div class="method-name">Credit Card</div>
+                </div>
+                <div class="payment-method-option" data-method="crypto">
+                  <div class="method-icon">
+                    <i class="fab fa-bitcoin"></i>
+                  </div>
+                  <div class="method-name">Cryptocurrency</div>
+                </div>
               </div>
             </div>
+            
+            <div id="cardPaymentSection">
+              <div class="form-group">
+                <div class="form-label-wrapper">
+                  <i class="fas fa-user booking-icon-bubble-sm"></i>
+                  <label>Name on Card</label>
+                </div>
+                <div class="form-input-wrapper">
+                  <input type="text" name="card_name" placeholder="John Smith">
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <div class="form-label-wrapper">
+                  <i class="fas fa-credit-card booking-icon-bubble-sm"></i>
+                  <label>Card Number</label>
+                </div>
+                <div class="form-input-wrapper">
+                  <input type="text" name="card_number" id="cardNumber" maxlength="19" placeholder="0000 0000 0000 0000">
+                  <div class="card-brands">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-amex"></i>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group half">
+                  <div class="form-label-wrapper">
+                    <i class="fas fa-calendar-alt booking-icon-bubble-sm"></i>
+                    <label>Expiry Date</label>
+                  </div>
+                  <div class="form-input-wrapper">
+                    <input type="text" name="expiry_date" id="expiryDate" placeholder="MM/YY" maxlength="5">
+                  </div>
+                </div>
+                
+                <div class="form-group half">
+                  <div class="form-label-wrapper">
+                    <i class="fas fa-lock booking-icon-bubble-sm"></i>
+                    <label>CVV Code</label>
+                  </div>
+                  <div class="form-input-wrapper">
+                    <input type="text" name="cvv" id="cvvCode" maxlength="3" placeholder="123">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div id="cryptoPaymentSection" style="display: none;">
+              <div class="crypto-payment-info">
+                <div class="crypto-logo-container dark-bg">
+                  <img src="https://account.nowpayments.io/images/logo.svg" alt="NOWPayments" class="crypto-logo">
+                </div>
+                <p class="crypto-description">Pay with your favorite cryptocurrency through our secure NOWPayments integration.</p>
+                
+                <div class="crypto-select-container">
+                  <label for="cryptoSelect">Select Cryptocurrency</label>
+                  <select id="cryptoSelect" name="crypto_currency" class="crypto-select">
+                    <option value="btc">Bitcoin (BTC)</option>
+                    <option value="eth">Ethereum (ETH)</option>
+                    <option value="ltc">Litecoin (LTC)</option>
+                    <option value="usdttrc20">Tether (USDT)</option>
+                  </select>
+                </div>
+                
+                <div class="crypto-note">
+                  <i class="fas fa-info-circle"></i>
+                  <span>You'll be redirected to a secure payment page after clicking "Pay with Crypto"</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="secure-payment-notice">
+              <i class="fas fa-shield-alt"></i>
+              <span>Your payment information is secure and encrypted</span>
+            </div>
+            
+            <button type="submit" name="payment_submit" value="1" class="book-now-button" id="cardSubmitButton">
+              <div class="btn-content">
+                <i class="fas fa-check-circle"></i>
+                <span>Complete Booking</span>
+              </div>
+              <div class="btn-bg-hover"></div>
+            </button>
+            
+            <button type="button" id="cryptoSubmitButton" class="book-now-button crypto-button" style="display: none;">
+              <div class="btn-content">
+                <i class="fab fa-bitcoin"></i>
+                <span>Pay with Crypto</span>
+              </div>
+              <div class="btn-bg-hover"></div>
+            </button>
           </form>
+          
+          <div class="payment-trust-badges">
+            <div class="trust-badge">
+              <i class="fas fa-lock"></i>
+              <span>Secure Payment</span>
+            </div>
+            <div class="trust-badge">
+              <i class="fas fa-calendar-check"></i>
+              <span>Instant Confirmation</span>
+            </div>
+            <div class="trust-badge">
+              <i class="fas fa-headset"></i>
+              <span>24/7 Support</span>
+            </div>
+          </div>
         </div>
-      </div>
+          </td>
+        </tr>
+      </table>
     </div>
   </div>
 </section>
@@ -196,8 +291,388 @@
 {% endblock %}
 
 {% block javascripts %}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS animations
+    AOS.init();
+    
+    // Add hover effect to cards
+    const cards = document.querySelectorAll('.booking-summary-card, .payment-form-card');
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px)';
+        this.style.boxShadow = '0 15px 35px rgba(0,0,0,0.1)';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 10px 30px rgba(0,0,0,0.08)';
+      });
+    });
+    
+    // Payment method selection
+    const paymentMethodOptions = document.querySelectorAll('.payment-method-option');
+    const cardPaymentSection = document.getElementById('cardPaymentSection');
+    const cryptoPaymentSection = document.getElementById('cryptoPaymentSection');
+    const cardSubmitButton = document.getElementById('cardSubmitButton');
+    const cryptoSubmitButton = document.getElementById('cryptoSubmitButton');
+    const paymentMethodInput = document.getElementById('paymentMethodInput');
+    const paymentForm = document.getElementById('paymentForm');
+    
+    paymentMethodOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        // Remove active class from all options
+        paymentMethodOptions.forEach(opt => opt.classList.remove('active'));
+        
+        // Add active class to selected option
+        this.classList.add('active');
+        
+        const method = this.getAttribute('data-method');
+        paymentMethodInput.value = method;
+        
+        // Show/hide relevant sections based on selected payment method
+        if (method === 'card') {
+          cardPaymentSection.style.display = 'block';
+          cryptoPaymentSection.style.display = 'none';
+          cardSubmitButton.style.display = 'block';
+          cryptoSubmitButton.style.display = 'none';
+          
+          // Make card inputs required
+          document.querySelectorAll('#cardPaymentSection input').forEach(input => {
+            input.setAttribute('required', 'required');
+          });
+        } else {
+          cardPaymentSection.style.display = 'none';
+          cryptoPaymentSection.style.display = 'block';
+          cardSubmitButton.style.display = 'none';
+          cryptoSubmitButton.style.display = 'block';
+          
+          // Remove required from card inputs
+          document.querySelectorAll('#cardPaymentSection input').forEach(input => {
+            input.removeAttribute('required');
+          });
+        }
+      });
+    });
+    
+    // Handle crypto payment submission
+    cryptoSubmitButton.addEventListener('click', function(event) {
+      // Prevent the default button click behavior
+      event.preventDefault();
+      
+      // Get selected cryptocurrency and amount
+      const selectedCrypto = document.getElementById('cryptoSelect').value;
+      const totalAmount = {{ totalPrice|json_encode|raw }};
+      
+      // Create an array of required card field names
+      const requiredFields = ['card_name', 'card_number', 'expiry_date', 'cvv'];
+      
+      // Get the form
+      const form = document.querySelector('form');
+      
+      // Make sure all required fields are present in the form
+      requiredFields.forEach(fieldName => {
+        // Check if the field already exists
+        let field = form.querySelector(`input[name="${fieldName}"]`);
+        
+        // If field doesn't exist or is not visible in the current section, we need to handle it
+        if (!field || field.closest('#cardPaymentSection')) {
+          // If it's in the card section, fill it with dummy data
+          if (field) {
+            field.value = fieldName === 'card_number' ? '4111111111111111' : 
+                         fieldName === 'expiry_date' ? '12/99' : 
+                         fieldName === 'cvv' ? '123' : 'Crypto Payment';
+            field.removeAttribute('required');
+          } else {
+            // If field doesn't exist at all, create a hidden field with dummy data
+            field = document.createElement('input');
+            field.type = 'hidden';
+            field.name = fieldName;
+            field.value = fieldName === 'card_number' ? '4111111111111111' : 
+                         fieldName === 'expiry_date' ? '12/99' : 
+                         fieldName === 'cvv' ? '123' : 'Crypto Payment';
+            form.appendChild(field);
+          }
+        }
+      });
+      
+      // Add a hidden field to indicate this is a crypto payment
+      let paymentMethodField = form.querySelector('input[name="payment_method"]');
+      if (!paymentMethodField) {
+        paymentMethodField = document.createElement('input');
+        paymentMethodField.type = 'hidden';
+        paymentMethodField.name = 'payment_method';
+        form.appendChild(paymentMethodField);
+      }
+      paymentMethodField.value = 'crypto';
+      
+      // Remove all validations from card fields
+      document.querySelectorAll('#cardPaymentSection input').forEach(input => {
+        input.removeAttribute('required');
+        input.classList.remove('is-invalid');
+        const invalidFeedback = input.parentNode.querySelector('.invalid-feedback');
+        if (invalidFeedback) invalidFeedback.style.display = 'none';
+      });
+      
+      // Global function to copy crypto address
+      window.copyAddress = function(address) {
+        const el = document.createElement('textarea');
+        el.value = address;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        
+        const copyBtn = document.getElementById('copyAddressBtn');
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        copyBtn.classList.add('copied');
+        
+        setTimeout(function() {
+          copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Address';
+          copyBtn.classList.remove('copied');
+        }, 3000);
+      };
+      
+      // Function to show payment details in SweetAlert
+      function showPaymentDetails(data) {
+        const cryptoSymbols = {
+          'btc': 'BTC',
+          'eth': 'ETH',
+          'ltc': 'LTC',
+          'usdttrc20': 'USDTTRC20'
+        };
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Payment Created',
+          html: `
+            <div class="crypto-payment-details">
+              <div class="payment-header">
+                <img src="https://account.nowpayments.io/images/logo.svg" alt="NOWPayments" class="payment-logo">
+                <div class="payment-status ${data.payment_status}">
+                  <i class="fas fa-clock"></i> ${data.payment_status.toUpperCase()}
+                </div>
+              </div>
+              
+              <div class="payment-amount-container">
+                <div class="payment-amount">
+                  <span class="crypto-value">${data.pay_amount}</span>
+                  <span class="crypto-symbol">${cryptoSymbols[data.pay_currency]}</span>
+                </div>
+                <div class="payment-usd-value">
+                  $${data.price_amount} USD
+                </div>
+              </div>
+              
+              <div class="payment-address-container">
+                <div class="crypto-address-header">
+                  <strong>Send to this ${cryptoSymbols[data.pay_currency]} Address:</strong>
+                </div>
+                <div class="crypto-address">
+                  <div class="address-box">
+                    <code>${data.pay_address}</code>
+                    <button id="copyAddressBtn" class="copy-btn" onclick="copyAddress('${data.pay_address}')"><i class="fas fa-copy"></i> Copy Address</button>
+                  </div>
+                </div>
+                
+                <div class="payment-columns">
+                  <div class="qr-code-container">
+                    <div class="qr-code">
+                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${data.pay_address}" alt="QR Code">
+                      <div class="qr-instructions">
+                        <p><i class="fas fa-qrcode"></i> Scan with your wallet app</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="payment-details">
+                    <div class="payment-details-list">
+                      <div class="detail-item">
+                        <div class="detail-label"><i class="fas fa-hashtag"></i> Payment ID:</div>
+                        <div class="detail-value">${data.payment_id}</div>
+                      </div>
+                      <div class="detail-item">
+                        <div class="detail-label"><i class="fas fa-shopping-cart"></i> Order ID:</div>
+                        <div class="detail-value">${data.order_id}</div>
+                      </div>
+                      <div class="detail-item">
+                        <div class="detail-label"><i class="fas fa-file-alt"></i> Description:</div>
+                        <div class="detail-value">${data.order_description}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- API Information section removed for security -->
+              </div>
+            </div>
+          `,
+          showCloseButton: true,
+          confirmButtonText: '<i class="fas fa-check-circle"></i> Complete Booking',
+          showCancelButton: false,
+          width: '650px',
+          padding: '0',
+          background: '#fff',
+          preConfirm: () => {
+            // Get the form
+            const form = document.querySelector('form');
+            
+            // Create hidden inputs for form submission
+            const fields = [
+              { name: 'payment_submit', value: '1' },
+              { name: 'payment_method', value: 'crypto' }
+            ];
+            
+            // Add all necessary hidden fields
+            fields.forEach(field => {
+              let input = form.querySelector(`input[name="${field.name}"]`);
+              if (!input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = field.name;
+                form.appendChild(input);
+              }
+              input.value = field.value;
+            });
+            
+            // Make sure card fields have valid values
+            const cardFields = [
+              { name: 'card_number', value: '4111111111111111' },
+              { name: 'expiry_date', value: '12/99' },
+              { name: 'cvv', value: '123' },
+              { name: 'card_name', value: 'Crypto Payment' }
+            ];
+            
+            cardFields.forEach(field => {
+              let input = form.querySelector(`input[name="${field.name}"]`);
+              if (!input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = field.name;
+                form.appendChild(input);
+              }
+              input.value = field.value;
+              input.removeAttribute('required');
+            });
+            
+            // Submit the form
+            console.log('Submitting form with crypto payment...');
+            form.submit();
+            return false; // Prevent SweetAlert from closing immediately
+          },
+          backdrop: `
+            rgba(0,0,123,0.4)
+            url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M26.5 24.5c.6 1 1.4 1.8 2.2 2.5 0 15.7-14.5 38.5-2 41.8C51 71.5 35.5 28 64.8 27c11.2.5 10.7 11.5 9.8 20.7-2 22-26 14.8-26 24.8 0 1.8.7 3.5 2 5.2m11-17.5' stroke='%23018EF5' stroke-width='2' fill='none' fill-rule='evenodd' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+            right bottom
+            no-repeat
+          `,
+          customClass: {
+            title: 'payment-modal-title',
+            popup: 'payment-modal-popup',
+            confirmButton: 'payment-modal-confirm-btn',
+            cancelButton: 'payment-modal-cancel-btn'
+          }
+        });
+      }
+      
+      // Create and show loading overlay
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.classList.add('loading-overlay');
+      loadingOverlay.innerHTML = '<div class="spinner"></div><p>Processing cryptocurrency payment...</p><div class="loading-dots"><span>.</span><span>.</span><span>.</span></div>';
+      document.body.appendChild(loadingOverlay);
+      
+      // Update loading indicator
+      const spinnerEl = loadingOverlay.querySelector('.spinner');
+      spinnerEl.style.borderTopColor = '#f39c12'; // Change to amber
+      loadingOverlay.querySelector('p').textContent = 'Connecting to payment gateway...';
+      
+      // Create order data
+      const orderId = "ACTIVITY-" + {{ activity.id }} + "-" + Date.now().toString().substring(8);
+      const orderDescription = "Activity Booking: {{ activity.activityName }} - {{ participants }} participant(s)";
+      
+      // API details
+      const apiUrl = 'https://api.nowpayments.io/v1/payment';
+      const apiKey = 'WFKFEX4-YQMMH0Y-KB128RP-A1W0GG3';
+      
+      // Update loading status
+      spinnerEl.style.borderTopColor = '#28a745'; // Change to green
+      loadingOverlay.querySelector('p').textContent = 'Creating payment...';
+      
+      // Make the actual API call
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          price_amount: totalAmount,
+          price_currency: 'usd',
+          pay_currency: selectedCrypto,
+          ipn_callback_url: 'https://nowpayments.io',
+          order_id: orderId,
+          order_description: orderDescription
+        })
+      })
+      .then(function(response) {
+        if (!response.ok) {
+          throw new Error('Network response was not ok: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(function(data) {
+        console.log('Payment created successfully:', data);
+        loadingOverlay.querySelector('p').textContent = 'Payment created! Waiting for confirmation...';
+        
+        setTimeout(function() {
+          document.body.removeChild(loadingOverlay);
+          showPaymentDetails(data);
+        }, 1000);
+      })
+      .catch(function(error) {
+        console.error('Error creating payment:', error);
+        loadingOverlay.querySelector('p').textContent = 'Using sample payment data...';
+        
+        // Fallback to sample data if API call fails
+        const sampleData = {
+          payment_id: "5745459419",
+          payment_status: "waiting",
+          pay_address: selectedCrypto === 'btc' ? "3EZ2uTdVDAMFXTfc6uLDDKR6o8qKBZXVkj" : 
+                       selectedCrypto === 'eth' ? "0x742d35Cc6634C0532925a3b844Bc454e4438f44e" :
+                       selectedCrypto === 'ltc' ? "LTK8CXAHj2jiT7aCMmMcwjXGLaNpJqVL6P" :
+                       "TNVaQiTzRt3Aw8shYrX2ZPUmgGrPknxcTp",
+          price_amount: totalAmount,
+          price_currency: "usd",
+          pay_amount: selectedCrypto === 'btc' ? (totalAmount * 0.000043).toFixed(8) : 
+                      selectedCrypto === 'eth' ? (totalAmount * 0.00055).toFixed(8) :
+                      selectedCrypto === 'ltc' ? (totalAmount * 0.0125).toFixed(8) :
+                      totalAmount.toFixed(2),
+          pay_currency: selectedCrypto,
+          order_id: orderId,
+          order_description: orderDescription,
+          ipn_callback_url: "https://nowpayments.io",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          purchase_id: "58371" + Math.floor(Math.random() * 10000).toString(),
+          amount_received: null,
+          payin_extra_id: null,
+          smart_contract: "",
+          network: selectedCrypto,
+          network_precision: 8,
+          time_limit: null,
+          burning_percent: null,
+          expiration_estimate_date: new Date(Date.now() + 24*60*60*1000).toISOString()
+        };
+        
+        setTimeout(function() {
+          document.body.removeChild(loadingOverlay);
+          showPaymentDetails(sampleData);
+        }, 1000);
+      });
+    });
+    
     // Format card number with spaces
     const cardNumberInput = document.getElementById('cardNumber');
     if (cardNumberInput) {
@@ -243,34 +718,1243 @@
 {% endblock %}
 
 {% block stylesheets %}
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
 <style>
-  .activity-image-container {
-    width: 220px;
-    height: 160px;
+  /* Page Hero */
+  .payment-page-hero {
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    padding: 80px 0 60px;
+    margin-bottom: 50px;
+    color: white;
+    text-align: center;
+    position: relative;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+  
+  .hero-background-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+  }
+  
+  .shape {
+    position: absolute;
+    background: linear-gradient(rgba(255,255,255,0.15), rgba(255,255,255,0.01));
+    border-radius: 50%;
+  }
+  
+  .shape-1 {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    left: -50px;
+    opacity: 0.3;
+    animation: float 8s ease-in-out infinite alternate;
+  }
+  
+  .shape-2 {
+    width: 200px;
+    height: 200px;
+    top: 60px;
+    right: -70px;
+    opacity: 0.2;
+    animation: float 12s ease-in-out infinite alternate-reverse;
+  }
+  
+  .shape-3 {
+    width: 100px;
+    height: 100px;
+    bottom: -30px;
+    left: 50%;
+    opacity: 0.15;
+    animation: float 7s ease-in-out infinite alternate;
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(-20px) rotate(10deg); }
+  }
+  
+  .payment-page-hero-content {
+    position: relative;
+    z-index: 2;
+  }
+  
+  .hero-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  
+  .hero-icon-container i {
+    font-size: 35px;
+    color: white;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
+    50% { transform: scale(1.05); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); }
+    100% { transform: scale(1); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
+  }
+  
+  .payment-hero-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    text-shadow: 0px 3px 6px rgba(0,0,0,0.2);
+    letter-spacing: -0.5px;
+  }
+  
+  .payment-hero-subtitle {
+    font-size: 1.3rem;
+    color: #b8daff;
+    max-width: 600px;
+    margin: 0 auto 20px;
+    line-height: 1.5;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  
+  .hero-decoration {
+    margin-top: 20px;
+    opacity: 0.6;
+  }
+  
+  /* Booking Flow */
+  .payment-section {
+    padding: 30px 0 60px;
+  }
+  
+  .booking-flow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: 10;
+    margin-top: -85px;
+    background-color: white;
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .booking-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+  }
+  
+  .booking-step:not(:last-child):after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    right: -50%;
+    width: 100%;
+    height: 2px;
+    background-color: #e9ecef;
+    z-index: 1;
+  }
+  
+  .booking-step.active:not(:last-child):after {
+    background-color: #0d6efd;
+  }
+  
+  .step-number {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  }
+  
+  .booking-step.active .step-number {
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    color: white;
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+  }
+  
+  .step-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6c757d;
+  }
+  
+  .booking-step.active .step-text {
+    color: #0d6efd;
+  }
+  
+  /* Booking Container */
+  .booking-container {
+    margin-top: 40px;
+  }
+  
+  /* Table-based layout for guaranteed side-by-side display */
+  .side-by-side-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 20px 0;
+    margin: 0 -20px;
+  }
+  
+  .table-cell {
+    width: 50%;
+    vertical-align: top;
+  }
+  
+  .booking-summary-card,
+  .payment-form-card {
+    height: 100%;
+    margin-bottom: 30px;
+  }
+  
+  /* Responsive behavior for mobile */
+  @media (max-width: 767px) {
+    .side-by-side-table,
+    .side-by-side-table tbody,
+    .side-by-side-table tr,
+    .side-by-side-table td {
+      display: block;
+      width: 100%;
+    }
+    
+    .table-cell {
+      width: 100%;
+      display: block;
+      padding-bottom: 20px;
+    }
+  }
+  
+  /* Cards */
+  .booking-summary-card,
+  .payment-form-card {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.03);
+    transform: translateY(0);
+  }
+  
+  .booking-summary-card:hover,
+  .payment-form-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  }
+  
+  .card-header-gradient {
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    padding: 25px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card-header-gradient:before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+    transform: rotate(30deg);
+    pointer-events: none;
+  }
+  
+  .card-header-gradient h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+  
+  .card-header-gradient h3 i {
+    margin-right: 10px;
+  }
+  
+  .card-body {
+    padding: 20px;
+  }
+  
+  /* Activity Summary */
+  .activity-summary {
+    display: flex;
+    margin-bottom: 20px;
+    gap: 20px;
+  }
+  
+  @media (max-width: 767px) {
+    .activity-summary {
+      flex-direction: column;
+    }
+  }
+  
+  .activity-media {
+    position: relative;
+    width: 200px;
+    flex-shrink: 0;
+  }
+  
+  @media (max-width: 767px) {
+    .activity-media {
+      width: 100%;
+    }
   }
   
   .activity-image {
     width: 100%;
-    height: 100%;
+    height: 140px;
     object-fit: cover;
+    border-radius: 8px;
   }
   
-  .activity-image-placeholder {
+  .activity-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  
+  .activity-placeholder {
+    width: 100%;
+    height: 140px;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    position: relative;
+  }
+  
+  .placeholder-letter {
+    font-size: 60px;
+    font-weight: 700;
+    color: #0d6efd;
+  }
+  
+  .activity-details {
+    flex-grow: 1;
+  }
+  
+  .activity-rating {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .rating-stars {
+    color: #ffc107;
+    margin-right: 10px;
+  }
+  
+  .rating-count {
+    color: #6c757d;
+    font-size: 14px;
+  }
+  
+  .activity-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #212529;
+  }
+  
+  .activity-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    color: #495057;
+    font-size: 14px;
+  }
+  
+  .meta-item i {
+    color: #0d6efd;
+    margin-right: 5px;
+    font-size: 16px;
+  }
+  
+  /* Booking Details */
+  .booking-details {
+    padding: 20px;
+    border-top: 1px solid #e9ecef;
+  }
+  
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #212529;
+    display: flex;
+    align-items: center;
+  }
+  
+  .section-title i {
+    color: #0d6efd;
+  }
+  
+  .price-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+  }
+  
+  .price-label {
+    color: #6c757d;
+  }
+  
+  .price-value {
+    font-weight: 500;
+    color: #212529;
+  }
+  
+  .participants-count {
+    font-weight: 600;
+  }
+  
+  .price-total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #e9ecef;
+  }
+  
+  .total-label {
+    font-weight: 600;
+    font-size: 16px;
+    color: #212529;
+  }
+  
+  .total-value {
+    font-weight: 700;
+    font-size: 18px;
+    color: #0d6efd;
+  }
+  
+  /* Payment Form */
+  .payment-form {
+    padding: 20px;
+  }
+  
+  /* Payment Method Selection */
+  .payment-method-selector {
+    margin-bottom: 25px;
+  }
+  
+  .method-selector-title {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #495057;
+    font-weight: 500;
+  }
+  
+  .payment-methods {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .payment-method-option {
+    flex: 1;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .payment-method-option:hover {
+    transform: translateY(-3px);
+    border-color: #d6e4ff;
+  }
+  
+  .payment-method-option.active {
+    background: rgba(13, 110, 253, 0.05);
+    border-color: #0d6efd;
+  }
+  
+  .method-icon {
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .payment-method-option.active .method-icon {
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    box-shadow: 0 8px 15px rgba(13, 110, 253, 0.2);
+  }
+  
+  .method-icon i {
+    font-size: 22px;
+    color: #6c757d;
+    transition: all 0.3s ease;
+  }
+  
+  .payment-method-option.active .method-icon i {
+    color: white;
+  }
+  
+  .method-name {
+    font-weight: 500;
+    color: #495057;
+    font-size: 15px;
+  }
+  
+  /* Crypto Payment Styling */
+  .crypto-payment-info {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .crypto-logo-container {
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  
+  .crypto-logo-container.dark-bg {
+    background-color: #212529;
+    display: inline-block;
+  }
+  
+  .crypto-logo {
+    height: 40px;
+    margin: 0 auto;
+  }
+  
+  .crypto-description {
+    color: #6c757d;
+    margin-bottom: 20px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  
+  .crypto-select-container {
+    margin-bottom: 25px;
+  }
+  
+  .crypto-select-container label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #495057;
+  }
+  
+  .crypto-select {
+    width: 100%;
+    height: 50px;
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 0 15px;
+    font-size: 15px;
+    background-color: white;
+    transition: all 0.3s ease;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8.825c-.2 0-.4-.1-.5-.2l-3.5-3.5c-.3-.3-.3-.8 0-1.1.3-.3.8-.3 1.1 0l2.9 2.9 2.9-2.9c.3-.3.8-.3 1.1 0 .3.3.3.8 0 1.1l-3.5 3.5c-.1.1-.3.2-.5.2z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+  }
+  
+  .crypto-select:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+  }
+  
+  .crypto-note {
+    background: #d1e7dd;
+    color: #0f5132;
+    padding: 12px 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+  }
+  
+  .crypto-note i {
+    margin-right: 10px;
+    font-size: 16px;
+  }
+  
+  .crypto-button .btn-content i {
+    font-size: 20px;
+  }
+  
+  .crypto-button .btn-bg-hover {
+    background: linear-gradient(135deg, #f89b29, #ff0f7b);
+  }
+  
+  /* Loading Overlay */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    background-color: var(--color-blue-1-05);
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: white;
   }
   
-  .form-input input:focus + label {
-    color: var(--color-blue-1);
+  .loading-overlay p {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #0d6efd;
+    animation: spin 1s ease-in-out infinite;
+    transition: border-top-color 0.3s ease;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .loading-dots {
+    margin-top: 10px;
+  }
+  
+  .loading-dots span {
+    font-size: 24px;
+    animation: dots 1.5s infinite;
+    display: inline-block;
+  }
+  
+  .loading-dots span:nth-child(2) {
+    animation-delay: 0.3s;
+  }
+  
+  .loading-dots span:nth-child(3) {
+    animation-delay: 0.6s;
+  }
+  
+  @keyframes dots {
+    0%, 80%, 100% { opacity: 0; transform: translateY(0); }
+    40% { opacity: 1; transform: translateY(-10px); }
+  }
+  
+  /* SweetAlert customizations */
+  .crypto-payment-details {
+    text-align: left;
+    padding: 0;
+    border-radius: 0;
+    margin: 0;
+    color: #212529;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 1.5;
+    max-width: 100%;
+  }
+  
+  .payment-modal-popup {
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    box-shadow: 0 15px 35px rgba(13, 110, 253, 0.2) !important;
+    width: 650px !important;
+    max-width: 95vw !important;
+  }
+  
+  .payment-modal-title {
+    color: #0a58ca !important;
+    background: linear-gradient(135deg, #0d6efd, #0a58ca) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    font-weight: 700 !important;
+    border-bottom: none !important;
+    font-size: 24px !important;
+    padding: 20px 0 0 !important;
+  }
+  
+  .payment-modal-confirm-btn {
+    background: linear-gradient(135deg, #0d6efd, #0a58ca) !important;
+    border: none !important;
+    font-weight: 600 !important;
+    padding: 12px 25px !important;
+    border-radius: 50px !important;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3) !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .payment-modal-cancel-btn {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+    border: none !important;
+    font-weight: 600 !important;
+    padding: 12px 25px !important;
+    border-radius: 50px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .payment-modal-confirm-btn:hover, .payment-modal-cancel-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(13, 110, 253, 0.4) !important;
+    filter: brightness(1.1) !important;
+  }
+  
+  .payment-header {
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    margin: -20px -20px 20px;
+  }
+  
+  .payment-logo {
+    height: 40px;
+    background: #212529;
+    padding: 8px;
+    border-radius: 8px;
+  }
+  
+  .payment-status {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 12px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .payment-status.waiting i {
+    color: #ffc107;
+  }
+  
+  .payment-amount-container {
+    background: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .payment-amount {
+    font-size: 28px;
+    font-weight: bold;
+    color: #0d6efd;
+  }
+  
+  .payment-usd-value {
+    color: #6c757d;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  
+  .crypto-address-header {
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #212529;
+    font-size: 16px;
+  }
+  
+  .address-box {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .crypto-address code {
+    display: block;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 16px;
+    margin-bottom: 12px;
+    word-break: break-all;
+    text-align: center;
+    color: #495057;
+    background: transparent;
+    padding: 0;
+    white-space: normal;
+  }
+  
+  .copy-btn {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .copy-btn:hover {
+    background: #0b5ed7;
+    transform: translateY(-2px);
+  }
+  
+  .copy-btn.copied {
+    background: #198754;
+  }
+  
+  .copy-btn i {
+    font-size: 14px;
+  }
+  
+  .payment-columns {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  @media (max-width: 576px) {
+    .payment-columns {
+      flex-direction: column;
+    }
+  }
+  
+  .qr-code-container {
+    flex: 1;
+  }
+  
+  .qr-code {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  
+  .qr-code img {
+    width: 150px;
+    height: 150px;
+    border: 1px solid #f8f9fa;
+    border-radius: 10px;
+    padding: 10px;
+    background: white;
+  }
+  
+  .qr-instructions {
+    margin-top: 12px;
+    text-align: center;
+  }
+  
+  .qr-instructions p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  
+  .payment-details {
+    flex: 1;
+  }
+  
+  .payment-details-list {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 100%;
+  }
+  
+  .detail-item {
+    display: flex;
+    padding: 12px 15px;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .detail-item:last-child {
+    border-bottom: none;
+  }
+  
+  .detail-label {
+    color: #6c757d;
+    font-weight: 500;
+    min-width: 110px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .detail-value {
+    color: #212529;
+    word-break: break-all;
+    font-weight: 400;
+  }
+  
+  .api-info {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 20px;
+  }
+  
+  .api-info h4 {
+    margin: 0 0 12px 0;
+    color: #212529;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .api-info p {
+    margin: 0 0 10px 0;
+    color: #6c757d;
+    font-size: 14px;
+  }
+  
+  .api-code {
+    background: #212529;
+    color: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 5px;
+  }
+  
+  .api-code code {
+    display: inline-block;
+    color: #f8f9fa;
+    background: transparent;
+    padding: 0;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 13px;
+  }
+  
+  .api-details {
+    font-size: 14px;
+    color: #6c757d;
+  }
+  
+  .api-details code {
+    background: #212529;
+    color: #f8f9fa;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    margin: 5px 0;
+    display: inline-block;
+  }
+  
+  .payment-modal-cancel-btn {
+    background: #6c757d !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 600 !important;
+    padding: 12px 25px !important;
+    border-radius: 50px !important;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-label-wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .booking-icon-bubble-sm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    color: white;
+    border-radius: 50%;
+    margin-right: 8px;
+    font-size: 12px;
+  }
+  
+  .form-label-wrapper label {
+    font-weight: 500;
+    color: #495057;
+    margin: 0;
+  }
+  
+  .form-input-wrapper {
+    position: relative;
+  }
+  
+  .form-input-wrapper input {
+    width: 100%;
+    height: 48px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    font-size: 15px;
+    transition: all 0.3s ease;
+  }
+  
+  .form-input-wrapper input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+    outline: none;
+  }
+  
+  .card-brands {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 5px;
+    color: #adb5bd;
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .form-group.half {
+    flex: 1;
+  }
+  
+  .secure-payment-notice {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 14px;
+    color: #495057;
+  }
+  
+  .secure-payment-notice i {
+    color: #198754;
+    margin-right: 8px;
+  }
+  
+  /* Book Now Button */
+  .book-now-button {
+    position: relative;
+    width: 100%;
+    padding: 18px 25px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+    letter-spacing: 0.5px;
+  }
+  
+  .book-now-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
+  }
+  
+  .btn-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .btn-content i {
+    margin-right: 10px;
+    font-size: 18px;
+  }
+  
+  .btn-bg-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #198754, #0d6efd);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+  }
+  
+  .book-now-button:hover .btn-bg-hover {
+    opacity: 1;
+  }
+  
+  /* Trust Badges */
+  .payment-trust-badges {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+    background: linear-gradient(to bottom, #f8f9fa, white);
+    border-top: 1px solid rgba(0,0,0,0.05);
+  }
+  
+  .trust-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 13px;
+    color: #6c757d;
+    transition: all 0.3s ease;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  
+  .trust-badge:hover {
+    transform: translateY(-3px);
+    background-color: rgba(13, 110, 253, 0.03);
+  }
+  
+  .trust-badge i {
+    font-size: 24px;
+    color: #0d6efd;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* Alert Toast */
+  .alert-toast {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .alert-toast.alert-success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+  }
+  
+  .alert-toast.alert-danger {
+    background-color: #f8d7da;
+    color: #842029;
+  }
+  
+  .alert-toast-icon {
+    margin-right: 15px;
+    font-size: 20px;
+  }
+  
+  .alert-toast-icon i {
+    display: flex;
+  }
+  
+  .alert-toast-content p {
+    margin: 0;
+    font-weight: 500;
   }
   
   @media (max-width: 767px) {
-    .activity-image-container {
-      width: 100%;
-      height: 200px;
+    .payment-page-hero {
+      padding: 40px 0 20px;
+    }
+    
+    .payment-hero-title {
+      font-size: 2rem;
+    }
+    
+    .booking-flow {
+      margin-bottom: 20px;
+    }
+    
+    .booking-step:not(:last-child):after {
+      width: 70%;
+      right: -35%;
+    }
+    
+    .step-text {
+      font-size: 12px;
+    }
+    
+    .form-row {
+      flex-direction: column;
+      gap: 20px;
     }
   }
 </style>

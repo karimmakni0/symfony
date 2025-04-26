@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Placeholder Generator</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; text-align: center; padding: 20px; }
+        .canvas-container { display: flex; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        canvas { margin: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px; }
+        button { padding: 10px 20px; background-color: #3554D1; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .buttons { margin: 20px 0; }
+        h1 { color: #051036; }
+        .instructions { max-width: 600px; margin: 0 auto; text-align: left; padding: 15px; background-color: #f8f9fa; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Activity Placeholder Generator</h1>
+    
+    <div class="instructions">
+        <p>This tool generates placeholder images for activities. Click the buttons below to download the images.</p>
+        <p>Once downloaded, place them in the <code>/assets/img/activities/</code> directory.</p>
+    </div>
+    
+    <div class="canvas-container">
+        <div>
+            <h3>placeholder.jpg</h3>
+            <canvas id="placeholderCanvas" width="800" height="600"></canvas>
+        </div>
+        <div>
+            <h3>default.jpg</h3>
+            <canvas id="defaultCanvas" width="800" height="600"></canvas>
+        </div>
+    </div>
+    
+    <div class="buttons">
+        <button id="downloadPlaceholder">Download placeholder.jpg</button>
+        <button id="downloadDefault">Download default.jpg</button>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to draw the placeholder image
+            function drawPlaceholder() {
+                const canvas = document.getElementById('placeholderCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Background gradient
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, '#3554D1');
+                gradient.addColorStop(1, '#0f2c75');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Center text
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 48px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Activity Image', canvas.width/2, canvas.height/2 - 30);
+                
+                // Subtext
+                ctx.font = '24px Arial';
+                ctx.fillText('Placeholder', canvas.width/2, canvas.height/2 + 30);
+                
+                // Draw icon
+                ctx.beginPath();
+                const iconSize = 80;
+                ctx.moveTo(canvas.width/2, canvas.height/2 - 100);
+                ctx.lineTo(canvas.width/2 - iconSize/2, canvas.height/2 - 100 + iconSize);
+                ctx.lineTo(canvas.width/2 + iconSize/2, canvas.height/2 - 100 + iconSize);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.fill();
+            }
+            
+            // Function to draw the default image (more detailed)
+            function drawDefault() {
+                const canvas = document.getElementById('defaultCanvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Background with pattern
+                ctx.fillStyle = '#f0f4f8';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw some mountains in the background
+                ctx.beginPath();
+                ctx.moveTo(0, 400);
+                ctx.lineTo(200, 200);
+                ctx.lineTo(400, 350);
+                ctx.lineTo(600, 180);
+                ctx.lineTo(800, 300);
+                ctx.lineTo(800, 600);
+                ctx.lineTo(0, 600);
+                ctx.closePath();
+                ctx.fillStyle = '#3554D1';
+                ctx.fill();
+                
+                // Draw a sun
+                ctx.beginPath();
+                ctx.arc(650, 120, 60, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffd54f';
+                ctx.fill();
+                
+                // Draw a text banner
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.fillRect(canvas.width/2 - 300, canvas.height/2 - 50, 600, 100);
+                
+                ctx.fillStyle = '#051036';
+                ctx.font = 'bold 40px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Go Trip Experience', canvas.width/2, canvas.height/2);
+                
+                // Border
+                ctx.strokeStyle = '#3554D1';
+                ctx.lineWidth = 10;
+                ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            // Draw images
+            drawPlaceholder();
+            drawDefault();
+            
+            // Download functions
+            document.getElementById('downloadPlaceholder').addEventListener('click', function() {
+                const link = document.createElement('a');
+                link.download = 'placeholder.jpg';
+                link.href = document.getElementById('placeholderCanvas').toDataURL('image/jpeg', 0.9);
+                link.click();
+            });
+            
+            document.getElementById('downloadDefault').addEventListener('click', function() {
+                const link = document.createElement('a');
+                link.download = 'default.jpg';
+                link.href = document.getElementById('defaultCanvas').toDataURL('image/jpeg', 0.9);
+                link.click();
+            });
+        });
+    </script>
+</body>
+</html>

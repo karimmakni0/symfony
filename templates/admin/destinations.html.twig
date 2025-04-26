@@ -2,6 +2,13 @@
 
 {% block title %}Manage Destinations{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-destinations.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin-pagination.css') }}">
+{% endblock %}
+
 {% block body %}
 <div class="row y-gap-20 justify-between items-end pb-30">
     <div class="col-auto">
@@ -10,28 +17,56 @@
     </div>
 </div>
 
+<!-- Filter Section -->
+<div class="filter-form-container">
+    <div class="filter-header">
+        <h3 class="filter-title">Filter Destinations</h3>
+        <a href="{{ path('admin_destinations') }}" class="clear-filters-link">
+            Clear All Filters
+        </a>
+    </div>
+    
+    <form action="{{ path('admin_destinations') }}" method="GET" class="filter-form js-filter-form">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="search-field">
+                    <input type="text" name="search" value="{{ filters.search|default('') }}" class="form-control" placeholder="Search by name, location or description">
+                </div>
+            </div>
+            
+            <div class="col-lg-1">
+                <button type="submit" class="filter-button">
+                    <i class="icon-search"></i>
+                    Filter
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
 <div class="py-30 px-30 rounded-4 bg-white shadow-3">
     <div class="tabs -underline-2 js-tabs">
         <div class="tabs__controls row x-gap-40 y-gap-10 lg:x-gap-20 js-tabs-controls">
             <div class="col-auto">
-                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">All Destinations ({{ destinations|length }})</button>
+                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".js-tabs-content-1">
+                    {% if filters.search %}Filtered{% else %}All{% endif %} Destinations ({{ count }})
+                </button>
             </div>
         </div>
 
         <div class="tabs__content pt-30 js-tabs-content">
-            <div class="tabs__pane -tab-item-1 is-tab-el-active">
-                <div class="overflow-scroll scroll-bar-1">
+            <div class="tabs__pane js-tabs-content-1 is-tab-el-active">
+                <div class="tabs-table-container">
                     <table class="table-4 -border-bottom col-12">
-                        <thead class="bg-light-2">
+                        <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Image</th>
-                                <th>Name</th>
-                                <th>Location</th>
-                                <th>Created By</th>
-                                <th>Description</th>
-                                <th>Created At</th>
-                                <th>Actions</th>
+                                <th class="col-id">ID</th>
+                                <th class="col-image">Image</th>
+                                <th class="col-name">Name</th>
+                                <th class="col-location">Location</th>
+                                <th class="col-creator">Created By</th>
+                                <th class="col-description">Description</th>
+                                <th class="col-actions">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -42,39 +77,69 @@
                             {% else %}
                                 {% for destination in destinations %}
                                     <tr>
-                                        <td>#{{ destination.id }}</td>
-                                        <td>
-                                            {% if destination.imagePath %}
-                                                <img src="{{ asset(destination.imagePath) }}" alt="{{ destination.name }}" class="size-60 rounded-4 object-cover">
-                                            {% else %}
-                                                <div class="size-60 rounded-4 bg-light-2 flex-center text-14">No Image</div>
-                                            {% endif %}
+                                        <td class="id-column">
+                                            <div class="id-badge">
+                                                <div class="id-symbol">#</div>
+                                                <div class="id-number">{{ destination.id }}</div>
+                                            </div>
                                         </td>
-                                        <td>{{ destination.name }}</td>
-                                        <td>{{ destination.location }}</td>
-                                        <td>
+                                        <td class="image-column">
+                                            <div class="destination-image">
+                                            {% if destination.imagePath %}
+                                                <img src="{{ asset(destination.imagePath) }}" alt="{{ destination.name }}">
+                                            {% else %}
+                                                <div class="no-image">No Image</div>
+                                            {% endif %}
+                                            </div>
+                                        </td>
+                                        <td class="name-column">{{ destination.name }}</td>
+                                        <td class="location-column">{{ destination.location }}</td>
+                                        <td class="creator-column">
                                             {% if destination.user %}
-                                                <div>
-                                                    <div class="fw-500">{{ destination.user.name }}</div>
-                                                    <div class="text-14 lh-15 text-light-1">{{ destination.user.email }}</div>
+                                                <div class="user-cell">
+                                                    <div class="user-details">
+                                                        <div class="user-name-row">
+                                                            <span>{{ destination.user.name }}</span>
+                                                            <a href="javascript:void(0)" onclick="showUserDetails({
+                                                                id: {{ destination.user.id }},
+                                                                name: '{{ destination.user.name|e('js') }}',
+                                                                lastname: '{{ destination.user.lastname|default('')|e('js') }}',
+                                                                email: '{{ destination.user.email|e('js') }}',
+                                                                roles: '{{ destination.user.roles|join(', ')|e('js') }}',
+                                                                phone: '{{ destination.user.phone|default('Not specified')|e('js') }}'
+                                                            })" class="view-details-link">
+                                                                <i class="icon-eye text-blue-1"></i> View
+                                                            </a>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             {% else %}
                                                 <div class="text-14 text-light-1">Unknown User</div>
                                             {% endif %}
                                         </td>
-                                        <td class="text-wrap">
-                                            {{ destination.description|length > 50 ? destination.description|slice(0, 50) ~ '...' : destination.description }}
-                                        </td>
-                                        <td>{{ destination.createdAt|date('d/m/Y H:i') }}</td>
-                                        <td>
-                                            <div class="row x-gap-10 y-gap-10">
-                                                <div class="col-auto">
-                                                    <a href="{{ path('admin_delete_destination', {'id': destination.id}) }}" 
-                                                       onclick="return confirm('Are you sure you want to delete the destination: {{ destination.name }}? This action cannot be undone.')" 
-                                                       class="flex-center size-35 rounded-4 bg-red-3 text-white">
-                                                        <i class="icon-trash text-12"></i>
+                                        <td class="description-column">
+                                            <div class="description-cell">
+                                                {{ destination.description|length > 60 ? destination.description|slice(0, 60) ~ '...' : destination.description }}
+                                                {% if destination.description|length > 60 %}
+                                                    <a href="javascript:void(0)" onclick="showDescriptionDetails('{{ destination.name|e('js') }}', '{{ destination.description|e('js') }}')" class="view-description-link" title="View Full Description">
+                                                        <i class="icon-eye text-blue-1"></i>
                                                     </a>
-                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+
+                                        <td class="actions-column">
+                                            <div class="action-buttons">
+                                                <a href="javascript:void(0)" 
+                                                   onclick="showDescriptionDetails('{{ destination.name|e('js') }}', '{{ destination.description|e('js') }}')" 
+                                                   class="action-button view-button" data-bs-toggle="tooltip" title="View Full Details">
+                                                    <i class="icon-eye text-12"></i>
+                                                </a>
+                                                <a href="{{ path('admin_delete_destination', {'id': destination.id}) }}" 
+                                                   onclick="return confirmDeleteDestination('{{ destination.id }}', '{{ destination.name }}')" 
+                                                   class="action-button delete-button" data-bs-toggle="tooltip" title="Delete Destination">
+                                                    <i class="icon-trash text-12"></i>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
@@ -82,6 +147,18 @@
                             {% endif %}
                         </tbody>
                     </table>
+                    
+                    {# Pagination #}
+                    {% if totalPages > 1 %}
+                        <div class="pagination-container">
+                            {% include 'admin/components/pagination.html.twig' with {
+                                currentPage: currentPage,
+                                totalPages: totalPages,
+                                routeName: 'admin_destinations',
+                                queryParams: app.request.query.all|merge({page: null})
+                            } %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -90,9 +167,7 @@
 {% endblock %}
 
 {% block javascripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Any additional JavaScript for destination management
-    });
-</script>
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('assets/js/admin-destinations.js') }}"></script>
 {% endblock %}

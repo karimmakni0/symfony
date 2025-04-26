@@ -2,47 +2,12 @@
 
 {% block title %}Manage Bookings{% endblock %}
 
-{% block child_stylesheets %}
-<style>
-    .action-btn {
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-    }
-    
-    .action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    .btn-red {
-        background-color: #D32F2F !important; /* Darker red */
-    }
-    
-    .status-badge {
-        font-weight: 500;
-        padding: 4px 10px;
-        border-radius: 30px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 80px;
-    }
-    
-    .status-pending {
-        background-color: #FFC107;
-        color: #212529;
-    }
-    
-    .status-confirmed {
-        background-color: #198754;
-        color: white;
-    }
-    
-    .status-cancelled {
-        background-color: #D32F2F;
-        color: white;
-    }
-</style>
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('assets/css/admin-bookings.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-bookings-fixes.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-bookings-final.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-pagination.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -53,28 +18,84 @@
     </div>
 </div>
 
+<!-- Filter Section -->
+<div class="filter-form-container">
+    <div class="filter-header">
+        <h3 class="filter-title">Filter Bookings</h3>
+        <a href="{{ path('admin_bookings') }}" class="clear-filters-link">
+            Clear All Filters
+        </a>
+    </div>
+    
+    <form action="{{ path('admin_bookings') }}" method="GET" class="filter-form js-filter-form" onsubmit="return validateDateRange()">
+        <div class="row">
+
+            <div class="col-lg-4">
+                <div class="search-field">
+                    <input type="text" name="search" value="{{ filters.search }}" class="form-control" placeholder="Search by name, email, or ticket #">
+                </div>
+            </div>
+            
+            <div class="col-lg-3">
+                <div class="select-field">
+                    <select name="activity" class="form-select js-filter-activity">
+                        <option value="">All Activities</option>
+                        {% for id, activity in allActivities %}
+                            <option value="{{ id }}" {% if filters.activity == id|string %}selected{% endif %}>{{ activity.activityName }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="col-lg-2">
+                <div class="select-field">
+                    <select name="status" class="form-select js-filter-status">
+                        <option value="">All Statuses</option>
+                        {% for status in statuses %}
+                            <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status|capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="col-lg-2">
+                <div class="search-field">
+                    <input type="date" id="date_filter" name="date_from" value="{{ filters.date_from }}" class="form-control" placeholder="Filter by Date">
+                </div>
+            </div>
+            
+            <div class="col-lg-1">
+                <button type="submit" class="filter-button">
+                    <i class="icon-search"></i>
+                    Filter
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
 <div class="py-30 px-30 rounded-4 bg-white shadow-3">
     <div class="tabs -underline-2 js-tabs">
         <div class="tabs__controls row x-gap-40 y-gap-10 lg:x-gap-20 js-tabs-controls">
             <div class="col-auto">
-                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">All Bookings ({{ bookings|length }})</button>
+                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">{% if filters.search or filters.activity or filters.status or filters.date_from %}Filtered{% else %}All{% endif %} Bookings ({{ bookings|length }})</button>
             </div>
         </div>
 
         <div class="tabs__content pt-30 js-tabs-content">
             <div class="tabs__pane -tab-item-1 is-tab-el-active">
-                <div class="overflow-scroll scroll-bar-1">
-                    <table class="table-4 -border-bottom col-12">
+                <div class="table-container">
+                    <div class="table-responsive">
+                    <table class="custom-table table-4">
                         <thead class="bg-light-2">
                             <tr>
-                                <th>ID</th>
-                                <th>Ticket #</th>
-                                <th>Activity</th>
-                                <th>User</th>
-                                <th>Places</th>
-                                <th>Price</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th class="col-id">ID</th>
+                                <th class="col-ticket">Ticket #</th>
+                                <th class="col-activity">Activity</th>
+                                <th class="col-user">User</th>
+                                <th class="col-price">Price</th>
+                                <th class="col-status">Status</th>
+                                <th class="col-actions">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,8 +107,8 @@
                                 {% for booking in bookings %}
                                     {% if booking is not null %}
                                     <tr>
-                                        <td>#{{ booking.id }}</td>
-                                        <td>
+                                        <td class="id-column">#{{ booking.id }}</td>
+                                        <td class="ticket-column">
                                             <div class="text-14 lh-14 fw-500">
                                                 {{ booking.numero }}
                                             </div>
@@ -107,17 +128,17 @@
                                             {% if booking.id is defined and booking.id is not null and reservations[booking.id] is defined %}
                                                 {% set reservation = reservations[booking.id] %}
                                                 {% if reservation.user is defined and reservation.user is not null %}
-                                                    <div class="d-flex items-center">
-                                                        {% if reservation.user.image %}
-                                                            <img src="{{ asset(reservation.user.image) }}" alt="{{ reservation.user.name }}" class="size-40 rounded-full object-cover mr-10">
-                                                        {% else %}
-                                                            <div class="size-40 rounded-full flex-center bg-blue-1-05 text-blue-1 mr-10">
-                                                                <i class="icon-user text-16"></i>
-                                                            </div>
-                                                        {% endif %}
-                                                        <div>
-                                                            <div class="text-14 lh-14 fw-500">{{ reservation.user.name }} {{ reservation.user.lastname }}</div>
-                                                            <div class="text-12 lh-14 text-light-1">{{ reservation.user.email }}</div>
+                                                    <div class="user-cell">
+                                                        <div class="user-avatar">
+                                                            {% if reservation.user.picture is defined and reservation.user.picture %}
+                                                                <img src="{{ asset('uploads/profile/' ~ reservation.user.picture) }}" alt="User Avatar" class="size-40 rounded-4 object-cover">
+                                                            {% else %}
+                                                                <div class="size-40 flex-center rounded-4 bg-blue-1-05 text-blue-1 fw-500">{{ reservation.user.name|slice(0, 1) }}</div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="user-details">
+                                                            <div class="user-name">{{ reservation.user.name }} {{ reservation.user.lastname }}</div>
+                                                            <div class="user-email">{{ reservation.user.email }}</div>
                                                         </div>
                                                     </div>
                                                 {% else %}
@@ -127,27 +148,9 @@
                                                 No Reservation
                                             {% endif %}
                                         </td>
-                                        <td>
-                                            <div class="d-flex items-center">
-                                                {% if booking.id is defined and booking.id is not null and reservations[booking.id] is defined %}
-                                                    {% set reservation = reservations[booking.id] %}
-                                                    <div class="text-14 lh-14 fw-500">
-                                                        <span class="text-blue-1">{{ reservation.nombre }}</span> / {{ booking.nb }} places
-                                                    </div>
-                                                {% else %}
-                                                    <div class="text-14 lh-14 fw-500">
-                                                        {{ booking.nb }} places
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-                                        </td>
-                                        <td>
+                                        <td class="price-column">
                                             {% if booking.id is defined and booking.id is not null and reservations[booking.id] is defined %}
                                                 {% set reservation = reservations[booking.id] %}
-                                                <div class="text-14 lh-14 fw-500">
-                                                    {{ reservation.prixTotal }} € <span class="text-12 text-light-1">({{ reservation.prixUnite }} € / unit)</span>
-                                                </div>
-                                            {% else %}
                                                 <div class="text-14 lh-14 fw-500">
                                                     {{ booking.prix }} €
                                                 </div>
@@ -188,9 +191,10 @@
                                         <td>
                                             <div class="row x-gap-10 y-gap-10">
                                                 <div class="col-auto">
-                                                    <a href="{{ path('admin_delete_booking', {'id': booking.id}) }}" 
-                                                       onclick="return confirm('Are you sure you want to delete booking #{{ booking.id }}? This action cannot be undone.')" 
-                                                       class="action-btn flex-center size-35 rounded-4 btn-red text-white" 
+                                                    <a href="javascript:void(0);" 
+                                                       onclick="confirmDeleteBooking('{{ booking.id }}', '{{ booking.numero }}', '{{ path('admin_delete_booking', {'id': booking.id}) }}')" 
+                                                       class="action-btn flex-center size-35 rounded-4 bg-red-1 text-white" 
+                                                       data-bs-toggle="tooltip" 
                                                        title="Delete Booking">
                                                         <i class="icon-trash text-12"></i>
                                                     </a>
@@ -203,6 +207,18 @@
                             {% endif %}
                         </tbody>
                     </table>
+                    
+                    {# Pagination #}
+                    {% if totalPages > 1 %}
+                        <div class="pagination-container">
+                            {% include 'admin/components/pagination.html.twig' with {
+                                currentPage: currentPage,
+                                totalPages: totalPages,
+                                routeName: 'admin_bookings',
+                                queryParams: app.request.query.all|merge({page: null})
+                            } %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -211,15 +227,6 @@
 {% endblock %}
 
 {% block javascripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add tooltips to action buttons
-        const actionButtons = document.querySelectorAll('.action-btn');
-        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-            actionButtons.forEach(button => {
-                new bootstrap.Tooltip(button);
-            });
-        }
-    });
-</script>
+{{ parent() }}
+<script src="{{ asset('assets/js/admin-bookings.js') }}"></script>
 {% endblock %}

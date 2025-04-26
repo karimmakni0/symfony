@@ -54,10 +54,18 @@ class ActivitiesController extends AbstractController
     }
     
     #[Route('/activities', name: 'app_activities')]
-    public function clientActivities(): Response
+    public function clientActivities(Request $request): Response
     {
-        // Get all activities to display to clients with their resources
-        $activities = $this->activitiesRepository->findAllWithResources();
+        // Get pagination parameters
+        $page = $request->query->getInt('page', 1);
+        $limit = 9; // Number of activities per page
+        
+        // Get total activities count
+        $totalActivities = $this->activitiesRepository->count([]);
+        $maxPages = ceil($totalActivities / $limit);
+        
+        // Get activities with resources for current page
+        $activities = $this->activitiesRepository->findAllWithResourcesPaginated($page, $limit);
         
         // Get unique destinations for the filter dropdown
         $destinations = $this->activitiesRepository->findAllDestinations();
@@ -72,7 +80,11 @@ class ActivitiesController extends AbstractController
             'activities' => $activities,
             'destinations' => $destinations,
             'activityTypes' => $activityTypes,
-            'durations' => $durations
+            'durations' => $durations,
+            'current_page' => $page,
+            'max_pages' => $maxPages,
+            'total_items' => $totalActivities,
+            'items_per_page' => $limit
         ]);
     }
     
@@ -186,7 +198,37 @@ class ActivitiesController extends AbstractController
         ]);
         $form->handleRequest($request);
         
+        // Check for direct POST data
+        if ($request->isMethod('POST')) {
+            $formData = $request->request->all();
+            
+            // Debug coordinates from form data
+            $formName = 'activity_form'; 
+            if (isset($formData[$formName]['latitude']) && isset($formData[$formName]['longitude'])) {
+                $latitude = $formData[$formName]['latitude'];
+                $longitude = $formData[$formName]['longitude'];
+                
+                // Log the coordinates for debugging
+                dump("Form coordinates: $latitude, $longitude");
+            }
+        }
+        
         if ($form->isSubmitted() && $form->isValid()) {
+            // Simple validation for coordinates
+            $latitude = $form->get('latitude')->getData();
+            $longitude = $form->get('longitude')->getData();
+            
+            // Ensure coordinates are valid
+            if (empty($latitude) || empty($longitude)) {
+                $this->addFlash('error', 'Coordinates are required. Please enter valid latitude and longitude values.');
+                
+                return $this->render('publicator/activities/add.html.twig', [
+                    'form' => $form->createView(),
+                    'destinations' => $destinations,
+                    'coordinate_error' => true
+                ]);
+            }
+            
             // Save the activity first to get its ID
             $this->entityManager->persist($activity);
             $this->entityManager->flush();
@@ -239,7 +281,7 @@ class ActivitiesController extends AbstractController
     }
     
     #[Route('/publicator/activities/edit/{id}', name: 'app_publicator_edit_activity')]
-    public function editActivity(Request $request, int $id): Response
+    public function editActivity(Request $request, $id): Response
     {
         // Check if user has the appropriate role
         $user = $this->getUser();
@@ -247,11 +289,12 @@ class ActivitiesController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
         
+        // Get the activity by ID
         $activity = $this->activitiesRepository->find($id);
         
-        // Check if activity exists and belongs to the current user
+        // Check if activity exists and belongs to this user
         if (!$activity || $activity->getUser() !== $user) {
-            $this->addFlash('error', 'Activity not found or you don\'t have permission to edit it.');
+            $this->addFlash('error', 'Activity not found or you are not authorized to edit it.');
             return $this->redirectToRoute('app_publicator_activities');
         }
         
@@ -264,62 +307,66 @@ class ActivitiesController extends AbstractController
             $destinationsChoices[$destination->getName() . ' (' . $destination->getLocation() . ')'] = $destination->getName();
         }
         
-        // Get all resources (images) for this activity
-        $resources = $this->resourcesRepository->findBy(['activity' => $activity]);
-        
-        // Create the form with our destinations choices but don't require images for edit
+        // Create a new form for editing
         $form = $this->createForm(ActivityFormType::class, $activity, [
             'destinations_choices' => $destinationsChoices,
             'images_required' => false
         ]);
+        
+        // Process form submission
         $form->handleRequest($request);
         
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Handle image uploads
-            $imageFiles = $form->get('activity_images')->getData();
-            if ($imageFiles) {
-                $uploadsDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads/activities';
+        // Check for direct POST data
+        if ($request->isMethod('POST')) {
+            $formData = $request->request->all();
+            
+            // Debug the form data
+            dump("Edit form data:", $formData);
+            
+            // Debugging latitude and longitude values
+            $formName = 'activity_form'; // Change this if needed to match your form name
+            if (isset($formData[$formName]['latitude']) && isset($formData[$formName]['longitude'])) {
+                $latitude = $formData[$formName]['latitude'];
+                $longitude = $formData[$formName]['longitude'];
                 
-                // Create directory if it doesn't exist
-                if (!file_exists($uploadsDirectory)) {
-                    mkdir($uploadsDirectory, 0777, true);
-                }
-                
-                foreach ($imageFiles as $imageFile) {
-                    if ($imageFile) {
-                        // Simple filename generation without transliterator
-                        $newFilename = 'activity-' . uniqid() . '-' . time() . '.' . $imageFile->guessExtension();
-                        
-                        try {
-                            $imageFile->move(
-                                $uploadsDirectory,
-                                $newFilename
-                            );
-                            
-                            // Create a new resource for this image
-                            $resource = new Resources();
-                            $resource->setPath('/uploads/activities/' . $newFilename);
-                            $resource->setActivity($activity);
-                            
-                            $this->entityManager->persist($resource);
-                        } catch (\Exception $e) {
-                            $this->addFlash('error', 'Failed to upload image: ' . $e->getMessage());
-                        }
-                    }
+                // Manually set coordinates if they exist in POST data
+                if (!empty($latitude) && !empty($longitude)) {
+                    $activity->setLatitude($latitude);
+                    $activity->setLongitude($longitude);
+                    
+                    // Debug info
+                    dump("Manually set coordinates in edit: $latitude, $longitude");
                 }
             }
+        }
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Simple validation for coordinates
+            $latitude = $form->get('latitude')->getData();
+            $longitude = $form->get('longitude')->getData();
             
-            // Handle image deletions if any
-            $imagesToDelete = $request->request->get('delete_images', []);
-            foreach ($imagesToDelete as $resourceId) {
+            // Ensure coordinates are valid
+            if (empty($latitude) || empty($longitude)) {
+                $this->addFlash('error', 'Coordinates are required. Please enter valid latitude and longitude values.');
+                
+                // Get existing images for the activity
+                $resources = $activity->getResources();
+                
+                // Render the form again with error
+                return $this->render('publicator/activities/edit.html.twig', [
+                    'form' => $form->createView(),
+                    'activity' => $activity,
+                    'destinations' => $destinations,
+                    'resources' => $resources,
+                    'coordinate_error' => true
+                ]);
+            }
+            
+            // Process deleted images
+            $deletedImages = $request->request->all('deleted_images') ?? [];
+            foreach ($deletedImages as $resourceId) {
                 $resource = $this->resourcesRepository->find($resourceId);
                 if ($resource && $resource->getActivity() === $activity) {
-                    // Remove the file from storage
-                    $filePath = $this->getParameter('kernel.project_dir') . '/public/' . $resource->getPath();
-                    if (file_exists($filePath)) {
-                        unlink($filePath);
-                    }
-                    
                     // Remove from database
                     $this->entityManager->remove($resource);
                 }
@@ -331,6 +378,9 @@ class ActivitiesController extends AbstractController
             $this->addFlash('success', 'Activity updated successfully!');
             return $this->redirectToRoute('app_publicator_activities');
         }
+        
+        // Get existing images for the activity
+        $resources = $activity->getResources();
         
         return $this->render('publicator/activities/edit.html.twig', [
             'form' => $form->createView(),
@@ -418,19 +468,8 @@ class ActivitiesController extends AbstractController
         return $this->redirectToRoute('app_publicator_activities');
     }
     
-    #[Route('/publicator/profile', name: 'app_publicator_profile')]
-    public function profile(): Response
-    {
-        // Check if user has the appropriate role
-        $user = $this->getUser();
-        if (!$user || $user->getRole() !== 'Publicitaire') {
-            return $this->redirectToRoute('app_login');
-        }
-        
-        return $this->render('publicator/profile/index.html.twig', [
-            'user' => $user,
-        ]);
-    }
+    // Removed redundant publicator profile route
+    // This functionality is now provided by the client profile route at /client/profile
     
     #[Route('/api/activities/{id}/tickets', name: 'app_api_activity_tickets')]
     public function getActivityTickets(int $id): Response
@@ -607,5 +646,69 @@ class ActivitiesController extends AbstractController
             $this->addFlash('error', 'Payment processing error: ' . $e->getMessage());
             return false;
         }
+    }
+
+    #[Route('/activities/map', name: 'app_activities_map')]
+    public function activitiesMap(): Response
+    {
+        // Get all activities with valid coordinates and resources
+        $activities = $this->activitiesRepository->findAll();
+        
+        // Prepare data for the map including resources
+        $activitiesData = [];
+        foreach ($activities as $activity) {
+            // Skip activities without coordinates
+            if (empty($activity->getLatitude()) || empty($activity->getLongitude())) {
+                continue;
+            }
+            
+            // Get resources (images) for this activity
+            $resources = $this->resourcesRepository->findBy(['activity' => $activity]);
+            $resourcesData = [];
+            
+            foreach ($resources as $resource) {
+                $resourcesData[] = [
+                    'id' => $resource->getId(),
+                    'path' => $resource->getPath()
+                ];
+            }
+            
+            $activitiesData[] = [
+                'activity_id' => $activity->getId(),
+                'activity_name' => $activity->getActivityName(),
+                'activity_description' => $activity->getActivityDescription(),
+                'activity_destination' => $activity->getActivityDestination(),
+                'activity_duration' => $activity->getActivityDuration(),
+                'activity_price' => $activity->getActivityPrice(),
+                'activity_genre' => $activity->getActivityGenre(),
+                'latitude' => $activity->getLatitude(),
+                'longitude' => $activity->getLongitude(),
+                'resources' => $resourcesData
+            ];
+        }
+        
+        // Get unique activity genres for the legend
+        $activityTypes = $this->activitiesRepository->findUniqueGenres();
+        
+        // Define function to get color for activity type
+        $getColorForType = function($type) {
+            $colors = [
+                'Adventure' => '#f44336', // Red
+                'Cultural' => '#9c27b0', // Purple 
+                'Relaxation' => '#03a9f4', // Light Blue
+                'Family' => '#4caf50', // Green
+                'Romantic' => '#e91e63', // Pink
+                'Educational' => '#ff9800', // Orange
+                'Sport' => '#2196f3', // Blue
+                'Other' => '#607d8b' // Blue Grey
+            ];
+            
+            return $colors[$type] ?? '#607d8b';
+        };
+        
+        return $this->render('user/activity/map.html.twig', [
+            'activities' => $activitiesData,
+            'activityTypes' => $activityTypes
+        ]);
     }
 }

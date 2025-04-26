@@ -15,13 +15,42 @@ use Symfony\Component\Routing\Annotation\Route;
 class UpgradeRequestsController extends AbstractController
 {
     #[Route('/', name: 'admin_upgrade_requests')]
-    public function index(UpgradeRequestsRepository $repository): Response
+    public function index(Request $request, UpgradeRequestsRepository $repository): Response
     {
-        // Get all upgrade requests
-        $requests = $repository->findBy([], ['request_date' => 'DESC']);
+        // Get filter parameters from the request
+        $filters = [
+            'search' => $request->query->get('search', ''),
+            'status' => $request->query->get('status', ''),
+            'date_from' => $request->query->get('date_from', ''),
+            'date_to' => $request->query->get('date_to', '')
+        ];
+        
+        // Get pagination parameters
+        $page = $request->query->getInt('page', 1);
+        $limit = 5; // Show 5 items per page
+        
+        // Get all upgrade requests with filters applied
+        $allRequests = $repository->filterRequests($filters);
+        
+        // Calculate pagination
+        $totalItems = count($allRequests);
+        $totalPages = ceil($totalItems / $limit);
+        
+        // Apply pagination (in memory since we already have all results)
+        $requests = array_slice($allRequests, ($page - 1) * $limit, $limit);
+        
+        // Get all possible statuses for the dropdown
+        $statuses = ['pending', 'Approved', 'Rejected'];
         
         return $this->render('admin/upgrade_requests/index.html.twig', [
-            'requests' => $requests
+            'requests' => $requests,
+            'filters' => $filters,
+            'statuses' => $statuses,
+            // Pagination data
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalItems' => $totalItems,
+            'limit' => $limit
         ]);
     }
     

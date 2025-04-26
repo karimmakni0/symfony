@@ -1,0 +1,95 @@
+.search-field input {
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid #e9e9e9;
+  padding: 0 15px;
+  width: 100%;
+  transition: all 0.3s;
+  font-size: 14px;
+  color: #051036;
+}
+.search-field input:focus {
+  border-color: #3554d1;
+  box-shadow: 0 0 0 2px rgba(53, 84, 209, 0.2);
+  outline: none;
+}
+.select-field select {
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid #e9e9e9;
+  padding: 0 15px;
+  width: 100%;
+  transition: all 0.3s;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  appearance: none;
+  font-size: 14px;
+  color: #051036;
+}
+.select-field select:focus {
+  border-color: #3554d1;
+  box-shadow: 0 0 0 2px rgba(53, 84, 209, 0.2);
+  outline: none;
+}
+input[type="date"] {
+  font-family: inherit;
+  width: 100%;
+}
+
+.action-btn {
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-blue {
+  background-color: #0B5ED7 !important; /* Darker blue */
+}
+
+.btn-yellow {
+  background-color: #DB9A06 !important; /* Darker yellow */
+}
+
+.btn-red {
+  background-color: #D32F2F !important; /* Darker red */
+}
+
+.btn-green {
+  background-color: #198754 !important; /* Darker green */
+}
+
+.status-badge {
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  white-space: nowrap;
+}
+
+.status-badge i {
+  margin-right: 4px;
+}
+
+.status-pending {
+  background-color: #FFC107;
+  color: #212529;
+}
+
+.status-confirmed {
+  background-color: #198754;
+  color: white;
+}
+
+.status-cancelled {
+  background-color: #D32F2F;
+  color: white;
+}

@@ -1,98 +1,390 @@
-{% extends 'adminbase.html.twig' %}
+{% extends 'AdminBase.html.twig' %}
 
-{% block title %}Admin - Blog Management{% endblock %}
+{% block title %}Manage Blog Posts{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('assets/css/admin-blog.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-blog-table.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-blog-user-details.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-blog-post-details.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-blog-grid-view.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-blog-grid-view-fix.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-blog-engagement-chart.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-blog-enhanced.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-pagination.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<!-- Add Bootstrap JS for tooltips and other functionality -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+// Global variables needed for the popups
+var viewCommentsUrl = "{{ path('app_admin_blog_details', {'id': '0'}) }}";
+var savePostUrl = "{{ path('app_admin_blog_edit', {'id': '0'}) }}";
+</script>
+<script src="{{ asset('assets/js/admin-blog-alerts.js') }}"></script>
+{% endblock %}
 
 {% block body %}
-<div class="page-header d-print-none">
-  <div class="container-xl">
-    <div class="row g-2 align-items-center">
-      <div class="col">
-        <h2 class="page-title">
-          Blog Management
-        </h2>
+<!-- Page title and Add New button section -->
+<div class="row y-gap-20 justify-between items-end pb-30 lg:pb-20 md:pb-15">
+  <div class="col-auto">
+    <h1 class="text-30 lh-14 fw-600">Blog Management</h1>
+    <div class="text-15 text-light-1">Manage your blog posts and content</div>
+  </div>
+  <div class="col-auto">
+    <a href="/admin/blog/new" class="button -md -dark-1 bg-blue-1 text-white">
+      <i class="icon-plus text-15 mr-10"></i>
+      Add New Post
+    </a>
+  </div>
+</div>
+
+<!-- Filter section -->
+<div class="py-20 px-30 rounded-4 bg-white shadow-3 mb-30">
+  <div class="row justify-between items-center pb-20">
+    <div class="col-auto">
+      <h3 class="text-16 lh-1 fw-500">Filter Blog Posts</h3>
+    </div>
+    <div class="col-auto">
+      <a href="{{ path('app_admin_blog_index') }}" class="text-14 text-blue-1">
+        Clear All Filters
+      </a>
+    </div>
+  </div>
+  
+  <form action="{{ path('app_admin_blog_index') }}" method="GET" class="js-filter-form" onsubmit="return validateDateRange()">
+    <div class="row y-gap-20 items-center">
+      <div class="col-xl-5 col-lg-4">
+        <div class="search-field">
+          <input type="text" name="search" value="{{ app.request.query.get('search') }}" class="form-control" placeholder="Search by title or author">
+        </div>
+      </div>
+      
+      <div class="col-xl-2 col-lg-3">
+        <div class="select-field">
+          <select name="activity" class="form-select js-filter-activity">
+            <option value="">All Activities</option>
+            {% for activity in activities %}
+              <option value="{{ activity.id }}" {% if app.request.query.get('activity') == activity.id|string %}selected{% endif %}>
+                {{ activity.activityName }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      
+      <div class="col-xl-2 col-lg-2">
+        <div class="search-field">
+          <input type="date" id="date_from" name="date_from" value="{{ app.request.query.get('date_from') }}" class="form-control" placeholder="From Date">
+        </div>
+      </div>
+      
+      <div class="col-xl-2 col-lg-2">
+        <div class="search-field">
+          <input type="date" id="date_to" name="date_to" value="{{ app.request.query.get('date_to') }}" class="form-control" placeholder="To Date">
+        </div>
+      </div>
+      
+      <div class="col-xl-1 col-lg-1">
+        <button type="submit" class="button -md h-50 w-100 bg-blue-1 text-white">
+          <i class="icon-search text-15 mr-10"></i>
+          Filter
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Stats Dashboard -->
+<div class="row mb-30">
+  <div class="col-12">
+    <div class="dashboard-header">
+      <div class="dashboard-header-stats">
+        <div class="stats-card">
+          <i class="icon-file-text stats-icon"></i>
+          <div class="stats-content">
+            <span class="stats-number">{{ posts|length }}</span>
+            <span class="stats-label">Total Posts</span>
+          </div>
+        </div>
+        <div class="stats-card">
+          <i class="icon-message-circle stats-icon"></i>
+          <div class="stats-content">
+            <span class="stats-number">{{ totalComments }}</span>
+            <span class="stats-label">Comments</span>
+          </div>
+        </div>
+        <div class="stats-card">
+          <i class="icon-thumbs-up stats-icon"></i>
+          <div class="stats-content">
+            <span class="stats-number">{{ totalLikes }}</span>
+            <span class="stats-label">Likes</span>
+          </div>
+        </div>
+        <div class="stats-card">
+          <i class="icon-thumbs-down stats-icon"></i>
+          <div class="stats-content">
+            <span class="stats-number">{{ totalDislikes }}</span>
+            <span class="stats-label">Dislikes</span>
+          </div>
+        </div>
+      </div>
+      <div class="dashboard-buttons">
+        <a href="/admin/blog/new" class="button -md -dark-1 bg-blue-1 text-white">
+          <i class="icon-plus text-15 mr-10"></i>
+          Add New Post
+        </a>
       </div>
     </div>
   </div>
 </div>
 
-<div class="page-body">
-  <div class="container-xl">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">All Blog Posts</h3>
+<!-- Blog Posts Table -->
+<div class="py-30 px-30 rounded-4 bg-white shadow-3" id="blog-posts">
+  <div class="dashboard-table-header">
+    <div class="left">
+      <h4 class="text-20 fw-600">{% if app.request.query.get('search') or app.request.query.get('activity') or app.request.query.get('date_from') %}Filtered{% else %}All{% endif %} Blog Posts</h4>
+      <div class="table-filter-info mt-5">
+        <span class="total-count">{{ posts|length }} items</span>
       </div>
-      <div class="card-body">
-        {% for message in app.flashes('success') %}
-          <div class="alert alert-success alert-dismissible" role="alert">
-            {{ message }}
-            <a href="#" class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
-          </div>
-        {% endfor %}
-        {% for message in app.flashes('error') %}
-          <div class="alert alert-danger alert-dismissible" role="alert">
-            {{ message }}
-            <a href="#" class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
-          </div>
-        {% endfor %}
-        
-        <div class="table-responsive">
-          <table class="table table-vcenter card-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Activity</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% if posts|length > 0 %}
-                {% for post in posts %}
-                  <tr>
-                    <td>{{ post.id }}</td>
-                    <td>
-                      <a href="{{ path('app_admin_blog_details', {'id': post.id}) }}">{{ post.title }}</a>
-                    </td>
-                    <td>{{ users[post.userId].name }} {{ users[post.userId].lastname }}</td>
-                    <td>{{ activitiesById[post.activityId].activityName }}</td>
-                    <td>{{ post.date|date('Y-m-d') }}</td>
-                    <td>
-                      <div class="btn-list flex-nowrap">
-                        <a href="{{ path('app_admin_blog_details', {'id': post.id}) }}" class="btn btn-primary">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-                            <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
-                          </svg>
-                          View
-                        </a>
-                        <a href="{{ path('app_admin_blog_delete', {'id': post.id}) }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this post?')">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <path d="M4 7l16 0"></path>
-                            <path d="M10 11l0 6"></path>
-                            <path d="M14 11l0 6"></path>
-                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
-                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
-                          </svg>
-                          Delete
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                {% endfor %}
-              {% else %}
-                <tr>
-                  <td colspan="6" class="text-center">No blog posts found</td>
-                </tr>
-              {% endif %}
-            </tbody>
-          </table>
-        </div>
+    </div>
+    <div class="right">
+      <div class="table-controls">
+        <a href="{{ path('app_admin_blog_index') }}" class="refresh-btn" title="Refresh">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M23 4V10H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1 20V14H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3.51 9.00008C4.01717 7.56686 4.87913 6.28548 6.01547 5.27549C7.1518 4.2655 8.52547 3.56066 10.0083 3.22479C11.4911 2.88892 13.0348 2.93465 14.4952 3.35685C15.9556 3.77905 17.2853 4.56275 18.36 5.64008L23 10.0001M1 14.0001L5.64 18.3601C6.71475 19.4374 8.04437 20.2211 9.50481 20.6433C10.9652 21.0655 12.5089 21.1112 13.9917 20.7753C15.4745 20.4395 16.8482 19.7346 17.9845 18.7246C19.1209 17.7146 19.9828 16.4333 20.49 15.0001" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
       </div>
     </div>
   </div>
+
+  {% if posts|length > 0 %}
+    <div class="table-responsive custom-scrollbar">
+      <table class="custom-table blog-posts-table">
+        <thead>
+          <tr>
+            <th class="col-id">ID</th>
+            <th class="col-title">Title & Image</th>
+            <th class="col-activity">Activity</th>
+            <th class="col-creator">Created By</th>
+            <th class="col-stats">Stats</th>
+            <th class="col-date">Date</th>
+            <th class="col-description">Description</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for post in posts %}
+            <tr>
+              <td class="id-column">
+                <div class="id-badge">#{{ post.id }}</div>
+              </td>
+              <td class="title-column">
+                <div class="post-row">
+                  {% if post.picture %}
+                    <img src="{{ asset('uploads/posts/' ~ post.picture) }}" alt="{{ post.title }}" class="post-image">
+                  {% else %}
+                    <div class="post-image-placeholder">
+                      <i class="icon-image text-20"></i>
+                    </div>
+                  {% endif %}
+                  <div class="post-info">
+                    <div class="post-title">{{ post.title }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="activity-column">
+                <span class="activity-badge">{{ activitiesById[post.activityId].activityName }}</span>
+              </td>
+              <td class="creator-column">
+                {% if users[post.userId] is defined %}
+                  <div class="user-cell">
+                    <div class="user-details">
+                      <div class="user-name-row">
+                        <span>{{ users[post.userId].name }} {{ users[post.userId].lastname }}</span>
+                        <a href="javascript:void(0)" onclick="showUserDetails({
+                          'id': {{ post.userId }},
+                          'name': '{{ users[post.userId].name }} {{ users[post.userId].lastname }}',
+                          'email': '{{ users[post.userId].email|e('js') }}',
+                          'phone': '{{ users[post.userId].phone|default('Not provided')|e('js') }}',
+                          'roles': '{{ users[post.userId].roles|join(', ')|e('js') }}'
+                        })" class="view-details-link">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                          <span>Details</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="text-14 text-light-1">Unknown User</div>
+                {% endif %}
+              </td>
+              <td class="stats-column">
+                <div class="post-stats-vertical">
+                  <div class="stat-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="comment-icon">
+                      <path d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z" stroke="#3554D1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="stat-value">{{ commentCounts[post.id]|default(0) }}</span>
+                    <span class="stat-label">Comments</span>
+                  </div>
+                  <div class="stat-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="like-icon">
+                      <path d="M7 22H4C3.46957 22 2.96086 21.7893 2.58579 21.4142C2.21071 21.0391 2 20.5304 2 20V13C2 12.4696 2.21071 11.9609 2.58579 11.5858C2.96086 11.2107 3.46957 11 4 11H7M14 9V5C14 4.20435 13.6839 3.44129 13.1213 2.87868C12.5587 2.31607 11.7956 2 11 2L7 11V22H18.28C18.7623 22.0055 19.2304 21.8364 19.5979 21.524C19.9654 21.2116 20.2077 20.7769 20.28 20.3L21.66 11.3C21.7035 11.0134 21.6842 10.7207 21.6033 10.4423C21.5225 10.1638 21.3821 9.90629 21.1919 9.68751C21.0016 9.46873 20.7661 9.29393 20.5016 9.17522C20.2371 9.0565 19.9499 8.99672 19.66 9H14Z" stroke="#27ae60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="stat-value">{{ ratingStats[post.id].likes|default(0) }}</span>
+                    <span class="stat-label">Likes</span>
+                  </div>
+                  <div class="stat-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="dislike-icon">
+                      <path d="M17 2H20C20.5304 2 21.0391 2.21071 21.4142 2.58579C21.7893 2.96086 22 3.46957 22 4V11C22 11.5304 21.7893 12.0391 21.4142 12.4142C21.0391 12.7893 20.5304 13 20 13H17M10 15V19C10 19.7956 10.3161 20.5587 10.8787 21.1213C11.4413 21.6839 12.2044 22 13 22L17 13V2H5.72C5.23765 1.99446 4.76958 2.16359 4.40212 2.47599C4.03467 2.78839 3.79235 3.2231 3.72 3.7L2.34 12.7C2.29647 12.9866 2.31583 13.2793 2.39666 13.5577C2.4775 13.8362 2.61791 14.0937 2.80815 14.3125C2.9984 14.5313 3.23393 14.7061 3.49843 14.8248C3.76294 14.9435 4.05009 15.0033 4.34 15H10Z" stroke="#d93025" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="stat-value">{{ ratingStats[post.id].dislikes|default(0) }}</span>
+                    <span class="stat-label">Dislikes</span>
+                  </div>
+                </div>
+              </td>
+              <td class="date-column">
+                {{ post.date|date('M d, Y') }}
+              </td>
+              <td class="description-column">
+                <div class="description-cell">
+                  {{ post.description|striptags|length > 60 ? post.description|striptags|slice(0, 60) ~ '...' : post.description|striptags }}
+                  {% if post.description|striptags|length > 60 %}
+                    <a href="javascript:void(0)" onclick="showPostDetails({
+                          'id': {{ post.id }},
+                          'title': '{{ post.title|e('js') }}',
+                          'image': '{{ (post.picture is not null ? asset(post.picture) : '')|e('js') }}',
+                          'activity': '{{ activitiesById[post.activityId].activityName|e('js') }}',
+                          'author': '{{ users[post.userId] is defined ? (users[post.userId].name ~ ' ' ~ users[post.userId].lastname)|e('js') : 'Unknown User' }}',
+                          'date': '{{ post.date|date('M d, Y')|e('js') }}',
+                          'description': '{{ post.description|e('js')|nl2br }}',
+                          'comments': {{ commentCounts[post.id]|default(0) }},
+                          'likes': {{ ratingStats[post.id].likes|default(0) }},
+                          'dislikes': {{ ratingStats[post.id].dislikes|default(0) }}
+                        })" class="view-description-link" title="View Full Description">
+                      <i class="icon-eye text-blue-1"></i>
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+              <td class="actions-column">
+                <div class="action-buttons">
+                  <a href="javascript:void(0)" 
+                     onclick="showPostDetails({
+                       id: {{ post.id }},
+                       title: '{{ post.title|e('js') }}',
+                       description: '{{ post.description|striptags|e('js') }}',
+                       activity: '{{ activitiesById[post.activityId].activityName|e('js') }}',
+                       date: '{{ post.date|date('M d, Y')|e('js') }}',
+                       author: '{{ users[post.userId] is defined ? (users[post.userId].name ~ ' ' ~ users[post.userId].lastname)|e('js') : 'Unknown User' }}',
+                       image: '{{ post.picture ? asset('uploads/posts/' ~ post.picture) : '' }}',
+                       likes: {{ ratingStats[post.id].likes|default(0) }},
+                       dislikes: {{ ratingStats[post.id].dislikes|default(0) }},
+                       comments: {{ commentCounts[post.id]|default(0) }}
+                     })" 
+                     class="action-button view-button" data-bs-toggle="tooltip" title="View Details" style="background-color: #3554d1; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; color: white;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </a>
+                  <a href="javascript:void(0)" 
+                     onclick="showEditPost({
+                        id: {{ post.id }},
+                        title: '{{ post.title|e('js') }}',
+                        description: '{{ post.description|striptags|e('js') }}',
+                        activityId: {{ post.activityId }},
+                        activity: '{{ activitiesById[post.activityId].activityName|e('js') }}',
+                        allActivities: [{% for activity in activities %}{
+                            id: {{ activity.id }},
+                            activityName: '{{ activity.activityName|e('js') }}'
+                         }{% if not loop.last %},{% endif %}{% endfor %}]
+                     }, savePostUrl.replace('/0', '/{{ post.id }}'))"
+                     class="action-button edit-button" data-bs-toggle="tooltip" title="Edit Post" style="background-color: #27ae60; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; color: white;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.4374 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </a>
+                  <a href="javascript:void(0)" 
+                     onclick="confirmDeleteBlog('{{ post.id }}', '{{ post.title }}', '{{ path('app_admin_blog_delete', {'id': post.id}) }}')" 
+                     class="action-button delete-button" data-bs-toggle="tooltip" title="Delete Post" style="background-color: #d93025; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; color: white;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 6H5H21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </a>
+                  <a href="javascript:void(0)" 
+                     onclick="showPostEngagement({
+                      'id': {{ post.id }},
+                      'title': '{{ post.title|e('js') }}',
+                      'comments': {{ commentCounts[post.id]|default(0) }},
+                      'likes': {{ ratingStats[post.id].likes|default(0) }},
+                      'dislikes': {{ ratingStats[post.id].dislikes|default(0) }}
+                    })" 
+                     class="action-button stats-button" data-bs-toggle="tooltip" title="View Engagement Stats" style="background-color: #3498db; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; color: white;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M18 20V10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M12 20V4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M6 20V14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="py-40 px-30 rounded-4 bg-white shadow-3">
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i class="icon-file-text"></i>
+        </div>
+        <h4 class="text-18 fw-500 mb-10">No Blog Posts Found</h4>
+        <p class="empty-state-text">No blog posts match your search criteria. Try adjusting your filters or create a new post.</p>
+        <a href="#" class="button -md -dark-1 bg-blue-1 text-white mt-20">
+          <i class="icon-plus text-15 mr-10"></i>
+          Create New Post
+        </a>
+      </div>
+    </div>
+  {% endif %}
+  
+  {# Pagination #}
+  {% if totalPages > 1 %}
+    <div class="pagination-container">
+      {% include 'admin/components/pagination.html.twig' with {
+        currentPage: currentPage,
+        totalPages: totalPages,
+        routeName: 'app_admin_blog_index',
+        queryParams: app.request.query.all|merge({page: null})
+      } %}
+    </div>
+  {% endif %}
 </div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<!-- Include SweetAlert, Rater.js, and Chart.js libraries -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/rater-js@1.0.1/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Include custom scripts -->
+<script src="{{ asset('assets/js/admin-blog-alerts.js') }}"></script>
+<script src="{{ asset('assets/js/admin-blog.js') }}"></script>
+<script src="{{ asset('assets/js/admin-blog-post-details.js') }}"></script>
+<script src="{{ asset('assets/js/admin-blog-engagement-chart.js') }}"></script>
 {% endblock %}

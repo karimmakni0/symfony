@@ -60,6 +60,12 @@
           </div>
         {% endif %}
       </div>
+      
+      {# Include pagination #}
+      {% include 'client/pagination.html.twig' with {
+          'current_page': current_page|default(1),
+          'max_pages': max_pages|default(1)
+      } %}
     </div>
   </section>
 {% endblock %}

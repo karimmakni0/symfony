@@ -1,0 +1,106 @@
+/**
+ * Admin Blog Engagement Chart Styles
+ * Styles for the engagement popup charts
+ */
+
+:root {
+  --color-primary: #3554d1;
+  --color-success: #27ae60;
+  --color-danger: #d93025;
+  --color-text: #697488;
+  --color-text-dark: #051036;
+  --color-border: #EAEEF3;
+}
+
+/* Chart Section */
+.engagement-charts {
+  margin: 20px 0 30px;
+}
+
+.chart-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.pie-chart-container {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin: 0 auto;
+}
+
+/* Chart legend styling */
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: var(--color-text-dark);
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.legend-color.comments {
+  background-color: var(--color-primary);
+}
+
+.legend-color.likes {
+  background-color: var(--color-success);
+}
+
+.legend-color.dislikes {
+  background-color: var(--color-danger);
+}
+
+/* Center chart numbers */
+.chart-center-data {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.chart-total {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  line-height: 1;
+}
+
+.chart-label {
+  font-size: 13px;
+  color: var(--color-text);
+  margin-top: 5px;
+}
+
+/* Tooltip styling */
+.chart-tooltip {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  color: var(--color-text-dark);
+}
+
+/* Enhanced engagement metrics */
+.engagement-metrics {
+  margin-top: 0;
+  border-top: 1px solid var(--color-border);
+  padding-top: 20px;
+}

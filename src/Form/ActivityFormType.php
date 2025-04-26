@@ -169,11 +169,10 @@ class ActivityFormType extends AbstractType
                 'required' => true,
                 'attr' => [
                     'class' => 'border-light location-field',
-                    'readonly' => true,
                 ],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Latitude is required. Please select a location on the map.',
+                        'message' => 'Latitude is required. Please enter a valid coordinate.',
                     ]),
                 ],
             ])
@@ -182,11 +181,10 @@ class ActivityFormType extends AbstractType
                 'required' => true,
                 'attr' => [
                     'class' => 'border-light location-field',
-                    'readonly' => true,
                 ],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Longitude is required. Please select a location on the map.',
+                        'message' => 'Longitude is required. Please enter a valid coordinate.',
                     ]),
                 ],
             ])

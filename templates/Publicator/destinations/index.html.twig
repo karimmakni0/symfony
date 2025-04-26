@@ -3,126 +3,549 @@
 {% block title %}My Destinations{% endblock %}
 
 {% block body %}
-<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+<div class="row y-gap-20 justify-between items-end pb-30 lg:pb-20 md:pb-16">
     <div class="col-auto">
         <h1 class="text-30 lh-14 fw-600">My Destinations</h1>
         <div class="text-15 text-light-1">Manage your travel destinations</div>
     </div>
     <div class="col-auto">
-        <a href="{{ path('app_publicator_add_destination') }}" class="button h-50 px-24 -dark-1 bg-blue-1 text-white">
+        <a href="{{ path('app_publicator_add_destination') }}" class="button h-50 px-24 -dark-1 bg-blue-1 text-white rounded-8">
             <i class="icon-plus mr-10"></i>
             Add Destination
         </a>
     </div>
 </div>
 
-{% for label, messages in app.flashes %}
-    {% for message in messages %}
-        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30">
-            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-4">
-                <div class="row x-gap-10 y-gap-10 items-center">
-                    <div class="col-auto">
-                        <div class="d-flex items-center">
-                            <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
-                            <div class="fw-500">{{ message }}</div>
+<!-- Stats Overview -->
+<div class="row y-gap-30 pt-20 pb-40">
+    <div class="col-md-6">
+        <div class="stats-card">
+            <div class="stats-card-top">
+                <div class="stats-card-icon blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z"/>
+                        <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="stats-card-value">{{ destinations|length }}</div>
+            <div class="stats-card-label">Total Destinations</div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="stats-card">
+            <div class="stats-card-top">
+                <div class="stats-card-icon green">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM4.5 7.5a.5.5 0 0 1 0 1H2.95a2.5 2.5 0 0 1 4.9 0H6.5a.5.5 0 0 1 0-1h2A.5.5 0 0 1 9 8v6a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5V8.5a.5.5 0 0 1 .5-.5h1.09l-.4.813A1 1 0 0 0 8.5 9.5H5a.5.5 0 0 1 0-1h3.5a.5.5 0 0 0 .497-.55L8.995 8H9zm4-2.5a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1h1zm0 3a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1h1zm-3-3a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1h1zm0 3a.5.5 0 0 1 0 1h-1a.5.5 0 0 1 0-1h1z"/>
+                        <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-7 7 7 7 0 0 0 7 7 7 7 0 0 0 7-7 7 7 0 0 0-7-7z"/>
+                    </svg>
+                </div>
+            </div>
+            {% set uniqueLocations = [] %}
+            {% for destination in destinations %}
+                {% if destination.location is not empty and destination.location not in uniqueLocations %}
+                    {% set uniqueLocations = uniqueLocations|merge([destination.location]) %}
+                {% endif %}
+            {% endfor %}
+            <div class="stats-card-value">{{ uniqueLocations|length }}</div>
+            <div class="stats-card-label">Unique Countries</div>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="row mb-30">
+    <div class="col-12">
+        <div class="px-20 py-20 rounded-4 bg-white shadow-3">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="search-box">
+                        <div class="search-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 21L16.65 16.65" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
                         </div>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search destinations...">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="search-box">
+                        <div class="search-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <select id="locationFilter" class="form-select">
+                            <option value="">Filter by location</option>
+                            {% for location in uniqueLocations|sort %}
+                                <option value="{{ location }}">{{ location }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
             </div>
         </div>
-    {% endfor %}
-{% endfor %}
+    </div>
+</div>
 
-<div class="row y-gap-30">
+<!-- Destinations Table -->
+<div class="py-30 px-30 rounded-12 bg-white shadow-3 mb-30" style="border: 1px solid rgba(230, 230, 230, 0.7);">
     {% if destinations|length > 0 %}
-        {% for destination in destinations %}
-            <div class="col-xl-3 col-lg-4 col-md-6 destination-card">
-                <div class="rounded-4 border-light shadow-4 hover-shadow-lg transition-all duration-300">
-                    <div class="cardImage ratio ratio-1:1 overflow-hidden">
-                        {% if destination.imagePath %}
-                            <img src="{{ asset(destination.imagePath) }}" alt="{{ destination.name }}" class="img-ratio rounded-top-4 hover-scale-image">
-                        {% else %}
-                            <img src="{{ asset('assets/img/dashboard/placeholder.jpg') }}" alt="{{ destination.name }}" class="img-ratio rounded-top-4 hover-scale-image">
-                        {% endif %}
-                        <div class="cardImage-badge">
-                            <div class="px-15 py-5 rounded-right-4 -blue-1 bg-white text-15 fw-500">{{ destination.location }}</div>
-                        </div>
-                    </div>
-                    <div class="p-20 text-center">
-                        <h4 class="text-18 fw-600 mb-10">{{ destination.name }}</h4>
-                        <div class="text-14 text-light-1 mb-15 lh-16">
-                            {{ destination.description|length > 100 ? destination.description|slice(0, 100) ~ '...' : destination.description }}
-                        </div>
-                        <div class="d-flex items-center justify-center gap-10 mt-20">
-                            <a href="{{ path('app_publicator_edit_destination', {'id': destination.id}) }}" class="button -blue-1 bg-blue-1-05 text-blue-1 py-15 px-30 rounded-100 hover-animation">
-                                <i class="icon-edit mr-5"></i>
-                                Edit
-                            </a>
-                            <a href="#" 
-                               class="delete-btn button -red-1 bg-red-1-05 text-red-1 py-15 px-30 rounded-100 hover-animation"
-                               data-id="{{ destination.id }}"
-                               data-url="{{ path('app_publicator_delete_destination', {'id': destination.id}) }}">
-                                <i class="icon-trash mr-5"></i>
-                                Delete
-                            </a>
-                        </div>
+        <!-- Section Title -->
+        <div class="d-flex justify-between items-center">
+            <h2 class="text-22 fw-500">All Destinations</h2>
+        </div>
+        
+        <!-- Blog Posts Table -->
+        <div class="tabs -underline-2 js-tabs">
+            <div class="tabs__content pt-30 js-tabs-content">
+                <div class="tabs__pane -tab-item-1 is-tab-el-active">
+                    <div class="overflow-scroll scroll-bar-1">
+                        <table class="table-4 -border-bottom col-12">
+                            <thead>
+                                <tr class="bg-blue-1-05">
+                                    <th class="rounded-left-8 py-15 px-15">#</th>
+                                    <th class="py-15 px-15">Destination</th>
+                                    <th class="py-15 px-15">Description</th>
+                                    <th class="rounded-right-8 py-15 px-15 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for destination in destinations %}
+                                    <tr class="fade-in blog-item border-bottom-light" data-title="{{ destination.name|lower }}" data-location="{{ destination.location|lower }}">
+                                        <td class="py-15 px-15">{{ loop.index }}</td>
+                                        <td class="py-15 px-15">
+                                            <div class="d-flex items-center">
+                                                {% if destination.imagePath %}
+                                                    <div class="mr-15">
+                                                        <img src="{{ asset(destination.imagePath) }}" alt="{{ destination.name }}" class="size-50 rounded-8 object-cover">
+                                                    </div>
+                                                {% else %}
+                                                    <div class="d-flex items-center justify-center bg-blue-1-05 rounded-8 size-50 mr-15">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="text-blue-1" viewBox="0 0 16 16">
+                                                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                                                        </svg>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <div class="text-15 lh-16 fw-500 destination-title">{{ destination.name }}</div>
+                                                    <div class="mt-5">
+                                                        <div class="d-flex items-center">
+                                                            <i class="icon-location text-14 text-light-1 mr-10"></i>
+                                                            <div class="text-14 lh-1 text-light-1 destination-location">{{ destination.location }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-15 px-15">
+                                            <div class="text-14 lh-16 text-light-1 destination-description">
+                                                {{ destination.description|length > 90 ? destination.description|slice(0, 90) ~ '...' : destination.description }}
+                                            </div>
+                                        </td>
+                                        <td class="py-15 px-15 text-center">
+                                            <div class="d-flex x-gap-10 items-center justify-center">
+                                                <a href="{{ path('app_publicator_edit_destination', {'id': destination.id}) }}" class="flex-center size-40 rounded-8 bg-blue-1-05 text-15 text-blue-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3554D1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                    </svg>
+                                                </a>
+                                                
+                                                <button class="flex-center size-40 rounded-8 bg-red-1-05 text-15 text-red-1 delete-destination" data-id="{{ destination.id }}">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-        {% endfor %}
+        </div>
     {% else %}
-        <div class="col-12">
-            <div class="py-50 px-30 rounded-4 bg-white shadow-3 text-center">
-                <div class="text-20 fw-500 mb-15">No destinations found</div>
-                <div class="text-15 text-light-1 mb-30">You haven't created any destinations yet.</div>
-                <a href="{{ path('app_publicator_add_destination') }}" class="button h-50 px-24 -dark-1 bg-blue-1 text-white hover-animation">
+            <div class="empty-state py-50 text-center">
+                <div class="empty-state-icon">
+                    <i class="icon-destination"></i>
+                </div>
+                <div class="empty-state-title">No destinations found</div>
+                <div class="empty-state-text">You haven't created any destinations yet</div>
+                <a href="{{ path('app_publicator_add_destination') }}" class="button -md -blue-1 bg-blue-1 text-white mt-20">
                     <i class="icon-plus mr-10"></i>
-                    Add Your First Destination
+                    Add Destination
                 </a>
             </div>
+        {% endif %}
+        
+        <!-- Search No Results State (Hidden by default) -->
+        <div id="searchNoResults" class="empty-state py-50 text-center" style="display: none;">
+            <div class="empty-state-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="text-blue-1" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+            </div>
+            <div class="empty-state-title">No destinations found</div>
+            <div class="empty-state-text">Try adjusting your search to find what you're looking for.</div>
+            <button id="clearFiltersBtn" class="button -md -outline-blue-1 text-blue-1 mt-20">
+                <i class="icon-close mr-10"></i>
+                Clear Filters
+            </button>
         </div>
-    {% endif %}
+    </div>
+</div>
+
+<!-- Empty State for search with no results -->
+<div id="noResults" class="empty-state text-center py-50 mt-10 rounded-4 bg-white shadow-3" style="display: none;">
+    <div class="empty-state-icon">
+        <i class="icon-search"></i>
+    </div>
+    <h3 class="empty-state-title text-18 fw-500 text-dark-1">No destinations found</h3>
+    <p class="empty-state-text text-15 text-light-1">Try changing your search terms or filters</p>
 </div>
 {% endblock %}
 
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('assets/css/admin-destinations.css') }}">
+{% endblock %}
+
 {% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle delete buttons
-        const deleteButtons = document.querySelectorAll('.delete-btn');
+        // Handle delete buttons with SweetAlert
+        const deleteButtons = document.querySelectorAll('.delete-destination');
         deleteButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const id = this.getAttribute('data-id');
-                const url = this.getAttribute('data-url');
+            button.addEventListener('click', function() {
+                const destinationId = this.getAttribute('data-id');
                 
-                if (confirm('Are you sure you want to delete this destination?')) {
-                    window.location.href = url;
-                }
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'You are about to delete this destination. This action cannot be undone!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '{{ path("app_publicator_delete_destination", {"id": "PLACEHOLDER"}) }}'.replace('PLACEHOLDER', destinationId);
+                    }
+                });
             });
         });
         
-        // Add animation to destination cards
-        const destinationCards = document.querySelectorAll('.destination-card');
-        destinationCards.forEach((card, index) => {
-            // Add a slight delay to each card for a staggered animation effect
-            card.style.animationDelay = (index * 0.1) + 's';
-            card.classList.add('fade-in-up');
+        // Animate destination items
+        const destinationItems = document.querySelectorAll('.destination-row');
+        destinationItems.forEach((item, index) => {
+            // Add a slight delay to each row for a staggered animation effect
+            item.style.animationDelay = (index * 0.1) + 's';
+            item.classList.add('fade-in-up');
         });
+        
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const locationFilter = document.getElementById('locationFilter');
+        const destinationRows = document.querySelectorAll('.blog-item');
+        const searchNoResults = document.getElementById('searchNoResults');
+        const tableWrapper = document.querySelector('.table-4');
+        const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+        
+        function filterDestinations() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const locationTerm = locationFilter.value.toLowerCase().trim();
+            let resultsFound = false;
+            
+            // Only apply filtering if we have a search term or location filter active
+            const isFiltering = searchTerm !== '' || locationTerm !== '';
+            
+            destinationRows.forEach(row => {
+                // Get data attributes for faster filtering
+                const title = row.dataset.title || '';
+                const location = row.dataset.location || '';
+                
+                const matchesSearch = searchTerm === '' || title.includes(searchTerm);
+                const matchesLocation = locationTerm === '' || location.includes(locationTerm);
+                
+                if (matchesSearch && matchesLocation) {
+                    row.style.display = '';
+                    resultsFound = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Show/hide elements based on results
+            if (resultsFound || !isFiltering) {
+                // Hide the search no results message
+                if (searchNoResults) searchNoResults.style.display = 'none';
+                
+                // Show the table
+                if (tableWrapper) tableWrapper.style.display = '';
+            } else {
+                // Show search no results message
+                if (searchNoResults) searchNoResults.style.display = 'block';
+                
+                // Hide the table when no results found during filtering
+                if (tableWrapper) tableWrapper.style.display = 'none';
+                
+                // Update no results message with search terms for context
+                const noResultsTitle = searchNoResults.querySelector('.empty-state-title');
+                const noResultsText = searchNoResults.querySelector('.empty-state-text');
+                
+                if (noResultsTitle && noResultsText) {
+                    let message = 'Try adjusting your search';
+                    if (searchTerm && locationTerm) {
+                        message += ` for "${searchTerm}" in "${locationTerm}"`;
+                    } else if (searchTerm) {
+                        message += ` for "${searchTerm}"`;
+                    } else if (locationTerm) {
+                        message += ` in "${locationTerm}"`;
+                    }
+                    message += ' to find what you\'re looking for.';
+                    
+                    noResultsText.textContent = message;
+                }
+            }
+        }
+        
+        // Clear filters function
+        function clearFilters() {
+            if (searchInput) searchInput.value = '';
+            if (locationFilter) locationFilter.value = '';
+            filterDestinations();
+        }
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', filterDestinations);
+        }
+        
+        if (locationFilter) {
+            locationFilter.addEventListener('change', filterDestinations);
+        }
+        
+        // Clear filters button click handler
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener('click', clearFilters);
+        }
+        
+        // Handle success message with SweetAlert
+        // Add no results element if it doesn't exist
+        if (!document.getElementById('noResults')) {
+            const noResultsDiv = document.createElement('div');
+            noResultsDiv.id = 'noResults';
+            noResultsDiv.className = 'empty-state';
+            noResultsDiv.style.display = 'none';
+            noResultsDiv.innerHTML = `
+                <div class="empty-state-icon">
+                    <i class="icon-search"></i>
+                </div>
+                <div class="empty-state-title">No destinations found</div>
+                <div class="empty-state-text">Try adjusting your search to find what you're looking for.</div>
+            `;
+            tableWrapper.after(noResultsDiv);
+        }
+        
+        {% if app.session.get('destination_created') == true %}
+            Swal.fire({
+                title: 'Success!',
+                text: 'New destination created successfully!',
+                icon: 'success',
+                confirmButtonColor: '#3085d6'
+            });
+            {% do app.session.remove('destination_created') %}
+        {% endif %}
+        
+        // No clear search button needed
     });
 </script>
 <style>
     /* Animation styles */
-    .hover-scale-image {
-        transition: transform 0.5s ease;
+        /* Stats card */
+    .stats-card {
+        padding: 25px;
+        border-radius: 12px;
+        background-color: white;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(230, 230, 230, 0.7);
     }
     
-    .hover-shadow-lg:hover {
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    .stats-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+    
+    .stats-card-icon {
+        height: 60px;
+        width: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+    
+    .stats-card-icon.blue {
+        background-color: rgba(53, 84, 209, 0.08);
+        color: var(--color-blue-1);
+    }
+    
+    .stats-card-icon.green {
+        background-color: rgba(52, 211, 153, 0.08);
+        color: rgb(16, 185, 129);
+    }
+    
+    .stats-card-icon.purple {
+        background-color: rgba(139, 92, 246, 0.08);
+        color: rgb(124, 58, 237);
+    }
+    
+    .stats-card-icon.yellow {
+        background-color: rgba(251, 191, 36, 0.08);
+        color: rgb(245, 158, 11);
+    }
+    
+    .stats-card-value {
+        font-size: 40px;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        color: var(--color-dark-1);
+    }
+    
+    .stats-card-label {
+        font-size: 16px;
+        color: var(--color-light-1);
+        font-weight: 500;
     }
 
-    .hover-scale-image:hover {
-        transform: scale(1.05);
+    /* Ultra-minimal search and filter styling */
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: none !important;
+        outline: none !important;
+        border-color: #d1d5db !important;
+    }
+    
+    .form-control::placeholder,
+    .form-select::placeholder {
+        color: #9ca3af;
+        font-weight: 400;
+    }
+    
+    /* Remove default select styling in all browsers */
+    select.form-select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: none !important;
+    }
+    
+    /* Empty state styling */
+    .empty-state {
+        text-align: center;
+        padding: 30px 20px;
+    }
+    
+    .empty-state-icon {
+        font-size: 48px;
+        color: var(--color-blue-1);
+        margin-bottom: 15px;
+        opacity: 0.7;
+    }
+    
+    .empty-state-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--color-dark-1);
+        margin-bottom: 10px;
+    }
+    
+    .empty-state-text {
+        font-size: 16px;
+        color: var(--color-light-1);
+        margin-bottom: 25px;
+    }
+    
+    /* Badge styles */
+    .badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 100px;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1;
+    }
+    
+    /* Action buttons */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .action-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .action-button i {
+        margin-right: 6px;
+        font-size: 16px;
+    }
+    
+    .action-button:hover {
+        transform: translateY(-3px);
+    }
+    
+    .edit-button {
+        background-color: rgba(37, 99, 235, 0.1);
+        color: rgb(37, 99, 235);
+    }
+    
+    .edit-button:hover {
+        background-color: rgba(37, 99, 235, 0.2);
+    }
+    
+    .delete-button {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: rgb(239, 68, 68);
+    }
+    
+    .delete-button:hover {
+        background-color: rgba(239, 68, 68, 0.2);
     }
     
     .hover-animation {

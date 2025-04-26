@@ -1,0 +1,356 @@
+{% extends 'PubBase.html.twig' %}
+
+{% block title %}Edit Blog Post{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .dashboard-card {
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .dashboard-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    /* Enhanced form styling to match admin design */
+    input.form-control,
+    textarea.form-control,
+    select.form-select,
+    .form-input input,
+    .form-input textarea,
+    input[type="file"] {
+        border: 1px solid #e5e9f2 !important;
+        border-radius: 8px !important;
+        padding: 14px 16px !important;
+        width: 100% !important;
+        background-color: #f5f7fa !important;
+        color: #051036 !important;
+        font-size: 14px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: none !important;
+    }
+    
+    input.form-control:focus,
+    textarea.form-control:focus,
+    select.form-select:focus,
+    .form-input input:focus,
+    .form-input textarea:focus {
+        border-color: #3554D1 !important;
+        background-color: #fff !important;
+        box-shadow: 0 0 0 3px rgba(53, 84, 209, 0.1) !important;
+    }
+    
+    .form-input label {
+        font-weight: 500 !important;
+        color: #051036 !important;
+        font-size: 15px !important;
+        margin-bottom: 8px !important;
+        display: block !important;
+    }
+    
+    /* Style the file input button */
+    .custom-file-upload {
+        display: inline-block;
+        padding: 12px 20px;
+        cursor: pointer;
+        background-color: #f5f7fa;
+        border: 1px solid #e5e9f2;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        color: #051036;
+        transition: all 0.3s ease;
+    }
+    
+    .custom-file-upload:hover {
+        background-color: #e9ecf2;
+    }
+    
+    /* Hide the actual file input */
+    input[type="file"] {
+        border: 1px solid #e5e9f2 !important;
+        border-radius: 8px !important;
+        padding: 10px !important;
+        width: 100% !important;
+        background-color: #f5f7fa !important;
+        font-size: 14px !important;
+    }
+    
+    /* Enhanced preview container */
+    #image-preview-container {
+        margin-top: 15px;
+        padding: 20px;
+        border: 2px dashed #e5e9f2;
+        border-radius: 8px;
+        text-align: center;
+        background-color: #f9fafc;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    #image-preview-container.d-none {
+        display: none !important;
+    }
+    
+    #image-preview {
+        max-height: 220px;
+        object-fit: contain;
+        border-radius: 6px;
+        display: block;
+        margin: 0 auto;
+    }
+    
+    #image-filename {
+        margin-top: 10px;
+        font-size: 13px;
+        color: #697488;
+        word-break: break-all;
+    }
+    
+    .icon-image:before {
+        content: '\e925';
+        font-family: 'GoTrip' !important;
+    }
+    
+    .empty-preview-placeholder {
+        color: #a0a9bd;
+    }
+    
+    /* Style form section heading */
+    .form-section-heading {
+        font-size: 16px;
+        font-weight: 600;
+        color: #051036;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e5e9f2;
+    }
+    
+    /* Error message styling */
+    .text-danger {
+        color: #d63649 !important;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+    
+    /* Activity select dropdown styling */
+    .select-wrapper {
+        position: relative;
+    }
+    
+    .select-wrapper:after {
+        content: '';
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #051036;
+        pointer-events: none;
+    }
+    
+    /* Enhanced textarea for content */
+    textarea.form-control {
+        min-height: 220px !important;
+        line-height: 1.6 !important;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+    <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">Edit Blog Post</h1>
+        <div class="text-15 text-light-1">Update your blog content and information</div>
+    </div>
+</div>
+
+<div class="row y-gap-30">
+    <div class="col-12">
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-20">
+                    <div class="px-20 py-15 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} rounded-4">
+                        <h5 class="text-white fw-500">{{ message }}</h5>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <div class="col-12">
+        <div class="dashboard__content bg-white rounded-4 px-30 py-30 dashboard-card shadow-card">
+            <div class="row mb-20">
+                <div class="col-12">
+                    <div class="d-flex justify-between items-center pb-15 border-bottom-light">
+                        <div class="d-flex items-center">
+                            <i class="icon-edit text-blue-1 text-20 mr-10"></i>
+                            <h2 class="text-18 fw-500">Blog Details</h2>
+                        </div>
+                        <div class="fw-500 text-14 text-light-1">Fields marked with <span class="text-danger">*</span> are required</div>
+                    </div>
+                </div>
+            </div>
+            
+            {{ form_start(form, {'attr': {'class': 'row y-gap-20', 'enctype': 'multipart/form-data', 'id': 'blog-form'}}) }}
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label text-16 lh-1 fw-500 text-dark-1 mb-10">Title <span class="text-danger">*</span></label>
+                        {{ form_widget(form.title, {'attr': {'class': 'form-control', 'placeholder': 'Enter blog post title'}}) }}
+                        <div class="text-danger mt-5">
+                            {{ form_errors(form.title) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-20">
+                    <div class="form-group">
+                        <label class="form-label text-16 lh-1 fw-500 text-dark-1 mb-10">Select Activity <span class="text-danger">*</span></label>
+                        <div class="select-wrapper">
+                            {{ form_widget(form.activityId, {'attr': {'class': 'form-select', 'id': 'activity-select'}}) }}
+                        </div>
+                        <div class="text-danger mt-5">
+                            {{ form_errors(form.activityId) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-20">
+                    <div class="form-group">
+                        <label class="form-label text-16 lh-1 fw-500 text-dark-1 mb-10">Content <span class="text-danger">*</span></label>
+                        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'id': 'blog-content', 'rows': '12', 'placeholder': 'Write your blog post content here...'}}) }}
+                        <div class="text-danger mt-5">
+                            {{ form_errors(form.description) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-20">
+                    <div class="form-group">
+                        <label class="form-label text-16 lh-1 fw-500 text-dark-1 mb-10">
+                            <div class="d-flex justify-between">
+                                <div>Featured Image</div>
+                                <div class="text-14 text-light-1">800x600px recommended, Max 2MB</div>
+                            </div>
+                        </label>
+                        
+                        <div class="file-upload-container">
+                            {{ form_widget(form.picture, {'attr': {'class': 'form-control', 'id': 'blog-image', 'style': 'height: auto; padding: 10px;'}}) }}
+                        </div>
+                        
+                        {% if post.picture %}
+                            <div class="text-14 mt-10 text-light-1">Current image: {{ post.picture }}</div>
+                        {% endif %}
+                        
+                        <div class="text-danger mt-5">
+                            {{ form_errors(form.picture) }}
+                        </div>
+                        <div id="image-preview-container" class="mt-15 p-20 border border-dashed rounded-8 text-center {% if not post.picture %}d-none{% endif %}">
+                            {% if post.picture %}
+                                <img src="{{ asset('uploads/posts/' ~ post.picture) }}" id="image-preview" class="rounded-4" style="max-width: 100%; max-height: 300px;" />
+                                <div id="image-filename" class="text-14 mt-5 text-light-1">{{ post.picture }}</div>
+                            {% else %}
+                                <div class="empty-preview-placeholder text-center py-30">
+                                    <div class="icon-image text-40 text-light-1 mb-10"></div>
+                                    <div class="text-15 text-light-1">No image selected</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-30">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="border-top-light pt-20"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row y-gap-20 justify-center pt-15">
+                        <div class="col-md-4 col-sm-12 d-flex justify-center mb-20">
+                            <button type="submit" class="button w-100 h-60 px-30 bg-dark-1 text-white rounded-8 fw-500">
+                                <i class="icon-check-circle text-16 mr-10"></i> Update Post
+                            </button>
+                        </div>
+
+                        <div class="col-md-4 col-sm-12 d-flex justify-center mb-20">
+                            <a href="{{ path('app_blog_details', {'id': post.id}) }}" class="button w-100 h-60 px-30 bg-blue-1-05 text-blue-1 rounded-8 fw-500">
+                                <i class="icon-eye text-16 mr-10"></i> View Post
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-4 col-sm-12 d-flex justify-center mb-20">
+                            <a href="{{ path('app_publicator_blog_index') }}" class="button w-100 h-60 px-30 -outline-red-1 text-red-1 rounded-8 fw-500">
+                                <i class="icon-close text-16 mr-10"></i> Cancel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Preview uploaded image
+        var imageInput = document.getElementById('blog-image');
+        
+        if (imageInput) {
+            // Add some styling and a better label
+            imageInput.classList.add('cursor-pointer');
+            
+            imageInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    var reader = new FileReader();
+                    var previewContainer = document.getElementById('image-preview-container');
+                    
+                    // Clear any existing content in the preview container
+                    previewContainer.innerHTML = '';
+                    
+                    // Create a new image element
+                    var preview = document.createElement('img');
+                    preview.id = 'image-preview';
+                    preview.className = 'rounded-4';
+                    preview.style.maxWidth = '100%';
+                    preview.style.maxHeight = '300px';
+                    previewContainer.appendChild(preview);
+                    
+                    // Create filename element
+                    var fileName = document.createElement('div');
+                    fileName.id = 'image-filename';
+                    fileName.className = 'text-14 mt-5 text-light-1';
+                    previewContainer.appendChild(fileName);
+                    
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        previewContainer.classList.remove('d-none');
+                        fileName.textContent = this.files[0].name;
+                    }.bind(this);
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            // Trigger the file input when clicking the label
+            const fileLabel = document.querySelector('label[for="blog-image"]');
+            if (fileLabel) {
+                fileLabel.addEventListener('click', function() {
+                    imageInput.click();
+                });
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,132 @@
+/**
+ * Admin Blog - User Details Popup Styling
+ * Consistent with other admin interfaces
+ */
+
+:root {
+  --color-primary: #3554d1;
+  --color-primary-light: #EDF3FF;
+  --color-text: #697488;
+  --color-text-dark: #051036;
+  --color-border: #EAEEF3;
+  --color-bg-light: #F5F9FE;
+  --color-bg-hover: rgba(53, 84, 209, 0.05);
+  --border-radius: 8px;
+  --border-radius-sm: 6px;
+  --border-radius-lg: 10px;
+  --border-radius-pill: 30px;
+  --transition: all 0.2s ease;
+}
+
+/* Overall popup styling */
+.user-details-swal-popup {
+  padding: 0 !important;
+  border-radius: var(--border-radius) !important;
+  overflow: hidden !important;
+}
+
+.user-details-swal-content {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.user-details-confirm-btn {
+  border-radius: var(--border-radius-sm) !important;
+  font-weight: 500 !important;
+  padding: 10px 24px !important;
+  font-size: 15px !important;
+}
+
+/* Container styling */
+.user-details-container {
+  font-family: 'Jost', sans-serif;
+  color: var(--color-text);
+}
+
+/* Header with avatar and primary info */
+.user-details-header {
+  background-color: var(--color-primary-light);
+  padding: 25px 30px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.user-avatar-large {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-avatar-initials {
+  color: white;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.user-primary-info {
+  flex: 1;
+}
+
+.user-name-large {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  margin: 0 0 5px 0;
+}
+
+.user-id {
+  font-size: 14px;
+  color: var(--color-text);
+  opacity: 0.8;
+}
+
+/* Content with user details */
+.user-details-content {
+  padding: 25px 30px;
+}
+
+.user-detail-row {
+  display: flex;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.user-detail-row:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.detail-label {
+  width: 120px;
+  min-width: 120px;
+  font-weight: 500;
+  color: var(--color-text-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-label svg {
+  color: var(--color-primary);
+}
+
+.detail-value {
+  flex: 1;
+  word-break: break-word;
+}

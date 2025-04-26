@@ -3,13 +3,20 @@
 {% block title %}Add New Activity{% endblock %}
 
 {% block body %}
-<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+<div class="row y-gap-20 justify-between items-end pb-30 lg:pb-20 md:pb-16">
     <div class="col-auto">
-        <h1 class="text-30 lh-14 fw-600">Add New Activity</h1>
-        <div class="text-15 text-light-1">Create a new travel activity for your customers</div>
+        <div class="d-flex items-center mb-10">
+            <div class="icon-circle bg-blue-1-05 text-blue-1 size-60 rounded-full flex-center mr-15">
+                <i class="icon-route text-24"></i>
+            </div>
+            <div>
+                <h1 class="text-30 lh-14 fw-600">Add New Activity</h1>
+                <div class="text-15 text-light-1 mt-5">Create a new travel activity for your travelers</div>
+            </div>
+        </div>
     </div>
     <div class="col-auto">
-        <a href="{{ path('app_publicator_activities') }}" class="button h-50 px-24 -blue-1-05 text-blue-1 hover-animation">
+        <a href="{{ path('app_publicator_activities') }}" class="button h-50 px-24 -blue-1 bg-blue-1-05 text-blue-1 rounded-8 hover-shadow-blue">
             <i class="icon-arrow-left mr-10"></i>
             Back to Activities
         </a>
@@ -19,7 +26,7 @@
 {% for label, messages in app.flashes %}
     {% for message in messages %}
         <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30 fade-in">
-            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-4">
+            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-8">
                 <div class="row x-gap-10 y-gap-10 items-center">
                     <div class="col-auto">
                         <div class="d-flex items-center">
@@ -33,480 +40,513 @@
     {% endfor %}
 {% endfor %}
 
-<div class="py-40 px-40 rounded-4 bg-white shadow-3 fade-in">
-    <div class="row justify-center mb-30">
-        <div class="col-auto">
-            <div class="text-22 fw-600">Add New Activity</div>
-            <div class="text-14 text-center text-light-1 mt-5">Create an exciting new activity for your travelers</div>
+<div class="py-40 px-40 rounded-12 bg-white shadow-3 fade-in" style="border: 1px solid rgba(230, 230, 230, 0.7);">
+    <!-- Progress Steps -->
+    <div class="row justify-center mb-20">
+        <div class="col-12">
+            <div class="progress-wrapper">
+                <div class="progress-item active">
+                    <div class="progress-circle">
+                        <i class="icon-info text-16"></i>
+                    </div>
+                    <div class="progress-text">Basic Info</div>
+                </div>
+                <div class="progress-line active"></div>
+                <div class="progress-item active">
+                    <div class="progress-circle">
+                        <i class="icon-settings text-16"></i>
+                    </div>
+                    <div class="progress-text">Details</div>
+                </div>
+                <div class="progress-line active"></div>
+                <div class="progress-item active">
+                    <div class="progress-circle">
+                        <i class="icon-image text-16"></i>
+                    </div>
+                    <div class="progress-text">Images</div>
+                </div>
+            </div>
         </div>
     </div>
     
-    {{ form_start(form, {'attr': {'class': 'row y-gap-30 justify-center', 'enctype': 'multipart/form-data', 'id': 'activity-form'}}) }}
-    <div class="col-xl-9 col-lg-10">
-        <div class="row x-gap-20 y-gap-30">
-            <div class="col-12">
-                {{ form_label(form.activity_name, 'Activity Name', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                <span class="text-danger">*</span>
-                <div class="mt-10">
-                    {{ form_widget(form.activity_name, {'attr': {'class': 'form-control h-50 bg-white rounded-4 border-light'}}) }}
-                    {{ form_errors(form.activity_name) }}
+    <!-- Form Intro -->
+    <div class="row mb-20">
+        <div class="col-12">
+            <div class="bg-blue-1-05 rounded-8 py-15 px-20 mb-20">
+                <div class="row">
+                    <div class="col-auto">
+                        <div class="bg-white rounded-full size-50 flex-center">
+                            <i class="icon-info-circle text-blue-1 text-20"></i>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h4 class="text-18 fw-500 mb-5">Activity Information</h4>
+                        <p class="text-15 lh-16">Complete all fields marked with an asterisk (*). The more details you provide, the better the visibility of your activity will be to travelers.</p>
+                    </div>
                 </div>
             </div>
-
-            <div class="col-12">
-                {{ form_label(form.activity_description, 'Description', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                <span class="text-danger">*</span>
-                <div class="mt-10">
-                    {{ form_widget(form.activity_description, {'attr': {'class': 'form-control bg-white rounded-4 border-light', 'rows': '5'}}) }}
-                    {{ form_errors(form.activity_description) }}
+        </div>
+    </div>
+    
+    
+    
+    {{ form_start(form, {'attr': {'id': 'activity-form', 'class': 'row y-gap-20', 'enctype': 'multipart/form-data'}}) }}
+    
+    <!-- Basic Information Section -->
+    <div class="row y-gap-20 mb-30">
+        <div class="col-12">
+            <div class="py-30 px-30 rounded-12 bg-white shadow-3 border-light fade-in">
+                <div class="row">
+                    <div class="col-12 mb-20">
+                        <div class="d-flex">
+                            <div class="size-50 flex-center bg-blue-1 rounded-full mr-15 text-white">
+                                <i class="icon-info-circle text-20"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-18 fw-600">Basic Information</h3>
+                                <p class="text-14 text-light-1 mt-5">The essential details about your activity</p>
+                            </div>
+                        </div>
+                        <div class="mt-15">
+                            <div class="border-top-light"></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="col-md-6">
-                {{ form_label(form.activity_destination, 'Destination', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                <span class="text-danger">*</span>
-                <div class="mt-10">
-                    {{ form_widget(form.activity_destination, {'attr': {'class': 'form-select h-50 bg-white rounded-4 border-light'}}) }}
-                    {{ form_errors(form.activity_destination) }}
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                {{ form_label(form.activity_genre, 'Genre', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                <span class="text-danger">*</span>
-                <div class="mt-10">
-                    {{ form_widget(form.activity_genre, {'attr': {'class': 'form-select h-50 bg-white rounded-4 border-light'}}) }}
-                    {{ form_errors(form.activity_genre) }}
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                {{ form_label(form.activity_duration, 'Duration', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                <span class="text-danger">*</span>
-                <div class="mt-10">
-                    {{ form_widget(form.activity_duration, {'attr': {'class': 'form-control h-50 bg-white rounded-4 border-light'}}) }}
-                    {{ form_errors(form.activity_duration) }}
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                {{ form_label(form.activity_price, 'Price', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                <span class="text-danger">*</span>
-                <div class="mt-10">
-                    {{ form_widget(form.activity_price, {'attr': {'class': 'form-control h-50 bg-white rounded-4 border-light'}}) }}
-                    {{ form_errors(form.activity_price) }}
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                {{ form_label(form.activity_date, 'Activity Date', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                <div class="mt-10">
-                    {{ form_widget(form.activity_date, {'attr': {'class': 'form-control h-50 bg-white rounded-4 border-light'}}) }}
-                    {{ form_errors(form.activity_date) }}
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                {{ form_label(form.max_number, 'Maximum Participants', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                <span class="text-danger">*</span>
-                <div class="mt-10">
-                    {{ form_widget(form.max_number, {'attr': {'class': 'form-control h-50 bg-white rounded-4 border-light'}}) }}
-                    {{ form_errors(form.max_number) }}
-                    <small class="text-light-1">Maximum number of participants allowed</small>
-                </div>
-            </div>
-
-            <div class="col-12">
-                <div class="location-picker-container bg-light-2 rounded-4 px-20 py-20">
-                    <h5 class="text-15 fw-500">Select Activity Location</h5>
-                    <div id="mapbox-container" style="width: 100%; height: 350px;"></div>
-                    
-                    <div class="mt-10 d-flex flex-column">
-                        <div id="coordinates-display" class="my-10 p-10 bg-blue-1 rounded-4 text-white">
-                            <div class="fw-500">Selected Location:</div>
-                            <div class="d-flex gap-10 mt-5">
-                                <div class="flex-grow-1">
-                                    <label class="form-label">Latitude</label>
-                                    <input id="debug-lat" type="text" class="form-control" value="48.8566">
+                
+                <!-- Form fields -->
+                <div class="row x-gap-20 y-gap-20">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Activity Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-icon-wrap">
+                                    <i class="icon-bookmark text-16 text-light-1"></i>
                                 </div>
-                                <div class="flex-grow-1">
-                                    <label class="form-label">Longitude</label>
-                                    <input id="debug-lng" type="text" class="form-control" value="2.3522">
+                                {{ form_widget(form.activity_name, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'placeholder': 'Enter activity name'}}) }}
+                            </div>
+                            <div class="text-red-1 mt-5">{{ form_errors(form.activity_name) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Destination <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-icon-wrap">
+                                    <i class="icon-location text-16 text-light-1"></i>
+                                </div>
+                                {{ form_widget(form.activity_destination, {'attr': {'class': 'form-select rounded-8 px-20 py-15 border-light input-border-focus pl-45'}}) }}
+                            </div>
+                            <div class="text-red-1 mt-5">{{ form_errors(form.activity_destination) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Genre <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-icon-wrap">
+                                    <i class="icon-category text-16 text-light-1"></i>
+                                </div>
+                                {{ form_widget(form.activity_genre, {'attr': {'class': 'form-select rounded-8 px-20 py-15 border-light input-border-focus pl-45'}}) }}
+                            </div>
+                            <div class="text-red-1 mt-5">{{ form_errors(form.activity_genre) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Description <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-icon-wrap position-absolute" style="top: 15px;">
+                                    <i class="icon-message text-16 text-light-1"></i>
+                                </div>
+                                {{ form_widget(form.activity_description, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'placeholder': 'Enter detailed description of your activity', 'rows': '4', 'style': 'min-height: 120px;'}}) }}
+                            </div>
+                            <div class="text-red-1 mt-5">{{ form_errors(form.activity_description) }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Details Section -->
+    <div class="row y-gap-20 mb-30">
+        <div class="col-12">
+            <div class="py-30 px-30 rounded-12 bg-white shadow-3 border-light fade-in">
+                <div class="row">
+                    <div class="col-12 mb-20">
+                        <div class="d-flex">
+                            <div class="size-50 flex-center bg-green-1 rounded-full mr-15 text-white">
+                                <i class="icon-settings text-20"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-18 fw-600">Activity Details</h3>
+                                <p class="text-14 text-light-1 mt-5">Define timing, duration and capacity details</p>
+                            </div>
+                        </div>
+                        <div class="mt-15">
+                            <div class="border-top-light"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timing and participant details -->
+                <div class="row x-gap-20 y-gap-20">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Activity Date</label>
+                            <div class="input-group">
+                                <div class="input-icon-wrap">
+                                    <i class="icon-calendar text-16 text-light-1"></i>
+                                </div>
+                                {{ form_widget(form.activity_date, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'type': 'date'}}) }}
+                            </div>
+                            <div class="text-red-1 mt-5">{{ form_errors(form.activity_date) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Maximum Participants <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-icon-wrap">
+                                    <i class="icon-user text-16 text-light-1"></i>
+                                </div>
+                                {{ form_widget(form.max_number, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'type': 'number', 'min': '1'}}) }}
+                            </div>
+                            <div class="text-red-1 mt-5">{{ form_errors(form.max_number) }}</div>
+                            <small class="text-light-1 mt-5 d-block">Maximum number of participants allowed</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Duration <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-icon-wrap">
+                                    <i class="icon-clock text-16 text-light-1"></i>
+                                </div>
+                                {{ form_widget(form.activity_duration, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'placeholder': 'e.g. 2 hours'}}) }}
+                            </div>
+                            <div class="text-red-1 mt-5">{{ form_errors(form.activity_duration) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Price <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-icon-wrap">
+                                    <i class="icon-dollar text-16 text-light-1"></i>
+                                </div>
+                                {{ form_widget(form.activity_price, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'placeholder': 'e.g. 99.99'}}) }}
+                            </div>
+                            <div class="text-red-1 mt-5">{{ form_errors(form.activity_price) }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Section -->
+    <div class="row y-gap-20 mb-30">
+        <div class="col-12">
+            <div class="py-30 px-30 rounded-12 bg-white shadow-3 border-light fade-in">
+                <div class="row">
+                    <div class="col-12 mb-20">
+                        <div class="d-flex">
+                            <div class="size-50 flex-center bg-yellow-4 rounded-full mr-15 text-dark-1">
+                                <i class="icon-map-marker text-20"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-18 fw-600">Activity Location</h3>
+                                <p class="text-14 text-light-1 mt-5">Set the exact coordinates for your activity</p>
+                            </div>
+                        </div>
+                        <div class="mt-15">
+                            <div class="border-top-light"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Coordinates -->
+                <div class="row x-gap-20 y-gap-20">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Latitude <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-icon-wrap">
+                                    <i class="icon-location text-16 text-light-1"></i>
+                                </div>
+                                {{ form_widget(form.latitude, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'placeholder': 'e.g. 36.7128', 'id': 'activity_lat'}}) }}
+                            </div>
+                            <div class="text-red-1 mt-5">{{ form_errors(form.latitude) }}</div>
+                            <small class="text-light-1">Must be between -90 and 90</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Longitude <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <div class="input-icon-wrap">
+                                    <i class="icon-location text-16 text-light-1"></i>
+                                </div>
+                                {{ form_widget(form.longitude, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'placeholder': 'e.g. -122.4194', 'id': 'activity_lng'}}) }}
+                            </div>
+                            <div class="text-red-1 mt-5">{{ form_errors(form.longitude) }}</div>
+                            <small class="text-light-1">Must be between -180 and 180</small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-12 mt-10">
+                        <div class="bg-blue-1-05 rounded-8 px-20 py-15">
+                            <div class="d-flex">
+                                <div class="size-40 flex-center bg-white rounded-full">
+                                    <i class="icon-info-circle text-blue-1 text-16"></i>
+                                </div>
+                                <div class="ml-15">
+                                    <p class="text-14 lh-15">To find coordinates: Use Google Maps, right-click on your location and select "What's here?". The coordinates will appear at the bottom of the screen.</p>
                                 </div>
                             </div>
-                            <div class="mt-10">
-                                <button type="button" id="update-from-debug" class="btn btn-sm btn-primary w-100">Set These Coordinates</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Section -->
+    <div class="row y-gap-20 mb-30">
+        <div class="col-12">
+            <div class="py-30 px-30 rounded-12 bg-white shadow-3 border-light fade-in">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex flex-column justify-center items-center">
+                            <button type="submit" id="submitActivityBtn" class="button h-60 px-50 -dark-1 bg-blue-1 text-white rounded-8 shadow-1">
+                                <i class="icon-check text-18 mr-15"></i>
+                                <span class="fw-500 text-16">Create Activity</span>
+                            </button>
+                            
+                            <div class="text-center mt-20">
+                                <a href="{{ path('app_publicator_activities') }}" class="text-15 text-blue-1 fw-500">
+                                    <i class="icon-arrow-left mr-10"></i>
+                                    Cancel and return to activities
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Images Section -->
+    <div class="row y-gap-20 mb-30">
+        <div class="col-12">
+            <div class="py-30 px-30 rounded-12 bg-white shadow-3 border-light fade-in">
+                <div class="row">
+                    <div class="col-12 mb-20">
+                        <div class="d-flex">
+                            <div class="size-50 flex-center bg-purple-1 rounded-full mr-15 text-white">
+                                <i class="icon-image text-20"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-18 fw-600">Activity Images</h3>
+                                <p class="text-14 text-light-1 mt-5">Upload high-quality images of your activity</p>
+                            </div>
+                        </div>
+                        <div class="mt-15">
+                            <div class="border-top-light"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Image Upload -->
+                <div class="row x-gap-20 y-gap-20">
+                    <div class="col-12">
+                        <div class="upload-container bg-blue-1-05 rounded-12 py-25 px-25 text-center">
+                            <div class="d-flex justify-center items-center flex-column">
+                                <div class="size-80 flex-center bg-white rounded-full mb-20 shadow-2">
+                                    <i class="icon-upload text-blue-1 text-30"></i>
+                                </div>
+                                <div class="text-18 fw-500 mb-10">Upload Activity Images</div>
+                                <div class="text-center text-15 text-light-1 mb-20">Drag & drop files or <span class="fw-500 text-blue-1">Browse</span></div>
+                                <input type="file" id="imageUpload" name="images[]" class="file-input-hidden" multiple accept="image/*">
+                                <button type="button" id="uploadButton" class="button h-50 px-30 -dark-1 bg-blue-1 text-white rounded-8 shadow-1">
+                                    <i class="icon-upload mr-10"></i>
+                                    Select Images
+                                </button>
+                                <div id="imageCountContainer" class="d-none mt-15">
+                                    <span class="text-blue-1 fw-500">No file selected</span>
+                                </div>
+                                <button type="button" id="clearFileBtn" class="button -md -outline-red-1 text-red-1 mt-15">
+                                    <i class="icon-trash mr-10"></i>
+                                    Clear Selection
+                                </button>
                             </div>
                         </div>
                         
-                        <div id="debug-output" class="my-10 p-10 bg-dark-1 rounded-4 text-white" style="height: 100px; overflow-y: auto; font-family: monospace; font-size: 12px;">
-                            Debug log will appear here...
-                        </div>
-                    </div>
-
-                    <div class="d-none">
-                        {{ form_widget(form.latitude, {'attr': {'id': 'hidden-latitude', 'name': 'activity_form[latitude]'}}) }}
-                        {{ form_widget(form.longitude, {'attr': {'id': 'hidden-longitude', 'name': 'activity_form[longitude]'}}) }}
+                        <div id="previewsContainer" class="row x-gap-15 y-gap-15 pt-20"></div>
                     </div>
                 </div>
             </div>
-
-            <div class="col-12">
-                {{ form_label(form.activity_images, 'Activity Images', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                <span class="text-danger">*</span>
-                <div class="mt-10 rounded-4 px-30 py-30 border border-light bg-white">
-                    <div class="row y-gap-20">
-                        <div class="col-12">
-                            <div class="text-center">
-                                <div class="size-60 flex-center bg-blue-1 rounded-full mx-auto mb-15">
-                                    <i class="icon-cloud-upload text-white text-24"></i>
-                                </div>
-                                <div class="text-15 fw-500 mb-10">Upload Images</div>
-                                <div class="text-14 text-light-1">PNG or JPG format only</div>
-                                <div class="mt-20">
-                                    {{ form_widget(form.activity_images, {'attr': {'class': 'file-upload-input', 'id': 'imageUpload'}}) }}
-                                    {{ form_errors(form.activity_images) }}
-                                </div>
-                            </div>
-                            <div id="previewsContainer" class="row mt-30"></div>
-                            <div id="imageCountContainer" class="text-center mt-15 d-none">
-                                <span class="badge bg-blue-1 text-white py-10 px-20 rounded-full text-14"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="d-flex justify-center mt-40">
-            <button type="submit" class="button h-60 px-40 -dark-1 bg-blue-1 text-white hover-animation">
-                <i class="icon-check text-16 mr-15"></i>
-                <span class="fw-500">Create Activity</span>
-            </button>
         </div>
     </div>
+    
     {{ form_end(form) }}
 </div>
 {% endblock %}
 
 {% block javascripts %}
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Image upload handling elements
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get form elements
+        const form = document.getElementById('activity-form');
+        const latInput = document.getElementById('activity_lat');
+        const lngInput = document.getElementById('activity_lng');
+        const nameInput = document.getElementById('activity_activity_name');
+        const descInput = document.getElementById('activity_activity_description');
+        const priceInput = document.getElementById('activity_activity_price');
+        const requiredInputs = document.querySelectorAll('input[required], select[required], textarea[required]');
         const imageUpload = document.getElementById('imageUpload');
         const previewsContainer = document.getElementById('previewsContainer');
         const imageCountContainer = document.getElementById('imageCountContainer');
         const countSpan = imageCountContainer?.querySelector('span');
+        const clearFileBtn = document.getElementById('clearFileBtn');
         
-        // ========================
-        // DEBUG OUTPUT - Remove any existing debug
-        // ========================
-        const debugOutput = document.getElementById('debug-output');
-        if (debugOutput) {
-            debugOutput.innerHTML = '';
-        }
-        
-        // Create debug log function
-        function logDebug(message) {
-            console.log(message);
-            if (debugOutput) {
-                const now = new Date();
-                const timeStr = now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
-                const logLine = document.createElement('div');
-                logLine.textContent = `[${timeStr}] ${message}`;
-                debugOutput.appendChild(logLine);
-                debugOutput.scrollTop = debugOutput.scrollHeight;
-            }
-        }
-        
-        // Get form elements for coordinates
-        const activityForm = document.getElementById('activity-form');
-        const hiddenLatitude = document.getElementById('hidden-latitude');
-        const hiddenLongitude = document.getElementById('hidden-longitude');
-        
-        // Get debug elements for direct input
-        const debugLatInput = document.getElementById('debug-lat');
-        const debugLngInput = document.getElementById('debug-lng');
-        const updateFromDebugBtn = document.getElementById('update-from-debug');
-        
-        // ========================
-        // MAP INITIALIZATION
-        // ========================
-        
-        // Set API token
-        logDebug('Setting Mapbox token...');
-        mapboxgl.accessToken = "{{ app.request.server.get('MAPBOX_API')|default('pk.eyJ1IjoibmloZWR4dG4iLCJhIjoiY205cmNmNDZoMHc3bTJpczQ3b3FodWVibCJ9.MBPaL38J-sYOaaw2BUQO0Q') }}";
-        
-        logDebug('Creating map...');
-        
-        // Create map - starting at a different location (Paris) to avoid Tunisia default
-        const map = new mapboxgl.Map({
-            container: 'mapbox-container',
-            style: 'mapbox://styles/mapbox/satellite-streets-v12',
-            center: [2.3522, 48.8566], // Paris coordinates - deliberately not Tunisia
-            zoom: 10,
-            pitch: 45,
-            bearing: 0
+        // Add validation classes on input
+        requiredInputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (!this.value || this.value.trim() === '') {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                } else {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.value && this.value.trim() !== '') {
+                    this.classList.remove('is-invalid');
+                }
+            });
         });
         
-        // ========================
-        // COORDINATE HANDLING
-        // ========================
-        
-        // Function to sync from map to form
-        function syncCoordinatesFromMap() {
-            if (!map || !map.getCenter) {
-                logDebug('Error: Map not initialized properly');
-                return;
-            }
-            
-            try {
-                const center = map.getCenter();
-                const lat = center.lat.toFixed(6);
-                const lng = center.lng.toFixed(6);
+        // Set up form submission handler
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                // Check all required fields
+                let valid = true;
+                let firstInvalidElement = null;
                 
-                logDebug(`Map center: ${lat}, ${lng}`);
+                requiredInputs.forEach(input => {
+                    if (!input.value || input.value.trim() === '') {
+                        input.classList.add('is-invalid');
+                        valid = false;
+                        
+                        if (!firstInvalidElement) {
+                            firstInvalidElement = input;
+                        }
+                    } else {
+                        input.classList.remove('is-invalid');
+                        input.classList.add('is-valid');
+                    }
+                });
                 
-                // Update visible inputs
-                if (debugLatInput && debugLngInput) {
-                    debugLatInput.value = lat;
-                    debugLngInput.value = lng;
-                    logDebug('Updated debug inputs');
-                } else {
-                    logDebug('Debug inputs not found');
-                }
-                
-                // Update hidden form fields
-                if (hiddenLatitude && hiddenLongitude) {
-                    hiddenLatitude.value = lat;
-                    hiddenLongitude.value = lng;
-                    logDebug('Updated hidden fields');
-                } else {
-                    logDebug('Hidden fields not found');
-                }
-                
-                return { lat, lng };
-            } catch (e) {
-                logDebug('Error getting map center: ' + e.message);
-            }
-        }
-        
-        // Update map from manually entered coordinates
-        function syncMapFromInputs() {
-            try {
-                const lat = parseFloat(debugLatInput.value);
-                const lng = parseFloat(debugLngInput.value);
-                
-                if (!isNaN(lat) && !isNaN(lng)) {
-                    logDebug(`Moving map to: ${lat}, ${lng}`);
-                    
-                    map.flyTo({
-                        center: [lng, lat],
-                        zoom: 12
-                    });
-                    
-                    // Update hidden form fields directly
-                    if (hiddenLatitude && hiddenLongitude) {
-                        hiddenLatitude.value = lat.toFixed(6);
-                        hiddenLongitude.value = lng.toFixed(6);
-                        logDebug('Updated hidden fields directly');
+                // Specifically validate coordinates
+                if (!latInput.value || latInput.value.trim() === '') {
+                    latInput.classList.add('is-invalid');
+                    valid = false;
+                    if (!firstInvalidElement) {
+                        firstInvalidElement = latInput;
                     }
                 } else {
-                    logDebug('Invalid coordinates entered');
-                }
-            } catch (e) {
-                logDebug('Error updating map: ' + e.message);
-            }
-        }
-        
-        // Force update hidden fields from debug fields
-        function forceUpdateHiddenFields() {
-            if (hiddenLatitude && hiddenLongitude && debugLatInput && debugLngInput) {
-                try {
-                    // Directly set values
-                    hiddenLatitude.value = debugLatInput.value;
-                    hiddenLongitude.value = debugLngInput.value;
-                    
-                    // Log what we've set
-                    logDebug(`Force-updated hidden fields: ${hiddenLatitude.value}, ${hiddenLongitude.value}`);
-                } catch (e) {
-                    logDebug('Error force updating fields: ' + e.message);
-                }
-            }
-        }
-        
-        // ========================
-        // MAP SETUP AND EVENTS
-        // ========================
-        
-        // Add basic controls
-        logDebug('Adding map controls...');
-        map.addControl(new mapboxgl.NavigationControl());
-        
-        // Create marker at map center
-        const marker = new mapboxgl.Marker({
-            color: "#FF0000",
-            draggable: true
-        }).setLngLat([2.3522, 48.8566])
-          .addTo(map);
-          
-        // Update coordinates when marker is dragged
-        marker.on('dragend', function() {
-            const lngLat = marker.getLngLat();
-            debugLatInput.value = lngLat.lat.toFixed(6);
-            debugLngInput.value = lngLat.lng.toFixed(6);
-            forceUpdateHiddenFields();
-            logDebug(`Marker dragged to: ${lngLat.lat.toFixed(6)}, ${lngLat.lng.toFixed(6)}`);
-        });
-        
-        // Try to add geocoder if available
-        try {
-            if (typeof MapboxGeocoder !== 'undefined') {
-                logDebug('Adding Mapbox geocoder...');
-                const geocoder = new MapboxGeocoder({
-                    accessToken: mapboxgl.accessToken,
-                    mapboxgl: mapboxgl,
-                    marker: false
-                });
-                map.addControl(geocoder);
-                
-                // Add event listener for geocoder results
-                geocoder.on('result', function(e) {
-                    logDebug('Geocoder result received');
-                    marker.setLngLat(e.result.center);
-                    setTimeout(function() {
-                        const coords = syncCoordinatesFromMap();
-                        logDebug(`Updated after geocoder: ${coords.lat}, ${coords.lng}`);
-                    }, 500);
-                });
-            } else {
-                logDebug('MapboxGeocoder not available, skipping geocoder');
-            }
-        } catch (e) {
-            logDebug('Error initializing geocoder: ' + e.message);
-        }
-        
-        // Map initialization and terrain
-        map.on('load', function() {
-            logDebug('Map loaded');
-            
-            try {
-                // Add 3D terrain
-                map.addSource('mapbox-dem', {
-                    'type': 'raster-dem',
-                    'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-                    'tileSize': 512,
-                    'maxzoom': 14
-                });
-                
-                map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
-                logDebug('3D terrain added');
-            } catch (e) {
-                logDebug('Error adding terrain: ' + e.message);
-            }
-            
-            // Set initial coordinates
-            const coords = syncCoordinatesFromMap();
-            logDebug(`Initial coordinates set: ${coords?.lat}, ${coords?.lng}`);
-            
-            // Update marker position to match map center
-            marker.setLngLat(map.getCenter());
-        });
-        
-        // When map moves, update marker position
-        map.on('move', function() {
-            marker.setLngLat(map.getCenter());
-        });
-        
-        // Update coordinates when map stops moving
-        map.on('moveend', function() {
-            const coords = syncCoordinatesFromMap();
-            logDebug(`Map moved to: ${coords?.lat}, ${coords?.lng}`);
-        });
-        
-        // ========================
-        // BUTTON LISTENERS
-        // ========================
-        
-        // Update coordinates from manual input
-        if (updateFromDebugBtn) {
-            updateFromDebugBtn.addEventListener('click', function() {
-                logDebug('Manual update button clicked');
-                syncMapFromInputs();
-                forceUpdateHiddenFields();
-            });
-        }
-        
-        // Listen for direct input changes
-        if (debugLatInput && debugLngInput) {
-            debugLatInput.addEventListener('change', forceUpdateHiddenFields);
-            debugLngInput.addEventListener('change', forceUpdateHiddenFields);
-        }
-        
-        // ========================
-        // FORM SUBMISSION
-        // ========================
-        
-        // Handle form submission
-        if (activityForm) {
-            activityForm.addEventListener('submit', function(e) {
-                // Final force update of hidden fields
-                forceUpdateHiddenFields();
-                
-                // Get final values
-                const finalLat = hiddenLatitude.value;
-                const finalLng = hiddenLongitude.value;
-                
-                logDebug(`Form submission - Final coordinates: ${finalLat}, ${finalLng}`);
-                
-                // Ensure the form fields are valid for submission
-                let isValid = true;
-                let errorMessage = '';
-                
-                // Check for empty coordinates
-                if (!finalLat || !finalLng) {
-                    isValid = false;
-                    errorMessage = 'Coordinates cannot be empty. Please select a location on the map.';
-                    logDebug('ERROR: Empty coordinates detected');
-                } 
-                // Check for default Paris coordinates
-                else if (finalLat === '48.8566' && finalLng === '2.3522') {
-                    isValid = false;
-                    errorMessage = 'Please select a specific location for your activity. The coordinates are still set to the default Paris location.';
-                    logDebug('ERROR: Default Paris coordinates detected');
-                }
-                // Check for default Tunisia coordinates 
-                else if (finalLat === '36.800000' && finalLng === '10.180000') {
-                    isValid = false;
-                    errorMessage = 'Please select a specific location for your activity. The coordinates are still set to the default Tunisia location.';
-                    logDebug('ERROR: Default Tunisia coordinates detected');
+                    const lat = parseFloat(latInput.value);
+                    if (isNaN(lat) || lat < -90 || lat > 90) {
+                        latInput.classList.add('is-invalid');
+                        valid = false;
+                        if (!firstInvalidElement) {
+                            firstInvalidElement = latInput;
+                        }
+                    } else {
+                        latInput.classList.remove('is-invalid');
+                        latInput.classList.add('is-valid');
+                    }
                 }
                 
-                // If form is not valid, prevent submission and show error
-                if (!isValid) {
+                if (!lngInput.value || lngInput.value.trim() === '') {
+                    lngInput.classList.add('is-invalid');
+                    valid = false;
+                    if (!firstInvalidElement) {
+                        firstInvalidElement = lngInput;
+                    }
+                } else {
+                    const lng = parseFloat(lngInput.value);
+                    if (isNaN(lng) || lng < -180 || lng > 180) {
+                        lngInput.classList.add('is-invalid');
+                        valid = false;
+                        if (!firstInvalidElement) {
+                            firstInvalidElement = lngInput;
+                        }
+                    } else {
+                        lngInput.classList.remove('is-invalid');
+                        lngInput.classList.add('is-valid');
+                    }
+                }
+                
+                if (!valid) {
                     e.preventDefault();
-                    alert(errorMessage);
-                    return false;
+                    
+                    Swal.fire({
+                        title: 'Form Incomplete',
+                        text: 'Please fill in all required fields before submitting.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#3085d6'
+                    });
+                    
+                    // Scroll to the first invalid element
+                    if (firstInvalidElement) {
+                        firstInvalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(() => {
+                            firstInvalidElement.focus();
+                        }, 500);
+                    }
+                } else {
+                    // Show loading state
+                    const submitBtn = document.getElementById('submitActivityBtn');
+                    if (submitBtn) {
+                        submitBtn.innerHTML = '<i class="icon-loading-dot text-16 mr-10"></i> Creating Activity...';
+                        submitBtn.disabled = true;
+                    }
                 }
-                
-                // All checks passed, allow form submission
-                logDebug('FORM SUBMISSION ALLOWED - Coordinates valid: ' + finalLat + ', ' + finalLng);
-                
-                // Double check that the hidden fields have been updated
-                const formData = new FormData(activityForm);
-                logDebug('FORM DATA: latitude=' + formData.get('activity_form[latitude]') + ', longitude=' + formData.get('activity_form[longitude]'));
-                
-                return true;
             });
         }
         
-        // ========================
-        // IMAGE UPLOAD HANDLING
-        // ========================
+        // Also validate coordinates as user types
+        if (latInput && lngInput) {
+            [latInput, lngInput].forEach(input => {
+                input.addEventListener('input', function() {
+                    const lat = parseFloat(latInput.value);
+                    const lng = parseFloat(lngInput.value);
+                    
+                    if (input === latInput && (isNaN(lat) || lat < -90 || lat > 90)) {
+                        this.classList.add('is-invalid');
+                        this.classList.remove('is-valid');
+                    } else if (input === lngInput && (isNaN(lng) || lng < -180 || lng > 180)) {
+                        this.classList.add('is-invalid');
+                        this.classList.remove('is-valid');
+                    } else if (this.value.trim() !== '') {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    }
+                });
+            });
+        }
         
         // Image upload handling
         if (imageUpload) {
@@ -518,8 +558,16 @@
                     countSpan.textContent = `${this.files.length} file(s) selected`;
                     imageCountContainer.classList.remove('d-none');
                     
+                    // Add green border to input to show success
+                    this.classList.add('is-valid');
+                    
+                    // Reset validation after 3 seconds
+                    setTimeout(() => {
+                        this.classList.remove('is-valid');
+                    }, 3000);
+                    
                     // Create preview for each selected file
-                    for (let i = 0; i <this.files.length; i++) {
+                    for (let i = 0; i < this.files.length; i++) {
                         const file = this.files[i];
                         
                         if (file.type.match('image.*')) {
@@ -532,122 +580,276 @@
                                 previewCol.className = 'col-md-3 col-sm-6 mb-15';
                                 
                                 const previewCard = document.createElement('div');
-                                previewCard.className = 'border rounded-4 p-10 h-100 d-flex flex-column';
+                                previewCard.className = 'border rounded-8 p-10 h-100 d-flex flex-column shadow-sm hover-shadow-blue';
                                 
                                 const previewImg = document.createElement('img');
                                 previewImg.src = e.target.result;
                                 previewImg.className = 'w-100 rounded-4';
-                                previewImg.style.height = '100px';
+                                previewImg.style.height = '120px';
                                 previewImg.style.objectFit = 'cover';
                                 
                                 const imageName = document.createElement('div');
-                                imageName.className = 'text-14 mt-5 text-center text-truncate';
+                                imageName.className = 'text-14 mt-10 fw-500 text-truncate';
                                 imageName.textContent = file.name;
+                                
+                                const imageSize = document.createElement('div');
+                                imageSize.className = 'text-12 text-light-1';
+                                imageSize.textContent = Math.round(file.size / 1024) + ' KB';
+                                
+                                // Create a remove button
+                                const removeBtn = document.createElement('button');
+                                removeBtn.className = 'btn-sm mt-10 text-12 fw-500 text-red-1 bg-light-2 rounded-4 py-5 px-10 w-100';
+                                removeBtn.innerHTML = '<i class="icon-trash mr-5"></i> Remove';
+                                removeBtn.type = 'button';
+                                removeBtn.addEventListener('click', function() {
+                                    previewCol.remove();
+                                    // Update the file count
+                                    const currentCount = previewsContainer.querySelectorAll('.col-md-3').length;
+                                    if (currentCount === 0) {
+                                        if (countSpan) countSpan.textContent = 'No file selected';
+                                        if (imageCountContainer) imageCountContainer.classList.add('d-none');
+                                    } else {
+                                        if (countSpan) countSpan.textContent = `${currentCount} file(s) selected`;
+                                    }
+                                });
                                 
                                 previewCard.appendChild(previewImg);
                                 previewCard.appendChild(imageName);
+                                previewCard.appendChild(imageSize);
+                                previewCard.appendChild(removeBtn);
+                                
+                                // Add animation class
+                                previewCol.classList.add('fade-in');
+                                
                                 previewCol.appendChild(previewCard);
                                 previewsContainer.appendChild(previewCol);
-                            }
+                            };
                             
                             reader.readAsDataURL(file);
                         }
                     }
-                } else if (imageCountContainer) {
-                    imageCountContainer.classList.add('d-none');
+                } else {
+                    if (countSpan) countSpan.textContent = 'No file selected';
+                    if (imageCountContainer) imageCountContainer.classList.add('d-none');
                 }
             });
+            
+            // Clear button for the file input
+            if (clearFileBtn) {
+                clearFileBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    Swal.fire({
+                        title: 'Clear images?',
+                        text: 'Are you sure you want to clear all selected images?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, clear all',
+                        cancelButtonText: 'Cancel',
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if (imageUpload) {
+                                imageUpload.value = '';
+                                
+                                if (previewsContainer) previewsContainer.innerHTML = '';
+                                if (countSpan) countSpan.textContent = 'No file selected';
+                                if (imageCountContainer) imageCountContainer.classList.add('d-none');
+                            }
+                        }
+                    });
+                });
+            }
         }
     });
 </script>
 <style>
-    /* Animation styles */
-    .hover-animation {
-        transition: all 0.3s ease;
-    }
-    
-    .hover-animation:hover {
-        transform: translateY(-3px);
-    }
-    
-    /* Fade in animation */
-    .fade-in {
-        animation: fadeIn 0.6s ease forwards;
-    }
-    
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-    
     /* Form styling */
-    .form-control,
-    .form-select {
-        transition: all 0.3s ease;
-    }
-    
     .form-control:focus,
     .form-select:focus {
+        box-shadow: 0 0 0 3px rgba(53, 84, 209, 0.1) !important;
         border-color: var(--color-blue-1) !important;
-        box-shadow: 0 0 0 3px rgba(5, 142, 199, 0.1);
     }
     
-    .border-light {
-        border: 1px solid #ddd;
+    .input-icon-wrap {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+    }
+    
+    .input-group {
+        position: relative;
+    }
+    
+    .pl-45 {
+        padding-left: 45px !important;
+    }
+    
+    .is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+    }
+    
+    .is-valid {
+        border-color: #198754 !important;
+        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25) !important;
+    }
+    
+    /* Image upload */
+    .file-input-hidden {
+        position: absolute;
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+    
+    /* Card styling */
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+        transform: translateY(-5px);
+    }
+    
+    .card-header.bg-blue-1 {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
     }
     
     /* Button styling */
-    .button {
+    .hover-shadow-blue:hover {
+        box-shadow: 0 10px 20px rgba(53, 84, 209, 0.15);
+    }
+    
+    .hover-shadow-dark:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    #submitActivityBtn {
         transition: all 0.3s ease;
     }
     
-    .button.-blue-1:hover {
-        background-color: #0073cc !important;
+    #submitActivityBtn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(53, 84, 209, 0.15);
     }
     
-    /* File upload styling */
-    .file-upload-container {
-        position: relative;
-        text-align: center;
-        border: 2px dashed #ddd;
-        border-radius: 8px;
-        padding: 20px;
-        background-color: #f9f9f9;
-        transition: all 0.3s ease;
+    /* Form elements */
+    .form-group {
+        margin-bottom: 5px;
     }
     
-    .file-upload-container:hover {
+    .form-control, .form-select {
+        transition: all 0.2s ease;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .form-control:hover, .form-select:hover {
         border-color: var(--color-blue-1);
-        background-color: #f0f7fc;
     }
     
-    .file-upload-input {
-        display: block;
-        width: 100%;
-        height: 100%;
-        padding: 15px;
-        cursor: pointer;
-        font-size: 1rem;
+    /* Progress indicator */
+    .progress-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
     }
     
-    .file-upload-input::file-selector-button {
-        padding: 10px 20px;
-        border-radius: 4px;
-        border: none;
+    .progress-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+    
+    .progress-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: #f3f4f6;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-bottom: 8px;
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .progress-item.active .progress-circle {
         background-color: var(--color-blue-1);
         color: white;
+        border-color: var(--color-blue-1);
+    }
+    
+    .progress-line {
+        width: 60px;
+        height: 2px;
+        background-color: #e5e7eb;
+        margin: 0 10px;
+        margin-top: -28px;
+    }
+    
+    .progress-line.active {
+        background-color: var(--color-blue-1);
+    }
+    
+    .progress-text {
+        font-size: 12px;
+        color: #6b7280;
         font-weight: 500;
-        cursor: pointer;
-        margin-right: 15px;
+    }
+    
+    .progress-item.active .progress-text {
+        color: var(--color-blue-1);
+        font-weight: 600;
+    }
+    
+    /* Image previews */
+    #previewsContainer img {
         transition: all 0.3s ease;
     }
     
-    .file-upload-input::file-selector-button:hover {
-        background-color: #0073cc;
+    #previewsContainer img:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Overall page animation */
+    .fade-in {
+        animation: fadeInAnimation 0.6s ease forwards;
+    }
+    
+    @keyframes fadeInAnimation {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsive handling */
+    @media (max-width: 767px) {
+        .py-40 {
+            padding-top: 25px !important;
+            padding-bottom: 25px !important;
+        }
+        
+        .px-40 {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+        }
     }
 </style>
 {% endblock %}

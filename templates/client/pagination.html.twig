@@ -1,0 +1,84 @@
+{# Pagination styles are now included in base.html.twig #}
+
+{% if max_pages > 1 or total_items is defined %}
+<div class="pagination-container">
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <div class="pagination-wrapper">
+                {# Pagination Information #}
+                {% set total = total_items|default(0) %}
+                {% set items_per_page = items_per_page|default(9) %}
+                {% set current_showing_start = ((current_page - 1) * items_per_page) + 1 %}
+                {% set current_showing_end = min(current_page * items_per_page, total) %}
+                
+                {% if total > 0 %}
+                <div class="pagination-info">
+                    Showing <strong>{{ current_showing_start }}</strong> to <strong>{{ current_showing_end }}</strong> of <strong>{{ total }}</strong> results
+                </div>
+                {% endif %}
+                
+                {% if max_pages > 1 %}
+                <div class="pagination">
+                    {# Previous Button #}
+                    <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': max(1, current_page - 1)})) }}" 
+                       class="pagination__arrow {{ current_page <= 1 ? 'is-disabled' : '' }}" 
+                       aria-label="Previous page">
+                        <i class="icon-chevron-left"></i>
+                    </a>
+                    
+                    {# Calculate page range to display #}
+                    {% set visible_pages = 5 %} {# Number of page numbers to show #}
+                    {% set half_visible = (visible_pages / 2)|round(0, 'floor') %}
+                    
+                    {% set start_page = max(1, current_page - half_visible) %}
+                    {% set end_page = min(max_pages, start_page + visible_pages - 1) %}
+                    
+                    {% if end_page - start_page < visible_pages - 1 %}
+                        {% set start_page = max(1, end_page - visible_pages + 1) %}
+                    {% endif %}
+                    
+                    {# First page and ellipsis #}
+                    {% if start_page > 1 %}
+                        <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': 1})) }}" 
+                           class="pagination__item">
+                            1
+                        </a>
+                        {% if start_page > 2 %}
+                            <span class="pagination__dots">...</span>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {# Page Numbers #}
+                    {% for page in start_page..end_page %}
+                        <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': page})) }}" 
+                           class="pagination__item {% if page == current_page %}is-active{% endif %}" 
+                           aria-label="Page {{ page }}" 
+                           {% if page == current_page %}aria-current="page"{% endif %}>
+                            {{ page }}
+                        </a>
+                    {% endfor %}
+                    
+                    {# Last page and ellipsis #}
+                    {% if end_page < max_pages %}
+                        {% if end_page < max_pages - 1 %}
+                            <span class="pagination__dots">...</span>
+                        {% endif %}
+                        <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': max_pages})) }}" 
+                           class="pagination__item">
+                            {{ max_pages }}
+                        </a>
+                    {% endif %}
+                    
+                    {# Next Button #}
+                    <a href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': min(max_pages, current_page + 1)})) }}" 
+                       class="pagination__arrow {{ current_page >= max_pages ? 'is-disabled' : '' }}" 
+                       aria-label="Next page">
+                        <i class="icon-chevron-right"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

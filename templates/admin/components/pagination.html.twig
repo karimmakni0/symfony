@@ -1,0 +1,81 @@
+{#
+  Reusable Pagination Component
+  
+  Required parameters:
+  - currentPage: Current page number
+  - totalPages: Total number of pages
+  - routeName: The route name for pagination links
+  - queryParams: The query parameters to preserve in pagination links (optional)
+#}
+
+{% if totalPages > 1 %}
+<div class="admin-pagination">
+  <div class="pagination-info">
+    Page {{ currentPage }} of {{ totalPages }}
+  </div>
+  
+  <ul class="pagination">
+    {# Previous page link #}
+    {% if currentPage > 1 %}
+      {% set prevQueryParams = queryParams|default({})|merge({'page': currentPage - 1}) %}
+      <li class="page-item">
+        <a href="{{ path(routeName, prevQueryParams) }}" class="page-link" aria-label="Previous">
+          <span aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9.5 10.5L5.5 7L9.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+        </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link" aria-label="Previous">
+          <span aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9.5 10.5L5.5 7L9.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+        </span>
+      </li>
+    {% endif %}
+    
+    {# Page number links #}
+    {% set startPage = max(1, currentPage - 2) %}
+    {% set endPage = min(totalPages, startPage + 4) %}
+    {% if endPage - startPage < 4 %}
+      {% set startPage = max(1, endPage - 4) %}
+    {% endif %}
+    
+    {% for i in startPage..endPage %}
+      {% set pageQueryParams = queryParams|default({})|merge({'page': i}) %}
+      <li class="page-item {% if currentPage == i %}active{% endif %}">
+        <a href="{{ path(routeName, pageQueryParams) }}" class="page-link">{{ i }}</a>
+      </li>
+    {% endfor %}
+    
+    {# Next page link #}
+    {% if currentPage < totalPages %}
+      {% set nextQueryParams = queryParams|default({})|merge({'page': currentPage + 1}) %}
+      <li class="page-item">
+        <a href="{{ path(routeName, nextQueryParams) }}" class="page-link" aria-label="Next">
+          <span aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4.5 3.5L8.5 7L4.5 10.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+        </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link" aria-label="Next">
+          <span aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4.5 3.5L8.5 7L4.5 10.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+        </span>
+      </li>
+    {% endif %}
+  </ul>
+</div>
+{% endif %}

@@ -14,6 +14,7 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="{{ asset('assets/css/vendors.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/pagination.css') }}">
 
   <title>{% block title %}GoTrip{% endblock %}</title>
   
@@ -30,8 +31,139 @@
     
     /* Fix for mobile menu */
     @media (max-width: 991px) {
+      /* Improved mobile menu appearance */
+      .header-menu__content {
+        background-color: #0d2857 !important;
+      }
+      
       .menu__nav .subnav {
         background-color: #0d2857 !important;
+        padding: 0 !important;
+      }
+      
+      .menu__nav .subnav li a {
+        padding: 15px 30px !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+      }
+      
+      /* Better dropdown arrows on mobile */
+      .menu-item-has-children > a {
+        position: relative;
+        width: 100%;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 20px 30px !important;
+      }
+      
+      .menu-item-has-children > a .icon-chevron-sm-down {
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      
+      /* Improved back button styling */
+      .js-nav-list-back {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+      }
+      
+      .js-nav-list-back a {
+        display: flex !important;
+        align-items: center !important;
+        padding: 20px 30px !important;
+        font-weight: 500 !important;
+      }
+      
+      .js-nav-list-back a i {
+        margin-right: 10px;
+        transform: rotate(90deg);
+      }
+      
+      /* Make selected dropdown fully visible */
+      .menu__nav > li > .subnav.-is-active {
+        padding-top: 0 !important;
+        z-index: 10 !important;
+      }
+      
+      /* Fix whitespace in mobile menu */
+      .menu__nav > li > a {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+      }
+    }
+    
+    /* Fix for mobile header layout */
+    @media (max-width: 767px) {
+      .header__container .row {
+        flex-wrap: nowrap;
+      }
+      
+      /* Make sure profile menu is visible on mobile */
+      .dropdown__button {
+        height: 50px;
+      }
+    }
+    
+    /* Improved dropdown styling */
+    .js-user-nav-dropdown-mobile,
+    .js-user-nav-dropdown {
+      min-width: 180px;
+      z-index: 9999 !important;
+    }
+    
+    /* Ensure all dropdown menu items are clickable */
+    .menu-item-has-children > a {
+      cursor: pointer;
+    }
+    
+    /* Fix for submenu transitions */
+    .menu__nav .subnav {
+      transition: all 0.3s ease;
+    }
+    
+    /* Fix for Activities dropdown alignment */
+    .subnav .d-flex.align-items-center {
+      display: flex !important;
+      align-items: center !important;
+    }
+    
+    /* Fix for activities map icon */
+    .icon-map-marker.text-blue-1.mr-5 {
+      color: #3554D1 !important;
+      margin-right: 5px !important;
+      display: inline-block !important;
+    }
+    
+    /* Fix to match the exact appearance in the screenshots */
+    .menu-item-has-children {
+      position: relative;
+    }
+    
+    .menu-item-has-children .subnav {
+      position: absolute;
+      left: 0;
+      min-width: 230px;
+      box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+      border-radius: 4px;
+    }
+    
+    /* Mobile dropdown fixes */
+    @media (max-width: 991px) {
+      .menu-item-has-children .subnav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        min-width: 100%;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 20px 0 0 0;
+      }
+      
+      /* Fix first dropdown item */
+      .menu-item-has-children .subnav li:first-child {
+        border-top: none !important;
       }
     }
   </style>
@@ -103,37 +235,23 @@
                         </a>
                       </li>
                       <li class="menu-item-has-children">
-                        <a data-barba href="#" class="text-white">
+                        <a href="javascript:void(0)" class="text-white">
                           <span class="mr-10">Activities</span>
                           <i class="icon icon-chevron-sm-down"></i>
                         </a>
                         <ul class="subnav">
                           <li class="subnav__backBtn js-nav-list-back">
-                            <a href="#" class="text-white"><i class="icon icon-chevron-sm-down"></i>Activities</a>
+                            <a href="javascript:void(0)" class="text-white"><i class="icon icon-chevron-sm-down"></i>Activities</a>
                           </li>
                           <li><a href="{{ path('app_activities') }}" class="text-white">Activities List</a></li>
-                          <li><a href="#" class="text-white">Activities Map</a></li>
+                          <li><a href="{{ path('app_activities_map') }}" class="text-white d-flex align-items-center">
+                              <i class="icon-map-marker text-blue-1 mr-5"></i>
+                              <span>Activities Map</span>
+                            </a></li>
                         </ul>
                       </li>
                      
-                      <li class="menu-item-has-children">
-                        <a data-barba href="#" class="text-white">
-                          <span class="mr-10">About</span>
-                          <i class="icon icon-chevron-sm-down"></i>
-                        </a>
-                        <ul class="subnav">
-                          <li class="subnav__backBtn js-nav-list-back">
-                            <a href="#" class="text-white"><i class="icon icon-chevron-sm-down"></i> About</a>
-                          </li>
-                          <li><a href="#" class="text-white">About Us</a></li>
-                          <li><a href="#" class="text-white">Help center</a></li>
-                          <li><a href="#" class="text-white">Terms & Conditions</a></li>
-                        </ul>
-
-                      </li>
-                      <li>
-                        <a href="#" class="text-white">Contact</a>
-                      </li>
+                      <!-- About and Contact links removed -->
                     </ul>
                   </div>
 
@@ -145,11 +263,7 @@
 
               <div class="d-flex items-center ml-20 is-menu-opened-hide md:d-none">
                 {% if app.user %}
-                  {% if app.user.role == 'admin' %}
-                    <a href="{{ path('admin_dashboard') }}" class="button px-30 fw-400 text-14 -blue-1 bg-white h-50 text-dark-1">Admin Dashboard</a>
-                  {% elseif app.user.role == 'Publicitaire' %}
-                    <a href="{{ path('app_publicator') }}" class="button px-30 fw-400 text-14 -blue-1 bg-white h-50 text-dark-1">Publicator Dashboard</a>  
-                  {% else %}
+                  {% if app.user.role != 'admin' and app.user.role != 'Publicitaire' %}
                     <a href="{{ path('app_client_upgrade') }}" class="button px-30 fw-400 text-14 -blue-1 bg-white h-50 text-dark-1">Become Publicator</a>
                   {% endif %}
                   
@@ -190,48 +304,19 @@
                     </div>
                   </div>
                 {% else %}
-                  <a href="{{ path('app_client_upgrade') }}" class="button px-30 fw-400 text-14 -blue-1 bg-white h-50 text-dark-1">Become Publicator</a>
-                  <a href="{{ path('app_login') }}" class="button px-30 fw-400 text-14 border-white -blue-1 h-50 text-white ml-20">Sign In / Register</a>
+                  <a href="{{ path('app_login') }}" class="button px-30 fw-400 text-14 border-white -blue-1 h-50 text-white">Sign In / Register</a>
                 {% endif %}
               </div>
 
               <div class="d-none xl:d-flex x-gap-20 items-center pl-30 text-white" data-x="header-mobile-icons" data-x-toggle="text-white">
                 {% if app.user %}
-                <div class="dropdown js-dropdown js-user-nav">
-                  <div class="dropdown__button d-flex items-center" data-el-toggle=".js-user-nav-dropdown-mobile">
-                    <div class="avatar d-flex items-center justify-center bg-white size-40 rounded-circle">
-                      {% if app.user.image %}
-                        <img src="{{ asset('assets/img/UserPictures/' ~ app.user.image) }}" alt="avatar">
-                      {% else %}
-                        <img src="{{ asset('assets/img/avatars/3.png') }}" alt="avatar">
-                      {% endif %}
-                    </div>
-                  </div>
-                  
-                  <div class="toggle-element -dropdown-2 js-user-nav-dropdown-mobile">
-                    <div class="text-14 fw-500 js-dropdown-list">
-                      {% if app.user.role == 'admin' %}
-                        <div><a href="{{ path('admin_dashboard') }}" class="d-block">Admin Dashboard</a></div>
-                      {% elseif app.user.role == 'Publicitaire' %}
-                        <div><a href="{{ path('app_publicator') }}" class="d-block">Publicator Dashboard</a></div>
-                      {% endif %}
-                      <div><a href="{{ path('app_user_reservation_history') }}" class="d-block">My Bookings</a></div>
-                      <div><a href="{{ path('app_client_profile') }}" class="d-block">Profile Settings</a></div>
-                      <div><a href="{{ path('app_logout') }}" class="d-block">Logout</a></div>
-                    </div>
-                  </div>
-                </div>
+                <!-- Mobile user dropdown removed as requested -->
                 
-                {% if app.user.role == 'admin' %}
-                  <a href="{{ path('admin_dashboard') }}" class="button px-20 fw-400 text-14 -blue-1 bg-white h-50 text-dark-1 mr-5">Admin</a>
-                {% elseif app.user.role == 'Publicitaire' %}
-                  <a href="{{ path('app_publicator') }}" class="button px-20 fw-400 text-14 -blue-1 bg-white h-50 text-dark-1 mr-5">Publicator</a>  
-                {% else %}
-                  <a href="{{ path('app_client_upgrade') }}" class="button px-20 fw-400 text-14 -blue-1 bg-white h-50 text-dark-1 mr-5">Become</a>
+                {% if app.user.role != 'admin' and app.user.role != 'Publicitaire' %}
+                  <a href="{{ path('app_client_upgrade') }}" class="button px-20 fw-400 text-14 -blue-1 bg-white h-50 text-dark-1">Become Publicator</a>
                 {% endif %}
                 {% else %}
                 <a href="{{ path('app_login') }}" class="button px-20 fw-400 text-14 -white bg-white h-50 text-dark-1">Sign In</a>
-                <a href="{{ path('app_client_upgrade') }}" class="button px-20 fw-400 text-14 -blue-1 bg-white h-50 text-dark-1 mr-5">Become</a>
                 {% endif %}
                 <div><button class="d-flex items-center icon-menu text-inherit text-20" data-x-click="html, header, header-logo, header-mobile-icons, mobile-menu"></button></div>
               </div>
@@ -425,6 +510,23 @@
     </script>
     
     {% block additional_scripts %}{% endblock %}
+    
+    {# Only show live chat to non-admin users #}
+    {% if app.user is null or app.user.role != 'admin' %}
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/680be552e41bbb1918cd79e5/1ipn8ob71';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+    <!--End of Tawk.to Script-->
+    {% endif %}
   {% endblock %}
 </body>
 

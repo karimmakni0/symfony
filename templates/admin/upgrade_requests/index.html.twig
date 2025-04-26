@@ -2,26 +2,76 @@
 
 {% block title %}Manage Upgrade Requests{% endblock %}
 
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('assets/css/admin-upgrade-requests.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-pagination.css') }}">
+{% endblock %}
+
 {% block body %}
-<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+<div class="row y-gap-20 justify-between items-end pb-30 lg:pb-20 md:pb-15">
   <div class="col-auto">
     <h1 class="text-30 lh-14 fw-600">Upgrade Requests</h1>
     <div class="text-15 text-light-1">Manage user requests to become Publicators</div>
   </div>
 </div>
 
-<div class="py-30 px-30 rounded-4 bg-white shadow-3">
-  {% for message in app.flashes('success') %}
-    <div class="alert alert-success rounded-4 py-10 px-15 bg-green-1 text-green-2 mb-30">
-      {{ message }}
+<!-- Filter Section -->
+<div class="py-20 px-30 rounded-4 bg-white shadow-3 mb-30">
+  <div class="row justify-between items-center pb-20">
+    <div class="col-auto">
+      <h3 class="text-16 lh-1 fw-500">Filter Requests</h3>
     </div>
-  {% endfor %}
+    <div class="col-auto">
+      <a href="{{ path('admin_upgrade_requests') }}" class="text-14 text-blue-1">
+        Clear All Filters
+      </a>
+    </div>
+  </div>
   
-  {% for message in app.flashes('error') %}
-    <div class="alert alert-danger rounded-4 py-10 px-15 bg-red-3 text-red-2 mb-30">
-      {{ message }}
+  <form action="{{ path('admin_upgrade_requests') }}" method="GET" class="js-filter-form">
+    <div class="row y-gap-20 items-center">
+      <div class="col-lg-4">
+        <div class="search-field">
+          <input type="text" name="search" value="{{ filters.search }}" class="form-control" placeholder="Search by name or email">
+        </div>
+      </div>
+      
+      <div class="col-lg-2">
+        <div class="select-field">
+          <select name="status" class="form-select js-filter-status">
+            <option value="">All Statuses</option>
+            {% for status in statuses %}
+              <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      
+      <div class="col-lg-2">
+        <div class="search-field">
+          <input type="date" name="date_from" value="{{ filters.date_from }}" class="form-control" placeholder="From Date">
+        </div>
+      </div>
+      
+      <div class="col-lg-2">
+        <div class="search-field">
+          <input type="date" name="date_to" value="{{ filters.date_to }}" class="form-control" placeholder="To Date">
+        </div>
+      </div>
+      
+      <div class="col-lg-2">
+        <button type="submit" class="button -md h-50 w-100 bg-blue-1 text-white">
+          <i class="icon-search text-15 mr-10"></i>
+          Filter
+        </button>
+      </div>
     </div>
-  {% endfor %}
+  </form>
+</div>
+
+<div class="py-30 px-30 rounded-4 bg-white shadow-3">
+  {# Flash messages are now handled by SweetAlert in AdminBase.html.twig #}
   
   <div class="tabs -underline-2 js-tabs">
     <div class="tabs__content pt-30 js-tabs-content">
@@ -61,16 +111,35 @@
                       {% endif %}
                     </td>
                     <td>
-                      <div class="text-truncate" style="max-width: 200px;">{{ request.message }}</div>
+                      <div class="text-truncate" style="max-width: 200px;">
+                        {% if request.message|length > 50 %}
+                          {{ request.message|slice(0, 50) }}...
+                          <a href="javascript:void(0);" class="text-blue-1 ml-5" 
+                             onclick="viewMessage('{{ request.user.name }}', '{{ request.user.lastname }}', '{{ request.message }}')">
+                            Read more
+                          </a>
+                        {% else %}
+                          {{ request.message }}
+                        {% endif %}
+                      </div>
                     </td>
                     <td>
                       {% if request.status == 'pending' or request.status == 'Pending' %}
                         <div class="d-flex x-gap-10">
-                          <a href="{{ path('admin_upgrade_requests_approve', {'id': request.id}) }}" class="btn btn-sm py-5 px-15 -dark-1 bg-success-1 text-white">
-                            <i class="icon-check text-13 mr-5"></i> Approve
+                          <a href="javascript:void(0);" 
+                             onclick="confirmApprove('{{ request.id }}', '{{ request.user.name }}', '{{ request.user.lastname }}', '{{ path('admin_upgrade_requests_approve', {'id': request.id}) }}')" 
+                             class="action-btn flex-center size-35 rounded-4 bg-blue-1 text-white" title="Approve Request">
+                            <i class="icon-check text-12"></i>
                           </a>
-                          <a href="{{ path('admin_upgrade_requests_reject', {'id': request.id}) }}" class="btn btn-sm py-5 px-15 -dark-1 bg-red-1 text-white">
-                            <i class="icon-close text-13 mr-5"></i> Reject
+                          <a href="javascript:void(0);" 
+                             onclick="confirmReject('{{ request.id }}', '{{ request.user.name }}', '{{ request.user.lastname }}', '{{ path('admin_upgrade_requests_reject', {'id': request.id}) }}')" 
+                             class="action-btn flex-center size-35 rounded-4 bg-red-1 text-white" title="Reject Request">
+                            <i class="icon-close text-12"></i>
+                          </a>
+                          <a href="javascript:void(0);" 
+                             onclick="viewMessage('{{ request.user.name }}', '{{ request.user.lastname }}', '{{ request.message }}')" 
+                             class="action-btn flex-center size-35 rounded-4 bg-light-2 text-15" title="View Full Message">
+                            <i class="icon-eye text-12"></i>
                           </a>
                         </div>
                       {% else %}
@@ -84,9 +153,26 @@
               {% endif %}
             </tbody>
           </table>
+          
+          {# Pagination #}
+          {% if totalPages > 1 %}
+            <div class="pagination-container">
+              {% include 'admin/components/pagination.html.twig' with {
+                currentPage: currentPage,
+                totalPages: totalPages,
+                routeName: 'admin_upgrade_requests',
+                queryParams: app.request.query.all|merge({page: null})
+              } %}
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="{{ asset('assets/js/admin-upgrade-requests.js') }}"></script>
 {% endblock %}

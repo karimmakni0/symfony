@@ -3,33 +3,74 @@
 {% block title %}My Profile{% endblock %}
 
 {% block body %}
-<section class="layout-pt-md layout-pb-lg">
+<!-- Add FontAwesome for better icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<section class="layout-pt-md layout-pb-lg bg-light-2">
   <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <h1 class="text-30 fw-600 mb-30">My Profile</h1>
+    <div class="row justify-content-center">
+      <div class="col-xl-10 col-lg-11">
+        <!-- Page Header with Stats -->
+        <div class="row justify-content-between align-items-center mb-20">
+          <div class="col-md-6">
+            <h1 class="text-30 fw-600">My Profile</h1>
+          </div>
+          <div class="col-md-6 d-flex justify-content-md-end">
+            <div class="user-stats d-flex">
+              <div class="stat-card py-15 px-20 rounded-4 bg-white shadow-1 me-10">
+                <div class="d-flex align-items-center">
+                  <div class="size-50 flex-center bg-blue-1-05 rounded-4 me-15">
+                    <i class="fa fa-calendar-alt text-18 text-blue-1"></i>
+                  </div>
+                  <div>
+                    <span class="text-14 text-light-1 d-block">Member since</span>
+                    <span class="text-16 fw-500">{{ user.createdAt ? user.createdAt|date('M Y') : 'Recently' }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="stat-card py-15 px-20 rounded-4 bg-white shadow-1">
+                <div class="d-flex align-items-center">
+                  <div class="size-50 flex-center bg-blue-1-05 rounded-4 me-15">
+                    <i class="fa fa-user-shield text-18 text-blue-1"></i>
+                  </div>
+                  <div>
+                    <span class="text-14 text-light-1 d-block">Account type</span>
+                    <span class="text-16 fw-500">{{ user.role == 'Publicitaire' ? 'Publicator' : 'Member' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         
+        <!-- Alert Messages -->
         {% for message in app.flashes('success') %}
             <div class="alert alert-success rounded-4 py-10 px-15 bg-green-1 text-green-2 mb-30">
-                {{ message }}
+                <i class="fa fa-check-circle me-2"></i> {{ message }}
             </div>
         {% endfor %}
         
         {% for message in app.flashes('error') %}
             <div class="alert alert-danger rounded-4 py-10 px-15 bg-red-3 text-red-2 mb-30">
-                {{ message }}
+                <i class="fa fa-exclamation-circle me-2"></i> {{ message }}
             </div>
         {% endfor %}
         
+        <!-- Main Content Box -->
         <div class="py-30 px-30 rounded-4 bg-white shadow-3">
+          <!-- Tabs Navigation -->
           <div class="tabs -underline-2 js-tabs">
             <div class="tabs__controls row x-gap-40 y-gap-10 lg:x-gap-20 js-tabs-controls">
               <div class="col-auto">
-                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">Personal Information</button>
+                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button is-tab-el-active" data-tab-target=".-tab-item-1">
+                  <i class="fa fa-user me-2"></i> Personal Information
+                </button>
               </div>
 
               <div class="col-auto">
-                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button" data-tab-target=".-tab-item-2">Change Password</button>
+                <button class="tabs__button text-18 lg:text-16 text-light-1 fw-500 pb-5 lg:pb-0 js-tabs-button" data-tab-target=".-tab-item-2">
+                  <i class="fa fa-lock me-2"></i> Change Password
+                </button>
               </div>
             </div>
 
@@ -39,126 +80,200 @@
                 <form action="{{ path('app_client_profile_update_personal') }}" method="post" enctype="multipart/form-data">
                   <div class="row y-gap-30 items-center">
                     <div class="col-auto">
-                      <div class="d-flex ratio ratio-1:1 w-200">
-                        {% if user.image %}
-                          <img src="{{ asset('assets/img/UserPictures/' ~ user.image) }}" alt="User profile" class="img-ratio rounded-4">
-                        {% else %}
-                          <img src="{{ asset('assets/img/avatars/3.png') }}" alt="Default profile" class="img-ratio rounded-4">
-                        {% endif %}
+                      <div class="profile-image-container position-relative">
+                        <div class="ratio ratio-1:1 w-200 bg-light-2 rounded-circle overflow-hidden shadow-sm border">
+                          {% if user.image %}
+                            <img src="{{ asset('assets/img/UserPictures/' ~ user.image) }}" alt="User profile" class="img-ratio object-fit-cover">
+                          {% else %}
+                            <img src="{{ asset('assets/img/avatars/3.png') }}" alt="Default profile" class="img-ratio object-fit-cover">
+                          {% endif %}
+                        </div>
 
-                        <div class="d-flex justify-end px-10 py-10 h-100 w-1/1 absolute">
-                          <div class="size-40 bg-white rounded-4">
-                            <i class="icon-trash text-16"></i>
+                        <div class="image-controls position-absolute bottom-0 end-0 d-flex gap-2">
+                          <div class="size-40 bg-white rounded-circle flex-center shadow-sm hover-shadow cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Remove image">
+                            <i class="fa fa-trash text-16 text-red-2"></i>
+                          </div>
+                        </div>
+                        
+                        <div class="upload-overlay position-absolute top-0 left-0 w-100 h-100 d-flex flex-center opacity-0 upload-hover">
+                          <div class="size-50 bg-blue-1 rounded-circle flex-center">
+                            <i class="fa fa-camera text-20 text-white"></i>
                           </div>
                         </div>
                       </div>
                     </div>
 
                     <div class="col-auto">
-                      <h4 class="text-16 fw-500">Your avatar</h4>
-                      <div class="text-14 mt-5">PNG or JPG no bigger than 800px wide and tall.</div>
+                      <h4 class="text-18 fw-500 mb-10">Your Profile Picture</h4>
+                      <div class="text-14 text-light-1">Click on the avatar to change your photo.</div>
+                      <div class="text-14 text-light-1 mt-5">PNG or JPG no bigger than 800px wide and tall.</div>
 
                       <div class="d-inline-block mt-15">
-                        <button type="button" class="button h-50 px-24 -dark-1 bg-blue-1 text-white">
-                          <i class="icon-upload-file text-20 mr-10"></i>
-                          Browse
-                        </button>
-                        <input type="file" name="avatar" id="avatar" class="d-none">
+                        <input type="file" name="avatar" id="avatar" class="d-none" accept="image/png, image/jpeg">
+                        <div id="file-name" class="text-14 text-blue-1 mt-10 fw-500"></div>
                       </div>
                     </div>
                   </div>
 
                   <div class="border-top-light mt-30 mb-30"></div>
 
-                  <div class="col-xl-9">
+                  <div class="col-xl-10">
+                    <h3 class="text-18 fw-500 mb-20">Personal Details</h3>
                     <div class="row x-gap-20 y-gap-20">
                       <div class="col-md-6">
                         <div class="form-input">
                           <input type="text" name="name" value="{{ user.name }}" required>
-                          <label class="lh-1 text-16 text-light-1">First Name</label>
+                          <label class="lh-1 text-16 text-light-1"><i class="fa fa-user me-1"></i> First Name</label>
                         </div>
                       </div>
 
                       <div class="col-md-6">
                         <div class="form-input">
                           <input type="text" name="lastname" value="{{ user.lastname }}" required>
-                          <label class="lh-1 text-16 text-light-1">Last Name</label>
+                          <label class="lh-1 text-16 text-light-1"><i class="fa fa-user me-1"></i> Last Name</label>
                         </div>
                       </div>
 
                       <div class="col-md-6">
                         <div class="form-input">
                           <input type="email" name="email" value="{{ user.email }}" required>
-                          <label class="lh-1 text-16 text-light-1">Email</label>
+                          <label class="lh-1 text-16 text-light-1"><i class="fa fa-envelope me-1"></i> Email</label>
                         </div>
                       </div>
 
                       <div class="col-md-6">
                         <div class="form-input">
                           <input type="text" name="phone" value="{{ user.phone }}">
-                          <label class="lh-1 text-16 text-light-1">Phone Number</label>
+                          <label class="lh-1 text-16 text-light-1"><i class="fa fa-phone me-1"></i> Phone Number</label>
                         </div>
                       </div>
 
-                      <div class="col-12">
+                      <div class="col-md-6">
                         <div class="form-input">
                           <input type="date" name="birthday" value="{% if user.birthday %}{{ user.birthday|date('Y-m-d') }}{% endif %}">
-                          <label class="lh-1 text-16 text-light-1">Birthday</label>
+                          <label class="lh-1 text-16 text-light-1"><i class="fa fa-birthday-cake me-1"></i> Birthday</label>
                         </div>
                       </div>
+                      
+                      <!-- Notification preferences removed -->
                     </div>
                   </div>
 
-                  <div class="d-inline-block pt-30">
-                    <button type="submit" class="button h-50 px-24 -dark-1 bg-blue-1 text-white">
-                      Save Changes <div class="icon-arrow-top-right ml-15"></div>
+                  <div class="d-flex gap-3 pt-30 justify-content-center">
+                    <button type="submit" class="button h-50 px-30 -dark-1 bg-blue-1 text-white rounded-pill">
+                      <i class="fa fa-save me-2"></i> Save Changes
+                    </button>
+                    <button type="reset" class="button h-50 px-30 -blue-1 bg-blue-1-05 text-blue-1 rounded-pill">
+                      <i class="fa fa-undo me-2"></i> Reset
                     </button>
                   </div>
                 </form>
               </div>
 
-              <!-- Change Password Tab -->
+              <!-- Change Password Tab - Improved Design -->
               <div class="tabs__pane -tab-item-2">
-                <form action="{{ path('app_client_profile_change_password') }}" method="post">
-                  <div class="col-xl-9">
-                    <div class="row x-gap-20 y-gap-20">
-                      <div class="col-12">
-                        <div class="form-input">
-                          <input type="password" name="current_password" required>
-                          <label class="lh-1 text-16 text-light-1">Current Password</label>
+                <div class="row justify-content-center">
+                  <div class="col-xl-8 col-lg-10">
+                    <div>
+                      <div class="mb-20 text-center">
+                        <div class="size-60 flex-center bg-blue-1-05 rounded-full mx-auto mb-10">
+                          <i class="fa fa-lock text-24 text-blue-1"></i>
+                        </div>
+                        <h3 class="text-22 fw-500">Change Your Password</h3>
+                        <p class="mt-10 text-15 text-light-1">Keep your account secure with a strong password</p>
+                      </div>
+                    
+                      <div class="password-requirements p-20 rounded-4 mb-30">
+                        <div class="d-flex align-items-center mb-15">
+                          <div class="size-50 flex-center bg-blue-1 rounded-circle me-15">
+                            <i class="fa fa-shield-alt text-white text-20"></i>
+                          </div>
+                          <h4 class="text-18 fw-500 m-0">Password Requirements</h4>
+                        </div>
+                        
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="password-req-item d-flex align-items-center mb-10">
+                              <div class="size-30 flex-center bg-blue-1-05 rounded-circle me-10">
+                                <i class="fa fa-check text-blue-1 text-14"></i>
+                              </div>
+                              <div class="text-15">Minimum 8 characters</div>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="password-req-item d-flex align-items-center mb-10">
+                              <div class="size-30 flex-center bg-blue-1-05 rounded-circle me-10">
+                                <i class="fa fa-check text-blue-1 text-14"></i>
+                              </div>
+                              <div class="text-15">One uppercase letter</div>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="password-req-item d-flex align-items-center mb-10">
+                              <div class="size-30 flex-center bg-blue-1-05 rounded-circle me-10">
+                                <i class="fa fa-check text-blue-1 text-14"></i>
+                              </div>
+                              <div class="text-15">One number</div>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="password-req-item d-flex align-items-center mb-10">
+                              <div class="size-30 flex-center bg-blue-1-05 rounded-circle me-10">
+                                <i class="fa fa-check text-blue-1 text-14"></i>
+                              </div>
+                              <div class="text-15">One special character</div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-
-                      <div class="col-12">
-                        <div class="form-input">
-                          <input type="password" name="new_password" required>
-                          <label class="lh-1 text-16 text-light-1">New Password</label>
-                        </div>
-                      </div>
-
-                      <div class="col-12">
-                        <div class="form-input">
-                          <input type="password" name="new_password_confirmation" required>
-                          <label class="lh-1 text-16 text-light-1">Confirm New Password</label>
-                        </div>
-                      </div>
-
-                      <div class="col-12">
-                        <div class="row x-gap-10 y-gap-10">
-                          <div class="col-auto">
-                            <button type="submit" class="button h-50 px-24 -dark-1 bg-blue-1 text-white">
-                              Update Password <div class="icon-arrow-top-right ml-15"></div>
-                            </button>
+                    
+                      <form action="{{ path('app_client_profile_change_password') }}" method="post">
+                        <div class="row x-gap-20 y-gap-20">
+                          <div class="col-12">
+                            <div class="form-input">
+                              <input type="password" name="current_password" id="current_password" required>
+                              <label class="lh-1 text-16 text-light-1"><i class="fa fa-unlock-alt me-1"></i> Current Password</label>
+                            </div>
+                          </div>
+                        
+                          <div class="col-md-6">
+                            <div class="form-input">
+                              <input type="password" name="new_password" id="new_password" required>
+                              <label class="lh-1 text-16 text-light-1"><i class="fa fa-lock me-1"></i> New Password</label>
+                            </div>
+                            <div class="password-strength mt-10 mb-15">
+                              <div class="password-strength-meter">
+                                <div class="strength-segment"></div>
+                                <div class="strength-segment"></div>
+                                <div class="strength-segment"></div>
+                                <div class="strength-segment"></div>
+                              </div>
+                              <div class="password-strength-text text-14 mt-5">Password strength: <span id="strength-text">Type a password</span></div>
+                            </div>
                           </div>
 
-                          <div class="col-auto">
-                            <button type="reset" class="button h-50 px-24 -blue-1 bg-blue-1-05 text-blue-1">Cancel</button>
+                          <div class="col-md-6">
+                            <div class="form-input">
+                              <input type="password" name="new_password_confirmation" id="new_password_confirmation" required>
+                              <label class="lh-1 text-16 text-light-1"><i class="fa fa-check-circle me-1"></i> Confirm New Password</label>
+                            </div>
+                          </div>
+
+                          <div class="col-12 mt-30">
+                            <div class="d-flex justify-content-center gap-3">
+                              <button type="submit" class="button h-50 px-40 -dark-1 bg-blue-1 text-white rounded-pill">
+                                <i class="fa fa-lock me-2"></i> Update Password
+                              </button>
+                              <button type="reset" class="button h-50 px-40 -blue-1 bg-blue-1-05 text-blue-1 rounded-pill">
+                                <i class="fa fa-times me-2"></i> Cancel
+                              </button>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </form>
                     </div>
                   </div>
-                </form>
+                </div>
               </div>
             </div>
           </div>
@@ -175,23 +290,344 @@
     // Handle file upload button
     const browseButton = document.querySelector('.button.-dark-1.bg-blue-1');
     const fileInput = document.getElementById('avatar');
+    const fileNameElement = document.getElementById('file-name');
     
-    if (browseButton && fileInput) {
-      browseButton.addEventListener('click', function() {
-        fileInput.click();
-      });
-    }
-    
-    // Submit form when file is selected
-    if (fileInput) {
-      fileInput.addEventListener('change', function() {
-        if (this.files && this.files.length) {
-          const filename = this.files[0].name;
-          // Show the file name or preview if needed
-          // Can add code here to display the selected file name
+    // Click on profile image to trigger file upload
+    const profileImageContainer = document.querySelector('.profile-image-container');
+    if (profileImageContainer && fileInput) {
+      profileImageContainer.addEventListener('click', function(e) {
+        // Don't trigger if clicking on the trash icon
+        if (!e.target.closest('.image-controls')) {
+          fileInput.click();
         }
       });
     }
+    
+    // Password strength meter
+    const passwordInput = document.getElementById('new_password');
+    const strengthMeter = document.querySelector('.password-strength');
+    const strengthText = document.getElementById('strength-text');
+    const passwordReqItems = document.querySelectorAll('.password-req-item');
+    
+    if (passwordInput && strengthMeter) {
+      passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+        let strengthClass = '';
+        let strengthLabel = '';
+        
+        // Check password length
+        if (password.length >= 8) {
+          strength += 1;
+          passwordReqItems[0].querySelector('.size-30').classList.add('bg-green-1');
+          passwordReqItems[0].querySelector('.fa').classList.add('text-white');
+        } else {
+          passwordReqItems[0].querySelector('.size-30').classList.remove('bg-green-1');
+          passwordReqItems[0].querySelector('.fa').classList.remove('text-white');
+        }
+        
+        // Check for uppercase letter
+        if (/[A-Z]/.test(password)) {
+          strength += 1;
+          passwordReqItems[1].querySelector('.size-30').classList.add('bg-green-1');
+          passwordReqItems[1].querySelector('.fa').classList.add('text-white');
+        } else {
+          passwordReqItems[1].querySelector('.size-30').classList.remove('bg-green-1');
+          passwordReqItems[1].querySelector('.fa').classList.remove('text-white');
+        }
+        
+        // Check for numbers
+        if (/[0-9]/.test(password)) {
+          strength += 1;
+          passwordReqItems[2].querySelector('.size-30').classList.add('bg-green-1');
+          passwordReqItems[2].querySelector('.fa').classList.add('text-white');
+        } else {
+          passwordReqItems[2].querySelector('.size-30').classList.remove('bg-green-1');
+          passwordReqItems[2].querySelector('.fa').classList.remove('text-white');
+        }
+        
+        // Check for special characters
+        if (/[^A-Za-z0-9]/.test(password)) {
+          strength += 1;
+          passwordReqItems[3].querySelector('.size-30').classList.add('bg-green-1');
+          passwordReqItems[3].querySelector('.fa').classList.add('text-white');
+        } else {
+          passwordReqItems[3].querySelector('.size-30').classList.remove('bg-green-1');
+          passwordReqItems[3].querySelector('.fa').classList.remove('text-white');
+        }
+        
+        // Set strength class and label
+        if (password.length === 0) {
+          strengthClass = '';
+          strengthLabel = 'Type a password';
+        } else if (strength === 0) {
+          strengthClass = 'strength-weak';
+          strengthLabel = 'Very weak';
+        } else if (strength === 1) {
+          strengthClass = 'strength-weak';
+          strengthLabel = 'Weak';
+        } else if (strength === 2) {
+          strengthClass = 'strength-fair';
+          strengthLabel = 'Fair';
+        } else if (strength === 3) {
+          strengthClass = 'strength-good';
+          strengthLabel = 'Good';
+        } else if (strength === 4) {
+          strengthClass = 'strength-strong';
+          strengthLabel = 'Strong';
+        }
+        
+        // Remove any existing strength classes
+        strengthMeter.classList.remove('strength-weak', 'strength-fair', 'strength-good', 'strength-strong');
+        
+        // Add new strength class
+        if (strengthClass) {
+          strengthMeter.classList.add(strengthClass);
+        }
+        
+        // Update strength text
+        strengthText.textContent = strengthLabel;
+      });
+    }
+    
+    // Display selected filename
+    if (fileInput && fileNameElement) {
+      fileInput.addEventListener('change', function() {
+        if (this.files && this.files.length) {
+          const filename = this.files[0].name;
+          fileNameElement.textContent = 'Selected: ' + filename;
+          
+          // Preview image immediately
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const imgElement = document.querySelector('.profile-image-container img');
+            if (imgElement) {
+              imgElement.src = e.target.result;
+            }
+          };
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+    }
+
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
+    // Tab switching functionality
+    const tabButtons = document.querySelectorAll('.js-tabs-button');
+    const tabContents = document.querySelectorAll('.tabs__pane');
+    
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const targetTab = button.getAttribute('data-tab-target');
+        
+        // Remove active class from all buttons and tabs
+        tabButtons.forEach(btn => btn.classList.remove('is-tab-el-active'));
+        tabContents.forEach(tab => tab.classList.remove('is-tab-el-active'));
+        
+        // Add active class to clicked button and corresponding tab
+        button.classList.add('is-tab-el-active');
+        document.querySelector(targetTab).classList.add('is-tab-el-active');
+      });
+    });
   });
 </script>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+  /* Password requirements styling */
+  .password-requirements {
+    background-color: #f8f9fa;
+    border-left: 4px solid #3554D1;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .password-requirements:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+  
+  .password-req-item {
+    transition: all 0.3s ease;
+  }
+  
+  .password-req-item:hover {
+    transform: translateX(5px);
+  }
+  
+  /* Password strength meter */
+  .password-strength-meter {
+    display: flex;
+    gap: 5px;
+    height: 8px;
+    width: 100%;
+  }
+  
+  .strength-segment {
+    flex: 1;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  /* Password strength colors */
+  .strength-weak .strength-segment:nth-child(1) {
+    background-color: #dc3545;
+  }
+  
+  .strength-fair .strength-segment:nth-child(1),
+  .strength-fair .strength-segment:nth-child(2) {
+    background-color: #ffc107;
+  }
+  
+  .strength-good .strength-segment:nth-child(1),
+  .strength-good .strength-segment:nth-child(2),
+  .strength-good .strength-segment:nth-child(3) {
+    background-color: #28a745;
+  }
+  
+  .strength-strong .strength-segment {
+    background-color: #3554D1;
+  }
+  
+  /* Password strength text colors */
+  .strength-weak #strength-text {
+    color: #dc3545;
+    font-weight: 500;
+  }
+  
+  .strength-fair #strength-text {
+    color: #ffc107;
+    font-weight: 500;
+  }
+  
+  .strength-good #strength-text {
+    color: #28a745;
+    font-weight: 500;
+  }
+  
+  .strength-strong #strength-text {
+    color: #3554D1;
+    font-weight: 500;
+  }
+  
+  /* Modern profile styles */
+  .profile-image-container {
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .image-controls {
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+  
+  .upload-overlay {
+    background-color: rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+    z-index: 5;
+    border-radius: 50%;
+  }
+  
+  .profile-image-container:hover .image-controls {
+    opacity: 1;
+  }
+  
+  .profile-image-container:hover .upload-overlay {
+    opacity: 1;
+  }
+  
+  .hover-shadow:hover {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  
+  /* Stats card styling */
+  .stat-card {
+    transition: all 0.3s ease;
+    min-width: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+  }
+  
+  /* Responsive fixes for stats cards */
+  @media (max-width: 767px) {
+    .user-stats {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .stat-card {
+      width: 100%;
+      margin-bottom: 15px;
+      margin-right: 0 !important;
+    }
+    
+    .col-md-6.d-flex.justify-content-md-end {
+      margin-top: 20px;
+    }
+    
+    /* Profile image improvements for mobile */
+    .profile-image-container {
+      margin: 0 auto;
+      max-width: 200px;
+    }
+    
+    .row.y-gap-30.items-center {
+      text-align: center;
+    }
+    
+    .row.y-gap-30.items-center .col-auto {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+  }
+  
+  /* Improved form styling */
+  .form-input {
+    position: relative;
+    margin-bottom: 5px;
+  }
+  
+  .form-input input, .form-input select {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .form-input input:focus, .form-input select:focus {
+    border-color: #3554D1;
+    box-shadow: 0 0 0 3px rgba(53, 84, 209, 0.15);
+  }
+  
+  /* Tab styling */
+  .tabs__button.is-tab-el-active {
+    border-bottom: 2px solid #3554D1;
+    color: #3554D1 !important;
+    font-weight: 600;
+  }
+  
+  /* Button styling */
+  .button.rounded-pill {
+    border-radius: 50px;
+    transition: all 0.3s ease;
+  }
+  
+  .button.rounded-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px rgba(53, 84, 209, 0.15);
+  }
+</style>
 {% endblock %}

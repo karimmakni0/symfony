@@ -3,16 +3,10 @@
 {% block title %}Edit Destination{% endblock %}
 
 {% block body %}
-<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
-    <div class="col-auto">
+<div class="row y-gap-20 justify-between items-end pb-30 lg:pb-20 md:pb-16">
+    <div class="col-12">
         <h1 class="text-30 lh-14 fw-600">Edit Destination</h1>
-        <div class="text-15 text-light-1">Update your travel destination information</div>
-    </div>
-    <div class="col-auto">
-        <a href="{{ path('app_publicator_destinations') }}" class="button h-50 px-24 -blue-1-05 text-blue-1 hover-animation">
-            <i class="icon-arrow-left mr-10"></i>
-            Back to Destinations
-        </a>
+        <div class="text-15 text-light-1">Update details for your travel destination</div>
     </div>
 </div>
 
@@ -33,76 +27,102 @@
     {% endfor %}
 {% endfor %}
 
-<div class="py-40 px-40 rounded-4 bg-white shadow-3 fade-in">
-    <div class="row justify-center mb-30">
-        <div class="col-auto">
-            <div class="text-22 fw-600">Edit Destination</div>
-            <div class="text-14 text-center text-light-1 mt-5">Update the details for "{{ destination.name }}"</div>
+<div class="dashboard__content bg-white rounded-4 px-30 py-30 dashboard-card shadow-card fade-in">
+    <div class="row mb-20">
+        <div class="col-12">
+            <div class="d-flex justify-between items-center pb-15 border-bottom-light">
+                <div class="d-flex items-center">
+                    <i class="icon-map-pin text-blue-1 text-20 mr-10"></i>
+                    <h2 class="text-18 fw-500">Edit Destination</h2>
+                </div>
+                <div class="fw-500 text-14 text-light-1">Fields marked with <span class="text-danger">*</span> are required</div>
+            </div>
         </div>
     </div>
     
-    {{ form_start(form, {'attr': {'class': 'row y-gap-30 justify-center', 'enctype': 'multipart/form-data'}}) }}
+    {{ form_start(form, {'attr': {'id': 'destination_edit_form', 'class': 'row y-gap-30 justify-center', 'enctype': 'multipart/form-data'}}) }}
     <div class="col-xl-9 col-lg-10">
         <div class="row x-gap-20 y-gap-20">
             <div class="col-12">
-                <div class="form-input">
-                    {{ form_label(form.name, 'Destination Name', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                    <span class="text-danger">*</span>
-                    {{ form_widget(form.name) }}
-                    {{ form_errors(form.name) }}
+                <div class="form-group">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Destination Name <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <div class="input-icon-wrap">
+                            <i class="icon-map-marker text-16 text-light-1"></i>
+                        </div>
+                        {{ form_widget(form.name, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'placeholder': 'Enter destination name'}}) }}
+                    </div>
+                    <div class="text-red-1 mt-5">{{ form_errors(form.name) }}</div>
                 </div>
             </div>
 
             <div class="col-12">
-                <div class="form-input">
-                    {{ form_label(form.location, 'Location', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                    <span class="text-danger">*</span>
-                    {{ form_widget(form.location) }}
-                    {{ form_errors(form.location) }}
+                <div class="form-group">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Location <span class="text-danger">*</span></label>
+                    <div class="select-group">
+                        <div class="input-icon-wrap">
+                            <i class="icon-location-pin text-16 text-light-1"></i>
+                        </div>
+                        {{ form_widget(form.location, {'attr': {'class': 'd-none'}}) }}
+                        <select id="destination_location_select" class="form-select rounded-8 px-20 py-15 border-light input-border-focus pl-45" onchange="document.getElementById('{{ form.location.vars.id }}').value = this.value" required="required">
+                            <option value="">Select Country</option>
+                            {% set country_list = ['Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cambodia', 'Cameroon', 'Canada', 'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia', 'Comoros', 'Congo', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czech Republic', 'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea', 'Eritrea', 'Estonia', 'Eswatini', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Holy See', 'Honduras', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kiribati', 'Kuwait', 'Kyrgyzstan', 'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico', 'Micronesia', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Myanmar', 'Namibia', 'Nauru', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'North Korea', 'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palau', 'Palestine', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania', 'Russia', 'Rwanda', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Sao Tome and Principe', 'Saudi Arabia', 'Senegal', 'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Solomon Islands', 'Somalia', 'South Africa', 'South Korea', 'South Sudan', 'Spain', 'Sri Lanka', 'Sudan', 'Suriname', 'Sweden', 'Switzerland', 'Syria', 'Taiwan', 'Tajikistan', 'Tanzania', 'Thailand', 'Timor-Leste', 'Togo', 'Tonga', 'Trinidad and Tobago', 'Tunisia', 'Turkey', 'Turkmenistan', 'Tuvalu', 'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom', 'USA', 'Uruguay', 'Uzbekistan', 'Vanuatu', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'] %}
+                            {% for country in country_list %}
+                                <option value="{{ country }}" {% if destination.location == country %}selected{% endif %}>{{ country }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="text-red-1 mt-5">{{ form_errors(form.location) }}</div>
                 </div>
             </div>
 
             <div class="col-12">
-                <div class="form-input">
-                    {{ form_label(form.description, 'Description', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                    {{ form_widget(form.description) }}
-                    {{ form_errors(form.description) }}
+                <div class="form-group">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Description</label>
+                    <div class="textarea-container">
+                        {{ form_widget(form.description, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus', 'rows': '5', 'placeholder': 'Enter a detailed description of the destination...', 'style': 'min-height: 140px;'}}) }}
+                    </div>
+                    <div class="text-red-1 mt-5">{{ form_errors(form.description) }}</div>
                 </div>
             </div>
 
             <div class="col-12">
-                <div class="mt-20">
-                    {{ form_label(form.imageFile, 'Destination Image', {'label_attr': {'class': 'text-16 lh-1 fw-500 text-dark-1 mb-10'}}) }}
-                    <div class="mt-10 border-light rounded-4 px-20 py-20 bg-light-2">
+                <div class="form-group">
+                    <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Destination Image</label>
+                    <div class="mt-10 border-light rounded-8 px-20 py-20 bg-light-2">
                         <div class="row x-gap-10 y-gap-10 justify-center">
-                            <div class="col-auto text-center mb-10">
+                            <div class="col-12 text-center">
                                 <div id="imagePreviewContainer" class="{% if not destination.imagePath %}d-none{% endif %} mb-20">
-                                    {% if destination.imagePath %}
-                                        <img id="imagePreview" src="{{ asset(destination.imagePath) }}" alt="{{ destination.name }}" class="w-250 rounded-4 mb-10 mx-auto" style="max-height: 180px; object-fit: cover;">
-                                        <div class="text-14 fw-500 text-blue-1">Current Image</div>
-                                    {% else %}
-                                        <img id="imagePreview" class="w-250 rounded-4 mb-15 mx-auto" style="max-height: 180px; object-fit: cover;">
-                                    {% endif %}
+                                    <div class="image-preview-wrapper rounded-4 overflow-hidden d-inline-block">
+                                        {% if destination.imagePath %}
+                                            <img id="imagePreview" src="{{ asset(destination.imagePath) }}" alt="{{ destination.name }}" class="w-250 rounded-4 mx-auto" style="max-height: 180px; object-fit: cover;">
+                                        {% else %}
+                                            <img id="imagePreview" class="w-250 rounded-4 mx-auto" style="max-height: 180px; object-fit: cover;">
+                                        {% endif %}
+                                    </div>
                                 </div>
                                 
                                 <div class="d-flex flex-column items-center">
-                                    <div class="size-50 flex-center bg-blue-1 rounded-full mb-10">
-                                        <i class="icon-cloud-upload text-white"></i>
+                                    <div class="size-60 flex-center bg-blue-1 rounded-full mb-10 shadow-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="text-white" viewBox="0 0 16 16">
+                                            <path d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>
+                                            <path d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                                        </svg>
                                     </div>
-                                    <div class="text-14 fw-500 mb-5">Change Image</div>
-                                    <div class="text-14 text-light-1 mb-15">PNG or JPG format</div>
+                                    <div class="text-16 fw-500 mb-5">{% if destination.imagePath %}Change Image{% else %}Upload Image{% endif %}</div>
+                                    <div class="text-14 text-light-1 mb-15">PNG or JPG format (max 2MB)</div>
                                 </div>
                                 
-                                <div class="form-file">
-                                    {{ form_widget(form.imageFile, {'attr': {'id': 'imageUpload', 'accept': 'image/*'}}) }}
-                                    <div class="form-file__wrap">
-                                        <label for="imageUpload" class="button -md -blue-1 h-50 text-white">
+                                <div class="form-file mt-10">
+                                    <div class="d-flex justify-center">
+                                        <label for="{{ form.imageFile.vars.id }}" class="button -md bg-dark-1 h-50 px-30 text-white rounded-8 hover-shadow-dark cursor-pointer">
                                             <i class="icon-upload mr-10"></i>
                                             Browse Files
                                         </label>
+                                        {{ form_widget(form.imageFile, {'attr': {'class': 'file-input-hidden', 'accept': 'image/*', 'id': 'imageUpload'}}) }}
                                     </div>
                                 </div>
-                                {{ form_errors(form.imageFile) }}
+                                <div class="text-red-1 mt-10">{{ form_errors(form.imageFile) }}</div>
                             </div>
                         </div>
                     </div>
@@ -110,10 +130,14 @@
             </div>
         </div>
 
-        <div class="d-flex justify-center mt-30">
-            <button type="submit" class="button h-60 px-40 -dark-1 bg-blue-1 text-white hover-animation">
-                <i class="icon-check text-16 mr-15"></i>
-                <span class="fw-500">Update Destination</span>
+        <div class="d-flex justify-center mt-40 gap-20">
+            <a href="{{ path('app_publicator_destinations') }}" class="button h-60 px-40 -blue-1-05 text-blue-1 rounded-8">
+                <i class="icon-arrow-left mr-10"></i>
+                Cancel
+            </a>
+            <button type="submit" id="updateDestinationBtn" class="button h-60 px-40 -dark-1 bg-blue-1 text-white rounded-8">
+                <i class="icon-check text-16 mr-10"></i>
+                Update Destination
             </button>
         </div>
     </div>
@@ -122,86 +146,183 @@
 {% endblock %}
 
 {% block javascripts %}
+<!-- SweetAlert2 Library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const imageUpload = document.getElementById('imageUpload');
         const imagePreview = document.getElementById('imagePreview');
         const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const editForm = document.getElementById('destination_edit_form');
+        const updateBtn = document.getElementById('updateDestinationBtn');
         
-        imageUpload.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    imagePreviewContainer.classList.remove('d-none');
+        // Initialize the country dropdown with the current value
+        if (document.getElementById('{{ form.location.vars.id }}') && 
+            document.getElementById('destination_location_select')) {
+            const currentLocation = document.getElementById('{{ form.location.vars.id }}').value;
+            document.getElementById('destination_location_select').value = currentLocation;
+        }
+        
+        // Image upload preview
+        if (imageUpload) {
+            imageUpload.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
                     
-                    // Update text to show this is a new image
-                    const imageLabel = imagePreviewContainer.querySelector('.text-14.fw-500');
-                    if (imageLabel) {
-                        imageLabel.textContent = 'New Image (Not Saved Yet)';
-                        imageLabel.classList.remove('text-blue-1');
-                        imageLabel.classList.add('text-green-2');
-                    } else {
-                        const newLabel = document.createElement('div');
-                        newLabel.className = 'text-14 fw-500 text-green-2';
-                        newLabel.textContent = 'New Image (Not Saved Yet)';
-                        imagePreviewContainer.appendChild(newLabel);
+                    reader.onload = function(e) {
+                        if (imagePreview) {
+                            imagePreview.src = e.target.result;
+                            imagePreviewContainer.classList.remove('d-none');
+                        }
                     }
+                    
+                    reader.readAsDataURL(this.files[0]);
                 }
-                
-                reader.readAsDataURL(this.files[0]);
-            }
+            });
+        }
+        
+        // Add hover effects to buttons
+        const buttons = document.querySelectorAll('.button');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px)';
+            });
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
         });
+        
+        // Handle the form submission
+        if (editForm) {
+            editForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent the default form submission
+                
+                // Create FormData object
+                const formData = new FormData(this);
+                
+                // Add X-Requested-With header to mark it as an AJAX request
+                fetch('{{ path('app_publicator_edit_destination', {'id': destination.id}) }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    // First check if this is JSON response (success) or HTML (validation errors)
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json().then(data => {
+                            // Success response - show SweetAlert and redirect
+                            Swal.fire({
+                                title: 'Success!',
+                                text: data.message || 'Destination updated successfully!',
+                                icon: 'success',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#3554D1'
+                            }).then(result => {
+                                // Redirect to destinations list when user clicks OK
+                                window.location.href = '{{ path('app_publicator_destinations') }}';
+                            });
+                        });
+                    } else {
+                        // HTML response with validation errors
+                        return response.text().then(html => {
+                            // Update the page with the returned HTML containing validation errors
+                            document.open();
+                            document.write(html);
+                            document.close();
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // If there's an error with the fetch, submit the form normally
+                    this.removeEventListener('submit', arguments.callee);
+                    this.submit();
+                });
+            });
+        }
     });
 </script>
 <style>
-    /* Animation styles */
-    .hover-animation {
-        transition: all 0.3s ease;
+    /* Form styling */
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: 0 0 0 3px rgba(53, 84, 209, 0.1) !important;
+        border-color: var(--color-blue-1) !important;
     }
     
-    .hover-animation:hover {
-        transform: translateY(-3px);
+    .input-icon-wrap {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
     }
     
-    /* Fade in animation */
+    .input-group {
+        position: relative;
+    }
+    
+    .select-group {
+        position: relative;
+    }
+    
+    .pl-45 {
+        padding-left: 45px !important;
+    }
+    
+    .image-preview-wrapper {
+        display: block;
+        width: 250px;
+        height: 180px;
+        margin: 0 auto 15px;
+    }
+    
+    .file-input-hidden {
+        position: absolute;
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+    
+    .border-light {
+        border: 1px solid rgba(230, 230, 230, 0.7);
+    }
+    
+    .hover-shadow-dark:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Other styling */
+    .border-bottom-light {
+        border-bottom: 1px solid rgba(230, 230, 230, 0.7);
+    }
+    
+    .dashboard-card {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    .shadow-card {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+    
+    /* Animations */
     .fade-in {
-        animation: fadeIn 0.6s ease forwards;
+        animation: fadeIn 0.5s ease forwards;
     }
     
     @keyframes fadeIn {
         from {
             opacity: 0;
+            transform: translateY(10px);
         }
         to {
             opacity: 1;
+            transform: translateY(0);
         }
-    }
-    
-    /* Form styling */
-    .form-input input,
-    .form-input textarea {
-        transition: all 0.3s ease;
-    }
-    
-    .form-input input:focus,
-    .form-input textarea:focus {
-        border-color: var(--color-blue-1) !important;
-        box-shadow: 0 0 0 3px rgba(5, 142, 199, 0.1);
-    }
-    
-    .border-light {
-        border: 1px solid #ddd;
-    }
-    
-    /* Button styling */
-    .button {
-        transition: all 0.3s ease;
-    }
-    
-    .button.-blue-1:hover {
-        background-color: #0073cc !important;
     }
 </style>
 {% endblock %}

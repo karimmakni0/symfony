@@ -1,0 +1,330 @@
+/**
+ * Admin Blog - Post Details and Edit Form Styling
+ * Consistent with other admin interfaces
+ */
+
+:root {
+  --color-primary: #3554d1;
+  --color-primary-light: #EDF3FF;
+  --color-success: #27ae60;
+  --color-danger: #d93025;
+  --color-text: #697488;
+  --color-text-dark: #051036;
+  --color-border: #EAEEF3;
+  --color-bg-light: #F5F9FE;
+  --color-bg-hover: rgba(53, 84, 209, 0.05);
+  --border-radius: 8px;
+  --border-radius-sm: 6px;
+  --border-radius-lg: 10px;
+  --border-radius-pill: 30px;
+  --transition: all 0.2s ease;
+}
+
+/* ======= Post Details Popup ======= */
+.post-details-swal-popup {
+  padding: 0 !important;
+  border-radius: var(--border-radius) !important;
+  overflow: hidden !important;
+}
+
+.post-details-swal-content {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.post-details-confirm-btn {
+  border-radius: var(--border-radius-sm) !important;
+  font-weight: 500 !important;
+  padding: 10px 24px !important;
+  font-size: 15px !important;
+}
+
+/* Container styling */
+.post-details-container {
+  font-family: 'Jost', sans-serif;
+  color: var(--color-text);
+}
+
+/* Header with image and meta info */
+.post-details-header {
+  background-color: var(--color-primary-light);
+  padding: 25px 30px;
+  display: flex;
+  gap: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.post-image-container {
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  border-radius: var(--border-radius);
+  flex-shrink: 0;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.post-details-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.post-meta {
+  flex: 1;
+}
+
+.post-meta-row {
+  display: flex;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.meta-label {
+  width: 100px;
+  min-width: 100px;
+  font-weight: 500;
+  color: var(--color-text-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta-label svg {
+  color: var(--color-primary);
+}
+
+.meta-value {
+  flex: 1;
+  word-break: break-word;
+}
+
+.activity-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--border-radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Engagement stats */
+.engagement-stats {
+  display: flex;
+  margin-top: 15px;
+  gap: 15px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-value {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.likes svg {
+  color: var(--color-success);
+}
+
+.dislikes svg {
+  color: var(--color-danger);
+}
+
+/* Post content */
+.post-details-content {
+  padding: 25px 30px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  margin: 0 0 15px 0;
+}
+
+.section-title svg {
+  color: var(--color-primary);
+}
+
+.post-description {
+  line-height: 1.6;
+}
+
+/* Comments section */
+.post-comments-section {
+  padding: 25px 30px;
+}
+
+.no-comments-message {
+  color: var(--color-text);
+  font-style: italic;
+  padding: 15px 0;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.comment-item {
+  padding: 15px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background-color: #fff;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.comment-author {
+  font-weight: 500;
+  color: var(--color-text-dark);
+}
+
+.comment-date {
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+.comment-content {
+  line-height: 1.5;
+}
+
+/* ======= Edit Post Form ======= */
+.edit-post-swal-popup {
+  padding: 20px !important;
+  border-radius: var(--border-radius) !important;
+}
+
+.edit-post-form {
+  font-family: 'Jost', sans-serif;
+}
+
+.edit-post-confirm-btn, 
+.edit-post-cancel-btn {
+  border-radius: var(--border-radius-sm) !important;
+  font-weight: 500 !important;
+  padding: 10px 24px !important;
+  font-size: 15px !important;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--color-text-dark);
+  font-size: 14px;
+}
+
+.swal2-input, 
+.swal2-textarea, 
+.swal2-select {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--border-radius-sm) !important;
+  padding: 10px 12px !important;
+  font-family: 'Jost', sans-serif !important;
+  font-size: 14px !important;
+}
+
+.swal2-textarea {
+  min-height: 120px !important;
+  resize: vertical !important;
+}
+
+/* Image upload and preview */
+.image-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.image-preview-container {
+  width: 100%;
+  height: 200px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-light);
+}
+
+.image-preview-container.no-image {
+  background-color: #f9f9f9;
+}
+
+.image-preview-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-image-placeholder {
+  color: var(--color-text);
+  font-size: 14px;
+  font-style: italic;
+}
+
+.image-upload-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.select-image-btn,
+.remove-image-btn {
+  padding: 8px 16px;
+  border-radius: var(--border-radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: var(--transition);
+}
+
+.select-image-btn {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.select-image-btn:hover {
+  background-color: #2a43a5;
+}
+
+.remove-image-btn {
+  background-color: var(--color-danger);
+  color: white;
+}
+
+.remove-image-btn:hover {
+  background-color: #b72820;
+}
+
+.swal2-select {
+  height: auto !important;
+  padding: 8px 12px !important;
+}

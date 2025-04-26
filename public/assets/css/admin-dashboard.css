@@ -1,0 +1,80 @@
+/* Admin Dashboard Styles */
+:root {
+  --color-blue-1: #3554D1;
+  --color-blue-1-05: rgba(53, 84, 209, 0.05);
+  --color-blue-2: #4A6BE0;
+  --color-blue-3: #8092EB;
+  --color-blue-4: #CED9FF;
+  --color-green-1: #10B981;
+  --color-green-2: #5CC9A7;
+  --color-green-3: #BBF7D0;
+  --color-yellow-1: #FA8A00;
+  --color-yellow-2: #FDC672;
+  --color-yellow-3: #FFF8DB;
+  --color-red-1: #D93025;
+  --color-red-2: #F97066;
+  --color-red-3: #FCE9EA;
+}
+
+/* Quick Access Cards */
+.dashCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.dashCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+}
+
+.dashCard__icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.dashCard__content {
+  font-size: 16px;
+  font-weight: 500;
+  color: #051036;
+  margin-top: 10px;
+}
+
+/* Recent Posts & Upgrade Requests */
+.overflow-scroll.scroll-bar-1 {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-blue-1) transparent;
+}
+
+.overflow-scroll.scroll-bar-1::-webkit-scrollbar {
+  width: 5px;
+}
+
+.overflow-scroll.scroll-bar-1::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-scroll.scroll-bar-1::-webkit-scrollbar-thumb {
+  background-color: var(--color-blue-1);
+  border-radius: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashCard__icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .dashCard__content {
+    font-size: 14px;
+  }
+}

@@ -51,4 +51,39 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
     {
         return $this->findOneBy(['verification_code' => $verificationCode]);
     }
+    
+    /**
+     * Filter users based on search criteria
+     * 
+     * @param array $filters Filters to apply
+     * @return Users[] Returns an array of Users objects
+     */
+    public function filterUsers(array $filters = []): array
+    {
+        $qb = $this->createQueryBuilder('u');
+        
+        // Apply search term filter (searches in name, lastname, and email)
+        if (!empty($filters['search'])) {
+            $searchTerm = '%' . $filters['search'] . '%';
+            $qb->andWhere('u.name LIKE :search OR u.lastname LIKE :search OR u.email LIKE :search')
+               ->setParameter('search', $searchTerm);
+        }
+        
+        // Filter by role
+        if (!empty($filters['role'])) {
+            $qb->andWhere('u.role = :role')
+               ->setParameter('role', $filters['role']);
+        }
+        
+        // Filter by status (banned/active)
+        if (isset($filters['status'])) {
+            $qb->andWhere('u.isBanned = :status')
+               ->setParameter('status', $filters['status'] === 'banned');
+        }
+        
+        // Sort users
+        $qb->orderBy('u.id', 'ASC');
+        
+        return $qb->getQuery()->getResult();
+    }
 }

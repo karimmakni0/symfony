@@ -1,0 +1,700 @@
+{% extends 'PubBase.html.twig' %}
+
+{% block title %}My Blog Posts{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .dashboard-items-head {
+        padding: 15px;
+        border-radius: 8px;
+        background-color: var(--color-light-2);
+    }
+    
+    .dashboard-items-body {
+        padding: 0;
+    }
+    
+    .dashboard-items-body .row {
+        position: relative;
+        padding: 18px 15px;
+        border-bottom: 1px solid var(--color-border);
+        transition: all 0.2s ease;
+    }
+    
+    .dashboard-items-body .row:hover {
+        background-color: rgba(237, 242, 247, 0.5);
+    }
+    
+    .dashboard-table-image {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+    
+    .dashboard-table-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    
+    .dashboard-table-row i {
+        margin-right: 8px;
+        color: var(--color-blue-1);
+    }
+    
+    /* Badge styles */
+    .badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 100px;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1;
+    }
+    
+    .badge-green {
+        background-color: rgba(52, 211, 153, 0.1);
+        color: rgb(16, 185, 129);
+    }
+    
+    .badge-blue {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: rgb(37, 99, 235);
+    }
+    
+    .badge-red {
+        background-color: rgba(248, 113, 113, 0.1);
+        color: rgb(239, 68, 68);
+    }
+    
+    .badge-purple {
+        background-color: rgba(139, 92, 246, 0.1);
+        color: rgb(124, 58, 237);
+    }
+    
+    /* Action buttons */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .action-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .action-button i {
+        margin-right: 6px;
+        font-size: 16px;
+    }
+    
+    .action-button:hover {
+        transform: translateY(-3px);
+    }
+    
+    .view-button {
+        background-color: rgba(37, 99, 235, 0.9);
+        color: white;
+    }
+    
+    .view-button:hover {
+        background-color: rgb(29, 78, 216);
+    }
+    
+    .edit-button {
+        background-color: rgba(37, 99, 235, 0.1);
+        color: rgb(37, 99, 235);
+    }
+    
+    .edit-button:hover {
+        background-color: rgba(37, 99, 235, 0.2);
+    }
+    
+    .delete-button {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: rgb(239, 68, 68);
+    }
+    
+    .delete-button:hover {
+        background-color: rgba(239, 68, 68, 0.2);
+    }
+    
+    /* Stats card */
+    .stats-card {
+        padding: 25px;
+        border-radius: 12px;
+        background-color: white;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(230, 230, 230, 0.7);
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    .stats-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+    
+    .stats-card-icon {
+        height: 60px;
+        width: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+    
+    .stats-card-icon.blue {
+        background-color: rgba(53, 84, 209, 0.08);
+        color: var(--color-blue-1);
+    }
+    
+    .stats-card-icon.green {
+        background-color: rgba(52, 211, 153, 0.08);
+        color: rgb(16, 185, 129);
+    }
+    
+    .stats-card-icon.purple {
+        background-color: rgba(139, 92, 246, 0.08);
+        color: rgb(124, 58, 237);
+    }
+    
+    .stats-card-icon.yellow {
+        background-color: rgba(251, 191, 36, 0.08);
+        color: rgb(245, 158, 11);
+    }
+    
+    .stats-card-value {
+        font-size: 40px;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        color: var(--color-dark-1);
+    }
+    
+    .stats-card-label {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--color-light-1);
+        display: block;
+        position: relative;
+    }
+    
+    .empty-state {
+        padding: 40px 20px;
+        text-align: center;
+    }
+    
+    .empty-state-icon {
+        font-size: 60px;
+        color: var(--color-light-2);
+        margin-bottom: 20px;
+    }
+    
+    .empty-state-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--color-dark-1);
+        margin-bottom: 10px;
+    }
+    
+    .empty-state-text {
+        font-size: 16px;
+        color: var(--color-light-1);
+        margin-bottom: 25px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-30 lg:pb-20 md:pb-16">
+    <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">My Blog Posts</h1>
+        <div class="text-15 text-light-1">Manage your blog content</div>
+    </div>
+    <div class="col-auto">
+        <a href="{{ path('app_blog_add') }}" class="button h-50 px-24 -dark-1 bg-blue-1 text-white rounded-8">
+            <i class="icon-plus mr-10"></i>
+            Add New Blog Post
+        </a>
+    </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="row y-gap-30 pt-20 pb-40">
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card">
+            <div class="stats-card-top">
+                <div class="stats-card-icon blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-blue-1" viewBox="0 0 16 16">
+                        <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5v-11zM12 14c.37 0 .654-.211.853-.441.092-.106.147-.279.147-.531V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v11c0 .278.223.5.497.5H12z"/>
+                        <path d="M2 3h10v2H2V3zm0 3h4v3H2V6zm0 4h4v1H2v-1zm0 2h4v1H2v-1zm5-6h2v1H7V6zm3 0h2v1h-2V6zM7 8h2v1H7V8zm3 0h2v1h-2V8zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="stats-card-value">{{ posts|length }}</div>
+            <div class="stats-card-label">Total Posts</div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card">
+            <div class="stats-card-top">
+                <div class="stats-card-icon green">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-green-2" viewBox="0 0 16 16">
+                        <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                        <path d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="stats-card-value">{{ commentCounts|reduce((total, count) => total + count, 0) }}</div>
+            <div class="stats-card-label">Total Comments</div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card">
+            <div class="stats-card-top">
+                <div class="stats-card-icon purple">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-purple-1" viewBox="0 0 16 16">
+                        <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="stats-card-value">{{ posts|filter(post => post.Date|date('U') > ('now'|date('U') - 604800))|length }}</div>
+            <div class="stats-card-label">Posts Last 7 Days</div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card">
+            <div class="stats-card-top">
+                <div class="stats-card-icon yellow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="text-yellow-1" viewBox="0 0 16 16">
+                        <path d="M8.864.046C7.908-.193 7.02.53 6.956 1.466c-.072 1.051-.23 2.016-.428 2.59-.125.36-.479 1.013-1.04 1.639-.557.623-1.282 1.178-2.131 1.41C2.685 7.288 2 7.87 2 8.72v4.001c0 .845.682 1.464 1.448 1.545 1.07.114 1.564.415 2.068.723l.048.03c.272.165.578.348.97.484.397.136.861.217 1.466.217h3.5c.937 0 1.599-.477 1.934-1.064a1.86 1.86 0 0 0 .254-.912c0-.152-.023-.312-.077-.464.201-.263.38-.578.488-.901.11-.33.172-.762.004-1.149.069-.13.12-.269.159-.403.077-.27.113-.568.113-.857 0-.288-.036-.585-.113-.856a2.144 2.144 0 0 0-.138-.362 1.9 1.9 0 0 0 .234-1.734c-.206-.592-.682-1.1-1.2-1.272-.847-.282-1.803-.276-2.516-.211a9.84 9.84 0 0 0-.443.05 9.365 9.365 0 0 0-.062-4.509A1.38 1.38 0 0 0 9.125.111L8.864.046zM11.5 14.721H8c-.51 0-.863-.069-1.14-.164-.281-.097-.506-.228-.776-.393l-.04-.024c-.555-.339-1.198-.731-2.49-.868-.333-.036-.554-.29-.554-.55V8.72c0-.254.226-.543.62-.65 1.095-.3 1.977-.996 2.614-1.708.635-.71 1.064-1.475 1.238-1.978.243-.7.407-1.768.482-2.85.025-.362.36-.594.667-.518l.262.066c.16.04.258.143.288.255a8.34 8.34 0 0 1-.145 4.725.5.5 0 0 0 .595.644l.003-.001.014-.003.058-.014a8.908 8.908 0 0 1 1.036-.157c.663-.06 1.457-.054 2.11.164.175.058.45.3.57.65.107.308.087.67-.266 1.022l-.353.353.353.354c.043.043.105.141.154.315.048.167.075.37.075.581 0 .212-.027.414-.075.582-.05.174-.111.272-.154.315l-.353.353.353.354c.047.047.109.177.005.488a2.224 2.224 0 0 1-.505.805l-.353.353.353.354c.006.005.041.05.041.17a.866.866 0 0 1-.121.416c-.165.288-.503.56-1.066.56z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="stats-card-value">{{ totalLikes }}</div>
+            <div class="stats-card-label">Total Likes</div>
+        </div>
+    </div>
+</div>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30 fade-in">
+            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-4">
+                <div class="row x-gap-10 y-gap-10 items-center">
+                    <div class="col-auto">
+                        <div class="d-flex items-center">
+                            <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
+                            <div class="fw-500">{{ message }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<div class="py-30 px-30 rounded-12 bg-white shadow-3" style="border: 1px solid rgba(230, 230, 230, 0.7);">
+    {% if posts is empty %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="icon-article"></i>
+            </div>
+            <div class="empty-state-title">No Blog Posts Found</div>
+            <div class="empty-state-text">You haven't created any blog posts yet. Start sharing your travel experiences!</div>
+            <div class="d-flex justify-center">
+                <a href="{{ path('app_blog_add') }}" class="button px-30 h-50 -dark-1 bg-blue-1 text-white">
+                    <i class="icon-plus mr-10"></i>
+                    Create Your First Blog Post
+                </a>
+            </div>
+        </div>
+    {% else %}
+
+
+        <!-- Blog Posts Table -->
+        <div class="tabs -underline-2 js-tabs">
+            <div class="tabs__content pt-30 js-tabs-content">
+                <div class="tabs__pane -tab-item-1 is-tab-el-active">
+                    <div class="overflow-scroll scroll-bar-1">
+                        <table class="table-4 -border-bottom col-12">
+                            <thead>
+                                <tr class="bg-blue-1-05">
+                                    <th class="rounded-left-8 py-15 px-15">#</th>
+                                    <th class="py-15 px-15">Title</th>
+                                    <th class="py-15 px-15">Activity</th>
+                                    <th class="py-15 px-15">Date</th>
+                                    <th class="py-15 px-15">Comments</th>
+                                    <th class="rounded-right-8 py-15 px-15 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for post in posts %}
+                                    <tr class="fade-in blog-item border-bottom-light" data-title="{{ post.title|lower }}">
+                                        <td class="py-15 px-15">{{ loop.index }}</td>
+                                        <td class="py-15 px-15">
+                                            <div class="d-flex items-center">
+                                                {% if post.picture %}
+                                                    <div class="mr-15">
+                                                        <img src="{{ asset('uploads/posts/' ~ post.picture) }}" alt="{{ post.title }}" class="size-50 rounded-8 object-cover">
+                                                    </div>
+                                                {% else %}
+                                                    <div class="d-flex items-center justify-center bg-blue-1-05 rounded-8 size-50 mr-15">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="text-blue-1" viewBox="0 0 16 16">
+                                                            <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5v-11zM12 14c.37 0 .654-.211.853-.441.092-.106.147-.279.147-.531V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v11c0 .278.223.5.497.5H12z"/>
+                                                            <path d="M2 3h10v2H2V3zm0 3h4v3H2V6zm0 4h4v1H2v-1zm0 2h4v1H2v-1zm5-6h2v1H7V6zm3 0h2v1h-2V6zM7 8h2v1H7V8zm3 0h2v1h-2V8zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1z"/>
+                                                        </svg>
+                                                    </div>
+                                                {% endif %}
+                                                <div class="text-15 lh-16 fw-500 text-truncate" style="max-width: 250px;">{{ post.title }}</div>
+                                            </div>
+                                        </td>
+                                        <td class="py-15 px-15">
+                                            {% if post.activityId and activities[post.activityId] is defined %}
+                                                <span class="badge py-5 px-15 text-center bg-blue-1-05 rounded-100 text-14 fw-500 text-blue-1">
+                                                    {{ activities[post.activityId].activityName|length > 15 ? activities[post.activityId].activityName|slice(0, 15) ~ '...' : activities[post.activityId].activityName }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-light-1">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-15 px-15">
+                                            <div class="d-flex items-center">
+                                                <div class="size-35 rounded-8 flex-center bg-blue-1-05 mr-10">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-blue-1" viewBox="0 0 16 16">
+                                                        <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                                                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                                                    </svg>
+                                                </div>
+                                                <span class="text-15 fw-500">{{ post.date|date('M d, Y') }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-15 px-15">
+                                            <div class="d-flex items-center">
+                                                <div class="size-35 rounded-8 flex-center bg-green-1-05 mr-10">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-green-2" viewBox="0 0 16 16">
+                                                        <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                                    </svg>
+                                                </div>
+                                                <span class="text-15 fw-500">{{ commentCounts[post.id] }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-15 px-15">
+                                            <div class="d-flex items-center justify-center gap-10">
+                                                <a href="{{ path('app_blog_details', {'id': post.id}) }}" class="flex-center size-40 rounded-8 bg-blue-1-05 text-15 text-blue-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3554D1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                        <circle cx="12" cy="12" r="3"></circle>
+                                                    </svg>
+                                                </a>
+                                                
+                                                <a href="{{ path('app_blog_edit', {'id': post.id}) }}" class="flex-center size-40 rounded-8 bg-green-1-05 text-15 text-green-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                    </svg>
+                                                </a>
+                                                
+                                                <a href="#" class="flex-center size-40 rounded-8 bg-red-1-05 text-15 text-red-1 delete-post" data-id="{{ post.id }}">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                
+                                {% if posts|length == 0 %}
+                                    <tr id="noResults">
+                                        <td colspan="6" class="text-center py-30">
+                                            <div class="text-18 fw-500">No blog posts found</div>
+                                            <div class="mt-5 text-15 text-light-1">Create your first blog post to get started</div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        
+                        <!-- No search results message -->
+                        <div id="noResults" class="text-center py-30" style="display: none;">
+                            <div class="text-18 fw-500">No Results Found</div>
+                            <div class="mt-5 text-15 text-light-1">Try adjusting your search to find what you're looking for.</div>
+                            <button id="clearSearch" class="button -blue-1 bg-blue-1-05 text-blue-1 py-15 px-30 rounded-4 mt-20">
+                                <i class="icon-close mr-10"></i>
+                                Clear Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if max_pages > 1 %}
+            <div class="border-top-light mt-30 pt-30">
+                <div class="row x-gap-10 y-gap-20 justify-between md:justify-center">
+                    <div class="col-auto md:order-1">
+                        <div class="row x-gap-20 y-gap-20 items-center">
+                            {% if current_page > 1 %}
+                                <div class="col-auto">
+                                    <a href="{{ path('app_publicator_blog_index', {'page': current_page - 1}) }}" class="button -blue-1 size-40 rounded-full border-light">
+                                        <i class="icon-chevron-left text-12"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                            
+                            {% set start_page = max(1, current_page - 2) %}
+                            {% set end_page = min(max_pages, start_page + 4) %}
+                            {% if end_page - start_page < 4 and start_page > 1 %}
+                                {% set start_page = max(1, end_page - 4) %}
+                            {% endif %}
+                            
+                            {% for page in start_page..end_page %}
+                                <div class="col-auto">
+                                    <a href="{{ path('app_publicator_blog_index', {'page': page}) }}" class="button -blue-1 {% if page == current_page %}bg-dark-1 text-white{% else %}text-dark-1 bg-light-2{% endif %} size-40 rounded-full">
+                                        {{ page }}
+                                    </a>
+                                </div>
+                            {% endfor %}
+                            
+                            {% if current_page < max_pages %}
+                                <div class="col-auto">
+                                    <a href="{{ path('app_publicator_blog_index', {'page': current_page + 1}) }}" class="button -blue-1 size-40 rounded-full border-light">
+                                        <i class="icon-chevron-right text-12"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-auto md:order-2">
+                        <div class="text-15 text-light-1">
+                            Showing {{ ((current_page - 1) * items_per_page) + 1 }}-{{ min(current_page * items_per_page, total_items) }} of {{ total_items }} results
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for blog update success flag and show SweetAlert
+    {% if app.session.get('blog_updated') %}
+        Swal.fire({
+            title: 'Success!',
+            text: 'Your blog post has been updated successfully!',
+            icon: 'success',
+            confirmButtonColor: '#3554D1',
+            confirmButtonText: 'Great!'
+        });
+        // Clear the flag so it doesn't show again on refresh
+        {% set temp = app.session.remove('blog_updated') %}
+    {% endif %}
+    
+    // Check for blog creation success flag and show SweetAlert
+    {% if app.session.get('blog_created') %}
+        Swal.fire({
+            title: 'Success!',
+            text: 'Your blog post has been published successfully!',
+            icon: 'success',
+            confirmButtonColor: '#3554D1',
+            confirmButtonText: 'Great!'
+        });
+        // Clear the flag so it doesn't show again on refresh
+        {% set temp = app.session.remove('blog_created') %}
+    {% endif %}
+    
+    // Check for blog deletion success flag and show SweetAlert
+    {% if app.session.get('blog_deleted') %}
+        Swal.fire({
+            title: 'Success!',
+            text: 'Post deleted successfully!',
+            icon: 'success',
+            confirmButtonColor: '#3554D1',
+            confirmButtonText: 'Great!'
+        });
+        // Clear the flag so it doesn't show again on refresh
+        {% set temp = app.session.remove('blog_deleted') %}
+    {% endif %}
+    
+    // Delete post with SweetAlert confirmation
+    const deleteButtons = document.querySelectorAll('.delete-post');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-id');
+            
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You are about to delete this blog post. This action cannot be undone!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '{{ path("app_blog_delete", {"id": "PLACEHOLDER"}) }}'.replace('PLACEHOLDER', postId);
+                }
+            });
+        });
+    });
+    
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const blogItems = document.querySelectorAll('.blog-item');
+    const noResults = document.getElementById('noResults');
+    const clearSearchBtn = document.getElementById('clearSearch');
+    
+    if (searchInput && blogItems.length > 0) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let resultsFound = false;
+            
+            blogItems.forEach(item => {
+                const title = item.getAttribute('data-title');
+                if (title.includes(searchTerm)) {
+                    item.style.display = '';
+                    resultsFound = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Show/hide no results message
+            if (resultsFound) {
+                if (noResults) noResults.style.display = 'none';
+            } else {
+                if (noResults) noResults.style.display = 'block';
+            }
+        });
+    }
+    
+    // Clear search
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', function() {
+            if (searchInput) searchInput.value = '';
+            
+            // Show all items
+            blogItems.forEach(item => {
+                item.style.display = '';
+            });
+            
+            // Hide no results message
+            if (noResults) noResults.style.display = 'none';
+        });
+    }
+    
+    // Flash messages auto-dismiss
+    const flashMessages = document.querySelectorAll('.alert');
+    if (flashMessages.length > 0) {
+        setTimeout(() => {
+            flashMessages.forEach(message => {
+                message.style.opacity = '0';
+                setTimeout(() => {
+                    message.style.display = 'none';
+                }, 500);
+            });
+        }, 5000);
+    }
+});
+</script>
+<style>
+    /* Animation styles */
+    .hover-animation {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-animation:hover {
+        transform: translateY(-3px);
+    }
+    
+    /* Fade in animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    /* Table styling */
+    .table th {
+        font-weight: 500;
+        color: var(--color-dark-1);
+        padding: 12px 15px;
+    }
+    
+    .table td {
+        padding: 15px;
+        vertical-align: middle;
+    }
+    
+    .border-bottom-light {
+        border-bottom: 1px solid #eee;
+    }
+    
+    .border-top-light {
+        border-top: 1px solid #eee;
+    }
+    
+    /* Button styling */
+    .button {
+        transition: all 0.3s ease;
+    }
+    
+    .button.-blue-1:hover {
+        background-color: #0073cc !important;
+    }
+    
+    .button.-red-1:hover {
+        background-color: #e74c3c !important;
+        color: white !important;
+    }
+    
+    .button.-green-1:hover {
+        background-color: #27ae60 !important;
+        color: white !important;
+    }
+</style>
+{% endblock %}

@@ -3,13 +3,13 @@
 {% block title %}Your Activities{% endblock %}
 
 {% block body %}
-<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+<div class="row y-gap-20 justify-between items-end pb-30 lg:pb-20 md:pb-16">
     <div class="col-auto">
         <h1 class="text-30 lh-14 fw-600">Your Activities</h1>
-        <div class="text-15 text-light-1">Manage your travel activities</div>
+        <div class="text-15 text-light-1">Manage your travel activities and experiences</div>
     </div>
     <div class="col-auto">
-        <a href="{{ path('app_publicator_add_activity') }}" class="button h-50 px-24 -dark-1 bg-blue-1 text-white">
+        <a href="{{ path('app_publicator_add_activity') }}" class="button h-50 px-24 -dark-1 bg-blue-1 text-white rounded-8">
             <i class="icon-plus mr-10"></i>
             Add New Activity
         </a>
@@ -19,7 +19,7 @@
 {% for label, messages in app.flashes %}
     {% for message in messages %}
         <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30 fade-in">
-            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-4">
+            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-8">
                 <div class="row x-gap-10 y-gap-10 items-center">
                     <div class="col-auto">
                         <div class="d-flex items-center">
@@ -33,92 +33,484 @@
     {% endfor %}
 {% endfor %}
 
-<div class="py-30 px-30 rounded-4 bg-white shadow-3">
-    {% if activities is empty %}
-        <div class="row justify-center">
-            <div class="col-auto">
-                <div class="text-18 fw-500 text-center mb-10">No Activities Found</div>
-                <div class="text-15 text-light-1 text-center mb-30">You haven't created any activities yet.</div>
-                <div class="d-flex justify-center">
-                    <a href="{{ path('app_publicator_add_activity') }}" class="button px-30 h-50 -dark-1 bg-blue-1 text-white">
-                        <i class="icon-plus mr-10"></i>
-                        Create Your First Activity
-                    </a>
+<!-- Stats Overview -->
+<div class="row y-gap-30 pt-20 pb-40">
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-card-top">
+                <div class="stats-card-icon blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                        <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="stats-card-value">{{ activities|length }}</div>
+            <div class="stats-card-label">Total Activities</div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-card-top">
+                <div class="stats-card-icon green">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                    </svg>
+                </div>
+            </div>
+            {% set uniqueDestinations = [] %}
+            {% for activity in activities %}
+                {% if activity.activityDestination is not empty and activity.activityDestination not in uniqueDestinations %}
+                    {% set uniqueDestinations = uniqueDestinations|merge([activity.activityDestination]) %}
+                {% endif %}
+            {% endfor %}
+            <div class="stats-card-value">{{ uniqueDestinations|length }}</div>
+            <div class="stats-card-label">Unique Destinations</div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-card-top">
+                <div class="stats-card-icon purple">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                    </svg>
+                </div>
+            </div>
+            {% set upcomingActivities = 0 %}
+            {% for activity in activities %}
+                {% if activity.activityDate is not empty and activity.activityDate > 'now'|date('Y-m-d') %}
+                    {% set upcomingActivities = upcomingActivities + 1 %}
+                {% endif %}
+            {% endfor %}
+            <div class="stats-card-value">{{ upcomingActivities }}</div>
+            <div class="stats-card-label">Upcoming Activities</div>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="row mb-30">
+    <div class="col-12">
+        <div class="px-20 py-20 rounded-8 bg-white shadow-3" style="border: 1px solid rgba(230, 230, 230, 0.7);">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="search-box">
+                        <div class="search-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M21 21L16.65 16.65" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search activities...">
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="search-box">
+                        <div class="search-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 6V12L16 14" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <select id="destinationFilter" class="form-select">
+                            <option value="">Filter by destination...</option>
+                            {% set uniqueDestinations = [] %}
+                            {% for activity in activities %}
+                                {% if activity.activityDestination is not empty and activity.activityDestination not in uniqueDestinations %}
+                                    {% set uniqueDestinations = uniqueDestinations|merge([activity.activityDestination]) %}
+                                {% endif %}
+                            {% endfor %}
+                            {% for destination in uniqueDestinations|sort %}
+                                <option value="{{ destination }}">{{ destination }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="d-flex justify-center">
+                        <button id="clearFilters" class="button -md -blue-1 bg-blue-1 text-white rounded-8 h-50 px-30 shadow-hover-1">
+                            <i class="icon-close-circle text-16 mr-10"></i>
+                            Clear Filters
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Activities Table -->
+<div class="py-30 px-30 rounded-12 bg-white shadow-3 mb-30" style="border: 1px solid rgba(230, 230, 230, 0.7);">
+    {% if activities is empty %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="icon-calendar"></i>
+            </div>
+            <div class="empty-state-title">No Activities Found</div>
+            <div class="empty-state-text">You haven't created any activities yet.</div>
+            <a href="{{ path('app_publicator_add_activity') }}" class="button px-30 h-50 -dark-1 bg-blue-1 text-white rounded-8">
+                <i class="icon-plus mr-10"></i>
+                Create Your First Activity
+            </a>
+        </div>
     {% else %}
-        <div class="table-responsive">
-            <table class="table y-gap-40 text-15">
-                <thead class="bg-light-2">
-                    <tr>
-                        <th>Name</th>
-                        <th>Destination</th>
-                        <th>Genre</th>
-                        <th>Duration</th>
-                        <th>Price</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for activity in activities %}
-                        <tr class="border-bottom-light fade-in">
-                            <td>
-                                <div class="fw-500 text-blue-1">{{ activity.activityName }}</div>
-                            </td>
-                            <td>{{ activity.activityDestination }}</td>
-                            <td>{{ activity.activityGenre }}</td>
-                            <td>{{ activity.activityDuration }}</td>
-                            <td>${{ activity.activityPrice }}</td>
-                            <td>{{ activity.activityDate ? activity.activityDate|date('Y-m-d') : 'N/A' }}</td>
-                            <td>
-                                <div class="row x-gap-10 y-gap-10">
-                                    <div class="col-auto">
-                                        <a href="{{ path('app_publicator_activity_detail', {'id': activity.id}) }}" class="button -sm -dark-1 bg-blue-1 text-white hover-animation">
-                                            <i class="icon-eye"></i>
-                                            View Details
-                                        </a>
-                                    </div>
-                                    <div class="col-auto">
-                                        <a href="{{ path('app_publicator_edit_activity', {'id': activity.id}) }}" class="button -sm -blue-1 text-blue-1 bg-blue-1-05 hover-animation">
-                                            <i class="icon-edit"></i>
-                                            Edit
-                                        </a>
-                                    </div>
-                                    <div class="col-auto">
-                                        <button type="button" class="button -sm -red-1 text-red-1 bg-red-1-05 hover-animation delete-activity" data-id="{{ activity.id }}">
-                                            <i class="icon-trash"></i>
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- Section Title -->
+        <div class="d-flex justify-between items-center">
+            <h2 class="text-22 fw-500">All Activities</h2>
+        </div>
+        
+        <!-- Activities Table -->
+        <div class="tabs -underline-2 js-tabs">
+            <div class="tabs__content pt-30 js-tabs-content">
+                <div class="tabs__pane -tab-item-1 is-tab-el-active">
+                    <div class="overflow-scroll scroll-bar-1">
+                        <table class="table-4 -border-bottom col-12">
+                            <thead>
+                                <tr class="bg-blue-1-05">
+                                    <th class="rounded-left-8 py-15 px-15">#</th>
+                                    <th class="py-15 px-15">Activity</th>
+                                    <th class="py-15 px-15">Destination</th>
+                                    <th class="py-15 px-15">Genre</th>
+                                    <th class="py-15 px-15">Duration</th>
+                                    <th class="py-15 px-15">Price</th>
+                                    <th class="py-15 px-15">Date</th>
+                                    <th class="rounded-right-8 py-15 px-15 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for activity in activities %}
+                                    <tr class="border-bottom-light activity-item fade-in" 
+                                        data-name="{{ activity.activityName|lower }}" 
+                                        data-destination="{{ activity.activityDestination|lower }}" 
+                                        data-genre="{{ activity.activityGenre|lower }}">
+                                        <td class="py-15 px-15">{{ loop.index }}</td>
+                                        <td class="py-15 px-15">
+                                            <div class="fw-500 lh-14">{{ activity.activityName }}</div>
+                                        </td>
+                                        <td class="py-15 px-15">{{ activity.activityDestination }}</td>
+                                        <td class="py-15 px-15">
+                                            <span class="badge py-5 px-15 text-14 bg-blue-1-05 text-blue-1 rounded-100">{{ activity.activityGenre }}</span>
+                                        </td>
+                                        <td class="py-15 px-15">{{ activity.activityDuration }}</td>
+                                        <td class="py-15 px-15 fw-500">${{ activity.activityPrice }}</td>
+                                        <td class="py-15 px-15">
+                                            {% if activity.activityDate %}
+                                                {% set isUpcoming = activity.activityDate > 'now'|date('Y-m-d') %}
+                                                <span class="badge py-5 px-15 text-14 {% if isUpcoming %}bg-green-2 text-green-1{% else %}bg-light-2 text-light-1{% endif %} rounded-100">
+                                                    {{ activity.activityDate|date('d M Y') }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-light-1">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-15 px-15">
+                                            <div class="d-flex x-gap-10 justify-center">
+                                                <div>
+                                                    <a href="{{ path('app_publicator_activity_detail', {'id': activity.id}) }}" 
+                                                       class="btn size-30 rounded-8 bg-blue-1 text-white shadow-hover-2">
+                                                        <i class="icon-eye text-12"></i>
+                                                    </a>
+                                                </div>
+                                                <div>
+                                                    <a href="{{ path('app_publicator_edit_activity', {'id': activity.id}) }}" 
+                                                       class="btn size-30 rounded-8 bg-light-2 shadow-hover-2">
+                                                        <i class="icon-edit text-12"></i>
+                                                    </a>
+                                                </div>
+                                                <div>
+                                                    <button type="button" class="btn size-30 rounded-8 bg-red-3 text-red-1 shadow-hover-2 delete-activity" 
+                                                            data-id="{{ activity.id }}" data-name="{{ activity.activityName }}">
+                                                        <i class="icon-trash text-12"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- No Results Message -->
+        <div id="noResults" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">
+                <i class="icon-search"></i>
+            </div>
+            <div class="empty-state-title">No matching activities found</div>
+            <div class="empty-state-text">Try adjusting your search or filter to find what you're looking for.</div>
+            <button id="resetFilters" class="button px-30 h-50 -blue-1 bg-blue-1-05 text-blue-1 rounded-8">
+                <i class="icon-close mr-10"></i>
+                Reset Filters
+            </button>
         </div>
     {% endif %}
 </div>
 {% endblock %}
 
 {% block javascripts %}
+<!-- SweetAlert2 Library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Delete activity with confirmation
+    // Cache DOM elements
+    const searchInput = document.getElementById('searchInput');
+    const destinationFilter = document.getElementById('destinationFilter');
+    const clearFiltersBtn = document.getElementById('clearFilters');
+    const resetFiltersBtn = document.getElementById('resetFilters');
+    const activityItems = document.querySelectorAll('.activity-item');
+    const noResultsEl = document.getElementById('noResults');
+    const activityCountEl = document.getElementById('activityCount');
+    
+    // Search and filter functionality
+    function filterActivities() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const destinationValue = destinationFilter.value.toLowerCase();
+        
+        let visibleCount = 0;
+        
+        activityItems.forEach(item => {
+            const name = item.getAttribute('data-name') || '';
+            const destination = item.getAttribute('data-destination') || '';
+            const genre = item.getAttribute('data-genre') || '';
+            
+            const matchesSearch = searchTerm === '' || 
+                name.includes(searchTerm) || 
+                destination.includes(searchTerm) || 
+                genre.includes(searchTerm);
+                
+            const matchesDestination = destinationValue === '' || destination === destinationValue;
+            
+            if (matchesSearch && matchesDestination) {
+                item.style.display = '';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        // Update count and show/hide no results message
+        if (activityCountEl) {
+            activityCountEl.textContent = `${visibleCount} Activities`;
+        }
+        
+        if (noResultsEl) {
+            noResultsEl.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+        
+        // Show table or no results
+        const tableEl = document.querySelector('.tabs');
+        if (tableEl) {
+            tableEl.style.display = visibleCount === 0 ? 'none' : 'block';
+        }
+    }
+    
+    // Clear all filters
+    function clearFilters() {
+        if (searchInput) searchInput.value = '';
+        if (destinationFilter) destinationFilter.value = '';
+        filterActivities();
+    }
+    
+    // Add event listeners
+    if (searchInput) {
+        searchInput.addEventListener('input', filterActivities);
+    }
+    
+    if (destinationFilter) {
+        destinationFilter.addEventListener('change', filterActivities);
+    }
+    
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', clearFilters);
+    }
+    
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', clearFilters);
+    }
+    
+    // Delete activity with SweetAlert confirmation
     const deleteButtons = document.querySelectorAll('.delete-activity');
     deleteButtons.forEach(button => {
         button.addEventListener('click', function() {
             const activityId = this.getAttribute('data-id');
-            if (confirm('Are you sure you want to delete this activity? This action cannot be undone.')) {
-                window.location.href = '{{ path("app_publicator_activities") }}/delete/' + activityId;
-            }
+            const activityName = this.getAttribute('data-name');
+            
+            Swal.fire({
+                title: 'Are you sure?',
+                html: `You are about to delete <strong>${activityName}</strong>. This action cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '{{ path("app_publicator_activities") }}/delete/' + activityId;
+                }
+            });
         });
     });
 });
 </script>
 <style>
+    /* Stats Card Styling */
+    .stats-card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(230, 230, 230, 0.7);
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    .stats-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .stats-card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+    
+    .stats-card-icon.blue {
+        background-color: rgba(53, 84, 209, 0.08);
+        color: var(--color-blue-1);
+    }
+    
+    .stats-card-icon.green {
+        background-color: rgba(52, 211, 153, 0.08);
+        color: rgb(16, 185, 129);
+    }
+    
+    .stats-card-icon.purple {
+        background-color: rgba(139, 92, 246, 0.08);
+        color: rgb(124, 58, 237);
+    }
+    
+    .stats-card-icon.yellow {
+        background-color: rgba(251, 191, 36, 0.08);
+        color: rgb(245, 158, 11);
+    }
+    
+    .stats-card-value {
+        font-size: 40px;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        color: var(--color-dark-1);
+    }
+    
+    .stats-card-label {
+        font-size: 16px;
+        color: var(--color-light-1);
+        font-weight: 500;
+    }
+
+    /* Search Box Styling */
+    .search-box {
+        position: relative;
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .search-box .form-control,
+    .search-box .form-select,
+    .search-box .btn {
+        padding-left: 45px;
+        height: 50px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .search-box .form-control:focus,
+    .search-box .form-select:focus {
+        box-shadow: none;
+        border-color: var(--color-blue-1);
+    }
+    
+    /* Ultra-minimal search and filter styling */
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: none !important;
+        outline: none !important;
+        border-color: #d1d5db !important;
+    }
+    
+    .form-control::placeholder,
+    .form-select::placeholder {
+        color: #9ca3af;
+        font-weight: 400;
+    }
+    
+    /* Remove default select styling in all browsers */
+    select.form-select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: none !important;
+    }
+    
+    /* Empty state styling */
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+    }
+    
+    .empty-state-icon {
+        font-size: 48px;
+        color: var(--color-blue-1);
+        margin-bottom: 15px;
+        opacity: 0.7;
+    }
+    
+    .empty-state-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--color-dark-1);
+        margin-bottom: 10px;
+    }
+    
+    .empty-state-text {
+        font-size: 16px;
+        color: var(--color-light-1);
+        margin-bottom: 25px;
+    }
+    
     /* Animation styles */
     .hover-animation {
         transition: all 0.3s ease;
@@ -143,23 +535,70 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /* Table styling */
-    .table th {
-        font-weight: 500;
-        color: var(--color-dark-1);
-        padding: 12px 15px;
+    .table-4 {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
     }
     
-    .table td {
-        padding: 15px;
+    .table-4 th {
+        font-weight: 500;
+        color: var(--color-dark-1);
+        text-align: left;
+    }
+    
+    .table-4 td {
         vertical-align: middle;
     }
     
-    .border-bottom-light {
-        border-bottom: 1px solid #eee;
+    .table-4 tbody tr {
+        transition: all 0.2s ease;
     }
     
-    .border-top-light {
-        border-top: 1px solid #eee;
+    .table-4 tbody tr:hover {
+        background-color: rgba(53, 84, 209, 0.02);
+    }
+    
+    .rounded-left-8 {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+    }
+    
+    .rounded-right-8 {
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+    
+    .border-bottom-light {
+        border-bottom: 1px solid rgba(230, 230, 230, 0.7);
+    }
+    
+    /* Badge styles */
+    .badge {
+        display: inline-block;
+        border-radius: 100px;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1;
+    }
+    
+    /* Action buttons */
+    .btn.shadow-hover-2 {
+        transition: all 0.25s ease;
+    }
+    
+    .btn.shadow-hover-2:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn.size-30 {
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     /* Button styling */
@@ -168,17 +607,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     .button.-blue-1:hover {
-        background-color: #0073cc !important;
+        background-color: var(--color-blue-1) !important;
+        color: white !important;
     }
     
     .button.-red-1:hover {
-        background-color: #e74c3c !important;
+        background-color: var(--color-red-2) !important;
         color: white !important;
     }
     
-    .button.-green-1:hover {
-        background-color: #27ae60 !important;
-        color: white !important;
+    /* Fix for showing scrollbar only when needed */
+    .overflow-scroll {
+        overflow: auto !important;
+    }
+    
+    /* Make sure the table doesn't overflow on mobile */
+    @media (max-width: 767px) {
+        .overflow-scroll {
+            -webkit-overflow-scrolling: touch;
+        }
     }
 </style>
 {% endblock %}

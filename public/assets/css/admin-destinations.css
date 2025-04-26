@@ -1,0 +1,493 @@
+/* Admin Destinations Styling */
+
+/* Table container */
+.tabs-table-container {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 15px; /* Add space for scroll bar */
+  margin-bottom: 20px;
+  -webkit-overflow-scrolling: touch; /* Main container */
+  position: relative;
+}
+
+/* Tab styling */
+.tabs__button {
+  display: inline-block;
+  height: 50px;
+  line-height: 50px;
+  border: none;
+  background-color: transparent;
+  font-weight: 600;
+  font-size: 18px;
+  color: #051036;
+  padding: 0;
+  position: relative;
+  cursor: pointer;
+}
+
+.tabs__button.is-tab-el-active {
+  color: #3554d1;
+  font-weight: 700;
+}
+
+.tabs__button.is-tab-el-active:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #3554d1;
+}
+
+.dashboard__content {
+  position: relative;
+}
+
+/* Filter Form Styling */
+.filter-form-container {
+  padding: 25px 30px;
+  margin-bottom: 30px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filter-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #051036;
+  margin-bottom: 0;
+}
+
+.clear-filters-link {
+  color: #3554d1;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.clear-filters-link:hover {
+  color: #051036;
+  text-decoration: underline;
+}
+
+.filter-form {
+  margin: 0;
+}
+
+.filter-form .row {
+  margin: 0 -10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 0;
+}
+
+.filter-form .col-lg-1,
+.filter-form .col-lg-2,
+.filter-form .col-lg-3,
+.filter-form .col-lg-4 {
+  padding: 0 10px;
+  margin-bottom: 15px;
+}
+
+.filter-form .form-control:focus {
+  border-color: #3554d1;
+  box-shadow: 0 0 0 3px rgba(53, 84, 209, 0.1);
+}
+
+.search-field {
+  position: relative;
+}
+
+.search-field .form-control,
+.select-field .form-select {
+  height: 45px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  padding: 0 15px;
+  background-color: white;
+}
+
+.search-field .form-control:focus,
+.select-field .form-select:focus {
+  border-color: #3554d1;
+  box-shadow: 0 0 0 3px rgba(53, 84, 209, 0.1);
+}
+
+.filter-button {
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #3554d1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.filter-button:hover {
+  background-color: #2441b7;
+}
+
+.filter-button i {
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+/* Visual indicator for horizontal scroll */
+.tabs-table-container.has-scroll::after,
+.dashboard-list-table.has-scroll::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 15%;
+  height: 16px;
+  background: linear-gradient(to right, rgba(255,255,255,0), rgba(53, 84, 209, 0.1));
+  pointer-events: none;
+}
+
+/* Table styling */
+.tabs-table-container,
+.dashboard-list-table {
+  overflow-x: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+  background-color: white;
+  overflow: hidden;
+}
+
+table,
+.table-3 {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  min-width: 1100px; /* Ensures the table doesn't get too narrow */
+  table-layout: fixed;
+  margin-bottom: 0;
+}
+
+thead {
+  background-color: #f5f5f5;
+}
+
+thead tr {
+  height: auto;
+}
+
+th {
+  font-weight: 600;
+  text-align: left;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  color: #333;
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  background-color: #f5f5f5;
+}
+
+tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Prevent cell text from being cut off */
+tbody td {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 250px;
+}
+
+td {
+  padding: 15px;
+  vertical-align: middle;
+  color: #051036;
+  white-space: nowrap;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Define column widths */
+.col-id {
+  width: 5%;
+  text-align: center;
+}
+
+.col-image {
+  width: 8%;
+}
+
+.col-name {
+  width: 15%;
+}
+
+.col-location {
+  width: 12%;
+}
+
+.col-creator {
+  width: 20%;
+}
+
+.col-description {
+  width: 25%;
+}
+
+.col-actions {
+  width: 15%;
+  text-align: right;
+}
+
+/* User cell styling */
+.user-cell {
+  display: flex;
+  align-items: center;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #051036;
+}
+
+.user-name-row span {
+  margin-right: 10px;
+}
+
+.user-email {
+  font-size: 13px;
+  color: #697488;
+  margin-top: 3px;
+}
+
+.view-details-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  color: #3554d1;
+  text-decoration: none;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.view-details-link:hover {
+  color: #2441b7;
+  text-decoration: underline;
+}
+
+.view-details-link i {
+  margin-right: 4px;
+  font-size: 14px;
+}
+
+/* ID badge styling */
+.id-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  color: #3554d1;
+  background-color: rgba(53, 84, 209, 0.08);
+  padding: 4px;
+  border-radius: 6px;
+  line-height: 1.1;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+}
+
+.id-symbol {
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.id-number {
+  font-size: 14px;
+}
+
+/* User Details Popup Styling */
+.user-details-popup {
+  padding: 15px 0;
+  text-align: left;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  margin: 10px 0;
+}
+
+.detail-item {
+  margin-bottom: 14px;
+  display: flex;
+  font-size: 15px;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #051036;
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  color: #697488;
+  flex-grow: 1;
+  word-break: break-word;
+}
+
+/* Override some SweetAlert2 styles */
+.user-details-swal-popup,
+.description-details-swal-popup {
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.user-details-swal-content,
+.description-details-swal-content {
+  padding: 5px 10px 15px;
+}
+
+/* Description details popup styling */
+.description-details-popup {
+  padding: 10px 0;
+  text-align: left;
+}
+
+.description-details-popup h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #051036;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.description-details-popup p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #697488;
+  white-space: pre-line;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.action-button {
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.view-button {
+  background-color: #3554d1;
+}
+
+.view-button:hover {
+  background-color: #2441b7;
+  transform: translateY(-2px);
+}
+
+.delete-button {
+  background-color: #d93025;
+}
+
+.delete-button:hover {
+  background-color: #b7271e;
+  transform: translateY(-2px);
+}
+
+/* Image container */
+.destination-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.destination-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #697488;
+}
+
+/* Description cell */
+.description-cell {
+  white-space: normal;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  line-height: 1.4;
+}
+
+.description-cell a.view-description-link {
+  margin-left: 5px;
+  flex-shrink: 0;
+  color: #3554d1;
+  transition: color 0.2s;
+}
+
+.description-cell a.view-description-link:hover {
+  color: #2441b7;
+}

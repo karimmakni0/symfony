@@ -4,11 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Activities;
 use App\Entity\Destinations;
+use App\Entity\Post;
 use App\Entity\Users;
 use App\Entity\Billet;
 use App\Entity\Reservation;
+use App\Entity\UpgradeRequests;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -34,6 +37,58 @@ class AdminController extends AbstractController
         // Get recent bookings with their reservations
         $billets = $this->entityManager->getRepository(Billet::class)
             ->findRecentWithReservations(5);
+            
+        // Get recent blog posts - simplified query to avoid errors
+        try {
+            $posts = $this->entityManager->getRepository(Post::class)
+                ->findBy([], ['date' => 'DESC'], 5);
+                
+            // Get user data for the posts
+            $recentPosts = [];
+            if (!empty($posts)) {
+                $userIds = array_map(function($post) {
+                    return $post->getUserId();
+                }, $posts);
+                
+                $users = $this->entityManager->getRepository(Users::class)
+                    ->findBy(['id' => array_unique($userIds)]);
+                    
+                $usersById = [];
+                foreach ($users as $user) {
+                    $usersById[$user->getId()] = $user;
+                }
+                
+                foreach ($posts as $post) {
+                    $post->user = isset($usersById[$post->getUserId()]) ? $usersById[$post->getUserId()] : null;
+                    $recentPosts[] = $post;
+                }
+            }
+        } catch (\Exception $e) {
+            // If something goes wrong, provide an empty array
+            $recentPosts = [];
+        }
+            
+        // Get pending upgrade requests - simplified query to avoid errors
+        try {
+            $recentUpgradeRequests = $this->entityManager->getRepository(UpgradeRequests::class)
+                ->createQueryBuilder('ur')
+                ->leftJoin('ur.user', 'u')
+                ->addSelect('u')
+                ->where('ur.status = :status')
+                ->setParameter('status', 'pending')
+                ->orderBy('ur.request_date', 'DESC')
+                ->setMaxResults(5)
+                ->getQuery()
+                ->getResult();
+                
+            // Count total pending upgrade requests for badge
+            $pendingUpgrades = $this->entityManager->getRepository(UpgradeRequests::class)
+                ->count(['status' => 'pending']);
+        } catch (\Exception $e) {
+            // If something goes wrong, provide empty data
+            $recentUpgradeRequests = [];
+            $pendingUpgrades = 0;
+        }
             
         // Get reservations indexed by billet ID for easy lookup
         $reservations = [];
@@ -79,24 +134,54 @@ class AdminController extends AbstractController
             'recentBookings' => $billets,
             'reservations' => $reservations,
             'activities' => $activities,
+            'recentPosts' => $recentPosts,
+            'recentUpgradeRequests' => $recentUpgradeRequests,
+            'pendingUpgrades' => $pendingUpgrades,
         ]);
     }
 
     #[Route('/bookings', name: 'admin_bookings')]
-    public function bookings(): Response
+    public function bookings(Request $request): Response
     {
-        // Get all billets
-        $billets = $this->entityManager->getRepository(Billet::class)
-            ->findBy([], ['id' => 'DESC']);
-            
-        // Get reservations indexed by billet ID for easy lookup
-        $reservations = [];
-        $reservationRepository = $this->entityManager->getRepository(Reservation::class);
+        // Get filter parameters from the request
+        $filters = [
+            'search' => $request->query->get('search', ''),
+            'activity' => $request->query->get('activity', ''),
+            'status' => $request->query->get('status', ''),
+            'date_from' => $request->query->get('date_from', '')
+        ];
         
-        foreach ($billets as $billet) {
-            // Find the reservation associated with this billet
-            $reservation = $reservationRepository->findOneBy(['billet' => $billet]);
-            if ($reservation) {
+        // Get pagination parameters
+        $page = $request->query->getInt('page', 1);
+        $limit = 5; // Show 5 items per page
+        
+        // Get reservations with applied filters
+        $reservationRepository = $this->entityManager->getRepository(Reservation::class);
+        $reservationResults = [];
+        
+        // Apply filters if any are set
+        if (!empty($filters['search']) || !empty($filters['activity']) || !empty($filters['status']) || 
+            !empty($filters['date_from'])) {
+            $reservationResults = $reservationRepository->filterBookings($filters);
+        } else {
+            $reservationResults = $reservationRepository->findAllWithDetails();
+        }
+        
+        // Calculate pagination
+        $totalItems = count($reservationResults);
+        $totalPages = ceil($totalItems / $limit);
+        
+        // Apply pagination limits (on the already filtered results)
+        $reservationResults = array_slice($reservationResults, ($page - 1) * $limit, $limit);
+        
+        // Get all billets and organize reservations by billet ID
+        $billets = [];
+        $reservations = [];
+        
+        foreach ($reservationResults as $reservation) {
+            $billet = $reservation->getBillet();
+            if ($billet) {
+                $billets[] = $billet;
                 $reservations[$billet->getId()] = $reservation;
             }
         }
@@ -112,32 +197,66 @@ class AdminController extends AbstractController
             }
         }
         
-        // Get all activities in one database query
-        $activities = [];
-        if (!empty($activityIds)) {
-            $activityEntities = $this->entityManager->getRepository(Activities::class)
-                ->findBy(['id' => array_unique($activityIds)]);
-                
-            // Index activities by ID for easy lookup
-            foreach ($activityEntities as $activity) {
-                $activities[$activity->getId()] = $activity;
-            }
+        // Get list of all statuses for the filter dropdown
+        $statuses = ['pending', 'confirmed', 'cancelled'];
+        
+        // Get all activities for the filter dropdown
+        $activityRepository = $this->entityManager->getRepository(Activities::class);
+        $allActivities = $activityRepository->findAll();
+        $activitiesForFilter = [];
+        foreach ($allActivities as $activity) {
+            $activitiesForFilter[$activity->getId()] = $activity;
         }
-
+        
         return $this->render('admin/bookings.html.twig', [
             'bookings' => $billets,
             'reservations' => $reservations,
-            'activities' => $activities,
+            'activities' => $activitiesForFilter,
+            'allActivities' => $activitiesForFilter,
+            'statuses' => $statuses,
+            'filters' => $filters,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalItems' => $totalItems,
+            'limit' => $limit
         ]);
     }
 
     #[Route('/destinations', name: 'admin_destinations')]
-    public function destinations(): Response
+    public function destinations(Request $request): Response
     {
+        // Get filter parameters
+        $filters = [
+            'search' => $request->query->get('search', ''),
+        ];
+        
+        // Get pagination parameters
+        $page = $request->query->getInt('page', 1);
+        $limit = 5; // Show 5 items per page
+        
         // Get all destinations with their associated users
-        $destinations = $this->entityManager->getRepository(Destinations::class)
-            ->findAll();
-            
+        $destinationsRepo = $this->entityManager->getRepository(Destinations::class);
+        $qb = $destinationsRepo->createQueryBuilder('d');
+        
+        // Apply search filter if provided
+        if (!empty($filters['search'])) {
+            $qb->andWhere('d.name LIKE :search OR d.description LIKE :search')
+               ->setParameter('search', '%' . $filters['search'] . '%');
+        }
+        
+        // Get total count for pagination
+        $countQb = clone $qb;
+        $totalItems = count($countQb->getQuery()->getResult());
+        $totalPages = ceil($totalItems / $limit);
+        
+        // Add order and pagination to the main query
+        $qb->orderBy('d.id', 'DESC')
+           ->setFirstResult(($page - 1) * $limit)
+           ->setMaxResults($limit);
+        
+        // Execute query
+        $destinations = $qb->getQuery()->getResult();
+        
         // Get user IDs for easy lookup
         $userIds = [];
         foreach ($destinations as $destination) {
@@ -161,53 +280,82 @@ class AdminController extends AbstractController
         return $this->render('admin/destinations.html.twig', [
             'destinations' => $destinations,
             'users' => $users,
+            'filters' => $filters,
+            'count' => $totalItems,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalItems' => $totalItems,
+            'limit' => $limit
         ]);
     }
 
     #[Route('/users', name: 'admin_users')]
-    public function users(): Response
+    public function users(Request $request): Response
     {
-        $users = $this->entityManager->getRepository(Users::class)
-            ->findAll();
-
-        return $this->render('admin/users.html.twig', [
-            'users' => $users,
-        ]);
-    }
-
-    #[Route('/activities', name: 'admin_activities')]
-    public function activities(): Response
-    {
-        // Get all activities
-        $activities = $this->entityManager->getRepository(Activities::class)
-            ->findAll();
-            
-        // Get user IDs for easy lookup
-        $userIds = [];
-        foreach ($activities as $activity) {
-            if ($activity->getUser()) {
-                $userIds[] = $activity->getUser()->getId();
+        // Get filter parameters from the request
+        $filters = [
+            'search' => $request->query->get('search', ''),
+            'role' => $request->query->get('role', ''),
+            'status' => $request->query->get('status', '')
+        ];
+        
+        // Get pagination parameters
+        $page = $request->query->getInt('page', 1);
+        $limit = 5; // Show 5 items per page
+        
+        // Create query builder
+        $repository = $this->entityManager->getRepository(Users::class);
+        $queryBuilder = $repository->createQueryBuilder('u');
+        
+        // Apply filters if provided
+        if (!empty($filters['search'])) {
+            $queryBuilder->andWhere('u.name LIKE :search OR u.email LIKE :search')
+                ->setParameter('search', '%' . $filters['search'] . '%');
+        }
+        
+        if (!empty($filters['role'])) {
+            $queryBuilder->andWhere('u.role = :role')
+                ->setParameter('role', $filters['role']);
+        }
+        
+        if (!empty($filters['status'])) {
+            if ($filters['status'] === 'banned') {
+                $queryBuilder->andWhere('u.isBanned = :banned')
+                    ->setParameter('banned', true);
+            } else if ($filters['status'] === 'active') {
+                $queryBuilder->andWhere('u.isBanned = :banned')
+                    ->setParameter('banned', false);
             }
         }
         
-        // Get all users in one database query
-        $users = [];
-        if (!empty($userIds)) {
-            $userEntities = $this->entityManager->getRepository(Users::class)
-                ->findBy(['id' => array_unique($userIds)]);
-                
-            // Index users by ID for easy lookup
-            foreach ($userEntities as $user) {
-                $users[$user->getId()] = $user;
-            }
-        }
+        // Get total count for pagination
+        $countQb = clone $queryBuilder;
+        $totalItems = count($countQb->getQuery()->getResult());
+        $totalPages = ceil($totalItems / $limit);
+        
+        // Add order and pagination to the main query
+        $queryBuilder->orderBy('u.id', 'DESC')
+           ->setFirstResult(($page - 1) * $limit)
+           ->setMaxResults($limit);
+        
+        // Get paginated results
+        $users = $queryBuilder->getQuery()->getResult();
+        
+        // Get all available roles for the dropdown
+        $roles = ['Admin', 'Publicitaire', 'user'];
 
-        return $this->render('admin/activities.html.twig', [
-            'activities' => $activities,
+        return $this->render('admin/users.html.twig', [
             'users' => $users,
+            'filters' => $filters,
+            'roles' => $roles,
+            // Pagination data
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalItems' => $totalItems,
+            'limit' => $limit
         ]);
     }
-
+    
     #[Route('/delete/user/{id}', name: 'admin_delete_user')]
     public function deleteUser(int $id): Response
     {
@@ -405,5 +553,77 @@ class AdminController extends AbstractController
         }
         
         return $this->redirectToRoute('admin_users');
+    }
+    
+    #[Route('/activities', name: 'admin_activities')]
+    public function activities(Request $request): Response
+    {
+        // Get filter parameters
+        $search = $request->query->get('search', '');
+        $genre = $request->query->get('genre', '');
+        
+        // Get pagination parameters
+        $page = $request->query->getInt('page', 1);
+        $limit = 5; // Show 5 items per page
+        
+        // Create query builder
+        $repository = $this->entityManager->getRepository(Activities::class);
+        $queryBuilder = $repository->createQueryBuilder('a');
+        
+        // Apply filters if provided
+        if (!empty($search)) {
+            $queryBuilder->andWhere('a.activityName LIKE :search OR a.description LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+        
+        if (!empty($genre)) {
+            $queryBuilder->andWhere('a.genre = :genre')
+                ->setParameter('genre', $genre);
+        }
+        
+        // Get total count for pagination
+        $countQb = clone $queryBuilder;
+        $totalItems = count($countQb->getQuery()->getResult());
+        $totalPages = ceil($totalItems / $limit);
+        
+        // Add order and pagination to the main query
+        $queryBuilder->orderBy('a.id', 'DESC')
+           ->setFirstResult(($page - 1) * $limit)
+           ->setMaxResults($limit);
+        
+        // Get paginated results
+        $activities = $queryBuilder->getQuery()->getResult();
+            
+        // Get user IDs for easy lookup
+        $userIds = [];
+        foreach ($activities as $activity) {
+            if (method_exists($activity, 'getUser') && $activity->getUser()) {
+                $userIds[] = $activity->getUser()->getId();
+            }
+        }
+        
+        // Get all users in one database query
+        $users = [];
+        if (!empty($userIds)) {
+            $userEntities = $this->entityManager->getRepository(Users::class)
+                ->findBy(['id' => array_unique($userIds)]);
+                
+            // Index users by ID for easy lookup
+            foreach ($userEntities as $user) {
+                $users[$user->getId()] = $user;
+            }
+        }
+
+        return $this->render('admin/activities.html.twig', [
+            'activities' => $activities,
+            'users' => $users,
+            'search' => $search,
+            'genre' => $genre,
+            // Pagination data
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalItems' => $totalItems,
+            'limit' => $limit
+        ]);
     }
 }

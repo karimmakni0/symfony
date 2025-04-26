@@ -33,6 +33,27 @@ class ActivitiesRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    
+    /**
+     * Find all activities with their associated resources with pagination
+     * 
+     * @param int $page Current page number
+     * @param int $limit Number of items per page
+     * @return Activities[]
+     */
+    public function findAllWithResourcesPaginated(int $page = 1, int $limit = 9)
+    {
+        $firstResult = ($page - 1) * $limit;
+        
+        return $this->createQueryBuilder('a')
+            ->select('a', 'r')
+            ->leftJoin('a.resources', 'r')
+            ->orderBy('a.id', 'DESC')
+            ->setFirstResult($firstResult)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 
     /**
      * Get all unique destinations for filtering
@@ -183,5 +204,26 @@ class ActivitiesRepository extends ServiceEntityRepository
         $qb->orderBy('a.id', 'DESC');
         
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Find all unique activity genres
+     */
+    public function findUniqueGenres(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT DISTINCT activity_genre FROM activities WHERE activity_genre IS NOT NULL";
+        
+        try {
+            $stmt = $conn->prepare($sql);
+            $result = $stmt->executeQuery();
+            $genres = $result->fetchFirstColumn();
+            
+            return $genres ?: [];
+        } catch (\Exception $e) {
+            // If there's an error, log it and return empty array
+            error_log('Error fetching unique genres: ' . $e->getMessage());
+            return [];
+        }
     }
 }

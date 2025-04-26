@@ -4,6 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Users;
 use App\Repository\UsersRepository;
+use App\Service\DeviceDetectionService;
+use App\Service\HCaptchaService;
+use App\Service\LoginNotificationService;
 use App\Service\TotpService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,6 +28,9 @@ class WebSecurityController extends AbstractController
     private $passwordHasher;
     private $tokenStorage;
     private $totpService;
+    private $hCaptchaService;
+    private $loginNotificationService;
+    private $deviceDetectionService;
 
     public function __construct(
         UsersRepository $usersRepository,
@@ -32,7 +38,10 @@ class WebSecurityController extends AbstractController
         SessionInterface $session,
         UserPasswordHasherInterface $passwordHasher,
         TokenStorageInterface $tokenStorage,
-        TotpService $totpService
+        TotpService $totpService,
+        HCaptchaService $hCaptchaService,
+        LoginNotificationService $loginNotificationService,
+        DeviceDetectionService $deviceDetectionService
     ) {
         $this->usersRepository = $usersRepository;
         $this->entityManager = $entityManager;
@@ -40,6 +49,9 @@ class WebSecurityController extends AbstractController
         $this->passwordHasher = $passwordHasher;
         $this->tokenStorage = $tokenStorage;
         $this->totpService = $totpService;
+        $this->hCaptchaService = $hCaptchaService;
+        $this->loginNotificationService = $loginNotificationService;
+        $this->deviceDetectionService = $deviceDetectionService;
     }
     
     #[Route('/login', name: 'app_login')]
@@ -48,6 +60,11 @@ class WebSecurityController extends AbstractController
         // If user is already logged in, redirect to appropriate dashboard
         if ($this->getUser()) {
             return $this->redirectToRoute('login_check');
+        }
+        
+        // Check for password reset parameter
+        if ($request->query->get('password_reset') === 'success') {
+            $this->addFlash('success', 'Your password has been successfully reset. You can now log in with your new password.');
         }
         
         // Custom error messages
@@ -59,6 +76,19 @@ class WebSecurityController extends AbstractController
             $email = $request->request->get('email');
             $password = $request->request->get('password');
             $lastUsername = $email;
+            
+            // Verify hCaptcha response
+            $hCaptchaResponse = $request->request->get('h-captcha-response');
+            $clientIp = $request->getClientIp();
+            
+            if (!$this->hCaptchaService->verify($hCaptchaResponse, $clientIp)) {
+                $customError = 'Please verify that you are not a robot.';
+                return $this->render('security/login.html.twig', [
+                    'last_username' => $lastUsername,
+                    'error' => null,
+                    'custom_error' => $customError,
+                ]);
+            }
             
             // Find user by email
             $user = $this->usersRepository->findOneBy(['email' => $email]);
@@ -79,6 +109,9 @@ class WebSecurityController extends AbstractController
                         // Password is valid, save user ID for 2FA verification
                         $this->session->set('pending_login_user_id', $user->getId());
                         $this->session->set('pending_login_remember_me', $request->request->get('_remember_me', false));
+                        
+                        // Record login attempt (doesn't send notification until after 2FA)
+                        $this->session->set('check_new_device', true);
                         
                         // Redirect to 2FA verification page
                         return $this->redirectToRoute('app_totp_verify_page');
