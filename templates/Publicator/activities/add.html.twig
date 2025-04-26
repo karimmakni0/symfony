@@ -2,6 +2,12 @@
 
 {% block title %}Add New Activity{% endblock %}
 
+{# Check if there's a success message from the controller and create a variable to use in JavaScript #}
+{% set success_message = false %}
+{% for message in app.flashes('success') %}
+    {% set success_message = message %}
+{% endfor %}
+
 {% block body %}
 <div class="row y-gap-20 justify-between items-end pb-30 lg:pb-20 md:pb-16">
     <div class="col-auto">
@@ -23,21 +29,24 @@
     </div>
 </div>
 
+{# Only show error messages as flash messages #}
 {% for label, messages in app.flashes %}
-    {% for message in messages %}
-        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30 fade-in">
-            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-8">
-                <div class="row x-gap-10 y-gap-10 items-center">
-                    <div class="col-auto">
-                        <div class="d-flex items-center">
-                            <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
-                            <div class="fw-500">{{ message }}</div>
+    {% if label != 'success' %}
+        {% for message in messages %}
+            <div class="alert alert-danger mb-30 fade-in">
+                <div class="px-20 py-20 bg-red-1 text-white rounded-8">
+                    <div class="row x-gap-10 y-gap-10 items-center">
+                        <div class="col-auto">
+                            <div class="d-flex items-center">
+                                <i class="icon-close text-20 mr-10"></i>
+                                <div class="fw-500">{{ message }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    {% endif %}
 {% endfor %}
 
 <div class="py-40 px-40 rounded-12 bg-white shadow-3 fade-in" style="border: 1px solid rgba(230, 230, 230, 0.7);">
@@ -101,6 +110,8 @@
     
     
     {{ form_start(form, {'attr': {'id': 'activity-form', 'class': 'row y-gap-20', 'enctype': 'multipart/form-data'}}) }}
+    {# Hide the auto-generated price field - we have our custom one instead #}
+    {% do form.activity_price.setRendered %}
     
     <!-- Basic Information Section -->
     <div class="row y-gap-20 mb-30">
@@ -255,7 +266,7 @@
                                 <div class="input-icon-wrap">
                                     <i class="icon-dollar text-16 text-light-1"></i>
                                 </div>
-                                {{ form_widget(form.activity_price, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'placeholder': 'e.g. 99.99'}}) }}
+                                <input type="text" id="activity_form_activity_price" name="activity_form[activity_price]" required="required" class="form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45" placeholder="e.g. 99.99">
                             </div>
                             <div class="text-red-1 mt-5">{{ form_errors(form.activity_price) }}</div>
                         </div>
@@ -448,9 +459,27 @@
 {% endblock %}
 
 {% block javascripts %}
+{{ parent() }}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+
+<script>
+    // Show success message if set
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if success_message %}
+            Swal.fire({
+                title: 'Success!',
+                text: "{{ success_message }}",
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3554D1'
+            }).then((result) => {
+                window.location.href = '{{ path("app_publicator_activities") }}';
+            });
+        {% endif %}
+    });
+</script>
 <script>
     // Define function globally
     let imageUpload, countSpan, imageCountContainer, previewsContainer;

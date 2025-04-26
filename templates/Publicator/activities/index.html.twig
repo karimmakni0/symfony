@@ -16,21 +16,24 @@
     </div>
 </div>
 
+{# Display only error messages as flash messages #}
 {% for label, messages in app.flashes %}
-    {% for message in messages %}
-        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30 fade-in">
-            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-8">
-                <div class="row x-gap-10 y-gap-10 items-center">
-                    <div class="col-auto">
-                        <div class="d-flex items-center">
-                            <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
-                            <div class="fw-500">{{ message }}</div>
+    {% if label != 'success' %}
+        {% for message in messages %}
+            <div class="alert alert-danger mb-30 fade-in">
+                <div class="px-20 py-20 bg-red-1 text-white rounded-8">
+                    <div class="row x-gap-10 y-gap-10 items-center">
+                        <div class="col-auto">
+                            <div class="d-flex items-center">
+                                <i class="icon-close text-20 mr-10"></i>
+                                <div class="fw-500">{{ message }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    {% endif %}
 {% endfor %}
 
 <!-- Stats Overview -->
@@ -262,6 +265,24 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Check URL parameters for success message
+    const urlParams = new URLSearchParams(window.location.search);
+    const successParam = urlParams.get('success');
+    
+    if (successParam === 'activity_created') {
+        Swal.fire({
+            title: 'Success!',
+            text: 'Activity created successfully!',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3554D1'
+        });
+        
+        // Remove the success parameter from URL without reloading the page
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    }
+    
     // Cache DOM elements
     const searchInput = document.getElementById('searchInput');
     const destinationFilter = document.getElementById('destinationFilter');
@@ -629,3 +650,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 </style>
 {% endblock %}
+
+

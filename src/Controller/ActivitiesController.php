@@ -270,8 +270,8 @@ class ActivitiesController extends AbstractController
                 $this->entityManager->flush();
             }
             
-            $this->addFlash('success', 'Activity created successfully!');
-            return $this->redirectToRoute('app_publicator_activities');
+            // Redirect with success parameter instead of flash message
+            return $this->redirectToRoute('app_publicator_activities', ['success' => 'activity_created']);
         }
         
         return $this->render('publicator/activities/add.html.twig', [
