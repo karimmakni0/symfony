@@ -123,7 +123,14 @@
           </div>
         </div>
 
-       
+        <div class="sidebar__item">
+          <div class="sidebar__button {% if app.request.attributes.get('_route') starts with 'app_publicator_blog' or app.request.attributes.get('_route') == 'app_blog_add' %}-is-active{% endif %}">
+            <a href="{{ path('app_publicator_blog_index') }}" class="d-flex items-center text-15 lh-1 fw-500">
+              <img src="/assets/img/dashboard/sidebar/bookmark.svg" alt="blog" class="mr-15">
+              My Blog
+            </a>
+          </div>
+        </div>
 
         <div class="sidebar__item">
           <div class="sidebar__button {% if app.request.attributes.get('_route') == 'app_publicator_reservations' %}-is-active{% endif %}">
@@ -134,14 +141,6 @@
           </div>
         </div>
 
-        <div class="sidebar__item">
-          <div class="sidebar__button {% if app.request.attributes.get('_route') starts with 'app_publicator_blog' or app.request.attributes.get('_route') == 'app_blog_add' %}-is-active{% endif %}">
-            <a href="{{ path('app_publicator_blog_index') }}" class="d-flex items-center text-15 lh-1 fw-500">
-              <img src="/assets/img/dashboard/sidebar/bookmark.svg" alt="blog" class="mr-15">
-              My Blog
-            </a>
-          </div>
-        </div>
       </div>
     </div>
 
