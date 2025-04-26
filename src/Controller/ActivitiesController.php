@@ -372,11 +372,45 @@ class ActivitiesController extends AbstractController
                 }
             }
             
+            // Handle new image uploads
+            $imageFiles = $form->get('activity_images')->getData();
+            if ($imageFiles) {
+                $uploadsDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads/activities';
+                
+                // Create directory if it doesn't exist
+                if (!file_exists($uploadsDirectory)) {
+                    mkdir($uploadsDirectory, 0777, true);
+                }
+                
+                foreach ($imageFiles as $imageFile) {
+                    if ($imageFile) {
+                        // Generate unique filename
+                        $newFilename = 'activity-' . uniqid() . '-' . time() . '.' . $imageFile->guessExtension();
+                        
+                        try {
+                            // Move the file to the uploads directory
+                            $imageFile->move($uploadsDirectory, $newFilename);
+                            
+                            // Create a new resource for this image
+                            $resource = new Resources();
+                            $resource->setPath('/uploads/activities/' . $newFilename);
+                            $resource->setActivity($activity);
+                            
+                            $this->entityManager->persist($resource);
+                        } catch (\Exception $e) {
+                            $this->addFlash('error', 'Failed to upload image: ' . $e->getMessage());
+                        }
+                    }
+                }
+            }
+            
             // Save all changes
             $this->entityManager->flush();
             
-            $this->addFlash('success', 'Activity updated successfully!');
-            return $this->redirectToRoute('app_publicator_activities');
+            // Use URL parameter instead of flash message for consistency
+            return $this->redirectToRoute('app_publicator_activities', [
+                'success' => 'update'
+            ]);
         }
         
         // Get existing images for the activity

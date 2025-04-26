@@ -9,6 +9,26 @@
 {% endfor %}
 
 {% block body %}
+<!-- Success message handling with SweetAlert -->
+{% if app.request.query.get('success') == 'update' %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                title: 'Success!',
+                text: 'The activity has been updated successfully.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3554D1'
+            }).then(() => {
+                // Clean up the URL by removing the success parameter
+                const url = new URL(window.location.href);
+                url.searchParams.delete('success');
+                window.history.replaceState({}, '', url);
+            });
+        });
+    </script>
+{% endif %}
+
 <div class="row y-gap-20 justify-between items-end pb-30 lg:pb-20 md:pb-16">
     <div class="col-auto">
         <div class="d-flex items-center mb-10">
@@ -469,80 +489,364 @@
 {% endblock %}
 
 {% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/mapbox-gl@2.14.1/dist/mapbox-gl.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/mapbox-gl@2.14.1/dist/mapbox-gl.css" rel="stylesheet" />
+
 <script>
-    // Image deletion checkbox handling
-    const deleteCheckboxes = document.querySelectorAll('.delete-image-check');
-    deleteCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const imageCard = this.closest('.rounded-4');
-            if (this.checked) {
-                imageCard.classList.add('border-danger');
-            } else {
-                imageCard.classList.remove('border-danger');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Activity validation errors highlighting
+        const invalidFields = document.querySelectorAll('.is-invalid');
+        invalidFields.forEach(field => {
+            const parentFormGroup = field.closest('.form-group');
+            if (parentFormGroup) {
+                parentFormGroup.classList.add('has-error');
             }
         });
-    });
-    
-    // Image upload handling
-    const imageUpload = document.getElementById('imageUpload');
-    const previewsContainer = document.getElementById('previewsContainer');
-    const imageCountContainer = document.getElementById('imageCountContainer');
-    const countSpan = imageCountContainer?.querySelector('span');
-    
-    if (imageUpload) {
-        imageUpload.addEventListener('change', function() {
-            // Clear previous previews
-            if (previewsContainer) previewsContainer.innerHTML = '';
-            
-            if (this.files && this.files.length > 0 && countSpan) {
-                countSpan.textContent = `${this.files.length} file(s) selected`;
-                imageCountContainer.classList.remove('d-none');
+
+        // File Input functionality
+        const fileInput = document.getElementById('activity_images');
+        const previewsContainer = document.getElementById('previewsContainer');
+        const imageCountContainer = document.getElementById('imageCountContainer');
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                // Reset previews container
+                previewsContainer.innerHTML = '';
                 
-                // Create preview for each selected file
+                // Show image count
+                if (this.files.length > 0) {
+                    imageCountContainer.classList.remove('d-none');
+                    imageCountContainer.querySelector('span').textContent = `${this.files.length} file(s) selected`;
+                } else {
+                    imageCountContainer.classList.add('d-none');
+                }
+                
+                // Create previews
                 for (let i = 0; i < this.files.length; i++) {
                     const file = this.files[i];
+                    const reader = new FileReader();
                     
-                    if (file.type.match('image.*')) {
-                        const reader = new FileReader();
-                        
-                        reader.onload = function(e) {
-                            if (!previewsContainer) return;
+                    reader.onload = function(e) {
+                        const preview = document.createElement('div');
+                        preview.className = 'col-lg-3 col-md-4 col-sm-6';
+                        preview.innerHTML = `
+                            <div class="border rounded-8 p-15 h-100 d-flex flex-column shadow-sm">
+                                <img src="${e.target.result}" class="w-100 rounded-4" style="height: 180px; object-fit: cover;">
+                                <div class="text-14 mt-15 fw-500 text-truncate">${file.name}</div>
+                                <div class="text-12 text-light-1 mb-5">${(file.size / 1024).toFixed(2)} KB</div>
+                            </div>
+                        `;
+                        previewsContainer.appendChild(preview);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Check/uncheck image functionality
+        const deleteCheckboxes = document.querySelectorAll('.delete-image-check');
+        deleteCheckboxes.forEach(checkbox => {
+            const deletionIndicator = checkbox.closest('.position-relative')?.querySelector('.deletion-indicator');
+            
+            checkbox.addEventListener('change', function() {
+                const imageCard = this.closest('.position-relative');
+                if (this.checked) {
+                    if (imageCard) imageCard.classList.add('border-red-1');
+                    if (deletionIndicator) deletionIndicator.style.display = 'block';
+                } else {
+                    if (imageCard) imageCard.classList.remove('border-red-1');
+                    if (deletionIndicator) deletionIndicator.style.display = 'none';
+                }
+            });
+        });
+
+        // Location preview
+        const latInput = document.getElementById('activity_lat');
+        const lngInput = document.getElementById('activity_lng');
+        const mapPreview = document.getElementById('map-preview');
+
+        function displayMapPreview() {
+            const lat = parseFloat(latInput.value);
+            const lng = parseFloat(lngInput.value);
+
+            if (!isNaN(lat) && !isNaN(lng) && -90 <= lat && lat <= 90 && -180 <= lng && lng <= 180) {
+                mapPreview.style.display = 'block';
+                mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
+                const map = new mapboxgl.Map({
+                    container: 'map-preview',
+                    style: 'mapbox://styles/mapbox/streets-v11',
+                    center: [lng, lat],
+                    zoom: 12
+                });
+
+                // Add a marker at the selected coordinates
+                new mapboxgl.Marker()
+                    .setLngLat([lng, lat])
+                    .addTo(map);
+            } else {
+                mapPreview.style.display = 'none';
+            }
+        }
+
+        // Check if we have lat/lng values on page load
+        if (latInput && lngInput && latInput.value && lngInput.value) {
+            displayMapPreview();
+        }
+
+        // Update map preview when coordinates change
+        if (latInput && lngInput) {
+            latInput.addEventListener('change', displayMapPreview);
+            lngInput.addEventListener('change', displayMapPreview);
+        }
+
+        // Form validation
+        const activityForm = document.getElementById('activity-form');
+        if (activityForm) {
+            activityForm.addEventListener('submit', function(e) {
+                let isValid = true;
+                const requiredFields = activityForm.querySelectorAll('[required]');
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        const formGroup = field.closest('.form-group');
+                        if (formGroup) {
+                            formGroup.classList.add('has-error');
+                            const errorDiv = formGroup.querySelector('.text-red-1') || document.createElement('div');
+                            errorDiv.className = 'text-red-1 mt-5';
+                            errorDiv.textContent = 'This field is required';
                             
-                            const previewCol = document.createElement('div');
-                            previewCol.className = 'col-md-3 col-sm-6 mb-15';
-                            
-                            const previewCard = document.createElement('div');
-                            previewCard.className = 'border rounded-4 p-10 h-100 d-flex flex-column';
-                            
-                            const previewImg = document.createElement('img');
-                            previewImg.src = e.target.result;
-                            previewImg.className = 'w-100 rounded-4';
-                            previewImg.style.height = '100px';
-                            previewImg.style.objectFit = 'cover';
-                            
-                            const imageName = document.createElement('div');
-                            imageName.className = 'text-14 mt-5 text-center text-truncate';
-                            imageName.textContent = file.name;
-                            
-                            previewCard.appendChild(previewImg);
-                            previewCard.appendChild(imageName);
-                            previewCol.appendChild(previewCard);
-                            previewsContainer.appendChild(previewCol);
+                            if (!formGroup.querySelector('.text-red-1')) {
+                                formGroup.appendChild(errorDiv);
+                            }
                         }
-                        
-                        reader.readAsDataURL(file);
+                    } else {
+                        const formGroup = field.closest('.form-group');
+                        if (formGroup) {
+                            formGroup.classList.remove('has-error');
+                            const errorDiv = formGroup.querySelector('.text-red-1:not(.d-none)');
+                            if (errorDiv && !errorDiv.classList.contains('d-none')) {
+                                errorDiv.textContent = '';
+                            }
+                        }
+                    }
+                });
+                
+                // Check coordinates
+                const lat = parseFloat(latInput.value);
+                const lng = parseFloat(lngInput.value);
+                if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                    isValid = false;
+                    Swal.fire({
+                        title: 'Invalid Coordinates',
+                        text: 'Please enter valid latitude (-90 to 90) and longitude (-180 to 180) values.',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#3554D1'
+                    });
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    // Scroll to first error
+                    const firstError = activityForm.querySelector('.has-error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } else {
+                    // Show loading state
+                    const submitBtn = activityForm.querySelector('#submitActivityBtn');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<div class="spinner-border spinner-border-sm text-white" role="status"></div> Updating...';
                     }
                 }
-            } else if (imageCountContainer) {
-                imageCountContainer.classList.add('d-none');
-            }
+            });
+        }
+        
+        // Fade in all sections with the fade-in class
+        const fadeElements = document.querySelectorAll('.fade-in');
+        fadeElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transition = 'opacity 0.3s ease-in-out';
+            setTimeout(() => {
+                el.style.opacity = '1';
+            }, 100);
         });
-    }
+    });
 </script>
+
 <style>
-.border-danger {
-    border-color: #dc3545 !important;
-    background-color: rgba(220, 53, 69, 0.05);
-}
+    .input-icon-wrap {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 5;
+    }
+    
+    .input-border-focus:focus {
+        border-color: #3554D1 !important;
+        box-shadow: 0 0 0 0.2rem rgba(53, 84, 209, 0.25);
+    }
+    
+    .has-error .form-control,
+    .has-error .form-select {
+        border-color: #d94747 !important;
+    }
+    
+    .hover-shadow-blue:hover {
+        box-shadow: 0 10px 20px rgba(53, 84, 209, 0.15);
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .border-red-1 {
+        border-color: #d94747 !important;
+        background-color: rgba(217, 71, 71, 0.05);
+    }
+    
+    /* Card styling */
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+        transform: translateY(-5px);
+    }
+    
+    .card-header.bg-blue-1 {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+    
+    /* Button styling */
+    .hover-shadow-dark:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    #submitActivityBtn {
+        transition: all 0.3s ease;
+    }
+    
+    #submitActivityBtn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(53, 84, 209, 0.15);
+    }
+    
+    /* Form elements */
+    .form-group {
+        margin-bottom: 5px;
+    }
+    
+    .form-control, .form-select {
+        transition: all 0.2s ease;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .form-control:hover, .form-select:hover {
+        border-color: var(--color-blue-1);
+    }
+    
+    /* Progress indicator */
+    .progress-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    
+    .progress-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+    
+    .progress-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: #f3f4f6;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-bottom: 8px;
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .progress-item.active .progress-circle {
+        background-color: var(--color-blue-1);
+        color: white;
+        border-color: var(--color-blue-1);
+    }
+    
+    .progress-line {
+        width: 60px;
+        height: 2px;
+        background-color: #e5e7eb;
+        margin: 0 10px;
+        margin-top: -28px;
+    }
+    
+    .progress-line.active {
+        background-color: var(--color-blue-1);
+    }
+    
+    .progress-text {
+        font-size: 12px;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .progress-item.active .progress-text {
+        color: var(--color-blue-1);
+        font-weight: 600;
+    }
+    
+    /* Image previews */
+    #previewsContainer img {
+        transition: all 0.3s ease;
+    }
+    
+    #previewsContainer img:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Overall page animation */
+    .fade-in {
+        animation: fadeInAnimation 0.6s ease forwards;
+        opacity: 0;
+    }
+    
+    @keyframes fadeInAnimation {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsive handling */
+    @media (max-width: 767px) {
+        .py-40 {
+            padding-top: 25px !important;
+            padding-bottom: 25px !important;
+        }
+        
+        .px-40 {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+        }
+    }
 </style>
 {% endblock %}
