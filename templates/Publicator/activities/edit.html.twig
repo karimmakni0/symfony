@@ -157,10 +157,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Activity Name <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <div class="input-icon-wrap">
-                                    <i class="icon-destination text-16 text-light-1"></i>
-                                </div>
+                            <div class="input-group position-relative">
                                 {{ form_widget(form.activity_name, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'placeholder': 'Enter activity name'}}) }}
                             </div>
                             <div class="text-red-1 mt-5">{{ form_errors(form.activity_name) }}</div>
@@ -170,7 +167,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Destination <span class="text-danger">*</span></label>
-                            <div class="input-group">
+                            <div class="input-group position-relative">
                                 <div class="input-icon-wrap">
                                     <i class="icon-pin text-16 text-light-1"></i>
                                 </div>
@@ -183,7 +180,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Genre <span class="text-danger">*</span></label>
-                            <div class="input-group">
+                            <div class="input-group position-relative">
                                 <div class="input-icon-wrap">
                                     <i class="icon-category text-16 text-light-1"></i>
                                 </div>
@@ -196,8 +193,8 @@
                     <div class="col-12">
                         <div class="form-group">
                             <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Description <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <div class="input-icon-wrap position-absolute" style="top: 15px;">
+                            <div class="input-group position-relative">
+                                <div class="input-icon-wrap" style="top: 25px;">
                                     <i class="icon-message text-16 text-light-1"></i>
                                 </div>
                                 {{ form_widget(form.activity_description, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'placeholder': 'Enter detailed description of your activity', 'rows': '4', 'style': 'min-height: 120px;'}}) }}
@@ -238,10 +235,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Activity Date</label>
-                            <div class="input-group">
-                                <div class="input-icon-wrap">
-                                    <i class="icon-calendar text-16 text-light-1"></i>
-                                </div>
+                            <div class="input-group position-relative">
                                 {{ form_widget(form.activity_date, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'type': 'date'}}) }}
                             </div>
                             <div class="text-red-1 mt-5">{{ form_errors(form.activity_date) }}</div>
@@ -251,10 +245,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Maximum Participants <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <div class="input-icon-wrap">
-                                    <i class="icon-user text-16 text-light-1"></i>
-                                </div>
+                            <div class="input-group position-relative">
                                 {{ form_widget(form.max_number, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'type': 'number', 'min': '1'}}) }}
                             </div>
                             <div class="text-red-1 mt-5">{{ form_errors(form.max_number) }}</div>
@@ -265,10 +256,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Duration <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <div class="input-icon-wrap">
-                                    <i class="icon-clock text-16 text-light-1"></i>
-                                </div>
+                            <div class="input-group position-relative">
                                 {{ form_widget(form.activity_duration, {'attr': {'class': 'form-control rounded-8 px-20 py-15 border-light input-border-focus pl-45', 'placeholder': 'e.g. 2 hours'}}) }}
                             </div>
                             <div class="text-red-1 mt-5">{{ form_errors(form.activity_duration) }}</div>
@@ -278,7 +266,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Price <span class="text-danger">*</span></label>
-                            <div class="input-group">
+                            <div class="input-group position-relative">
                                 <div class="input-icon-wrap">
                                     <i class="icon-dollar text-16 text-light-1"></i>
                                 </div>
@@ -320,7 +308,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Latitude <span class="text-danger">*</span></label>
-                            <div class="input-group">
+                            <div class="input-group position-relative">
                                 <div class="input-icon-wrap">
                                     <i class="icon-map-pin text-16 text-light-1"></i>
                                 </div>
@@ -333,7 +321,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Longitude <span class="text-danger">*</span></label>
-                            <div class="input-group">
+                            <div class="input-group position-relative">
                                 <div class="input-icon-wrap">
                                     <i class="icon-map-pin text-16 text-light-1"></i>
                                 </div>
@@ -398,30 +386,83 @@
                 <!-- Current Images -->
                 <div class="row x-gap-20 y-gap-20">
                     <div class="col-12">
-                        <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Current Images</label>
+                        <div class="d-flex justify-between align-items-center mb-15">
+                            <label class="text-16 lh-1 fw-500 text-dark-1 mb-0">Current Images</label>
+                            <span class="badge bg-blue-1 text-white py-5 px-15 rounded-100">{{ resources|length }} image(s)</span>
+                        </div>
                         
                         {% if resources is empty %}
-                            <div class="py-15 px-20 rounded-8 text-center bg-light-2 border-light">
-                                <div class="text-14 text-light-1">No images available for this activity</div>
+                            <div class="py-40 px-30 rounded-16 text-center bg-blue-1-05 border-light">
+                                <div class="size-70 flex-center bg-white rounded-full mx-auto mb-20 shadow-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="#3554D1" viewBox="0 0 16 16">
+                                        <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                        <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                                    </svg>
+                                </div>
+                                <div class="text-18 fw-500 text-dark-1 mb-10">No images available</div>
+                                <div class="text-15 text-light-1">Add images to showcase your activity and attract visitors</div>
                             </div>
-                        {% else %}
-                            <div class="row g-20 mt-15">
-                                {% for resource in resources %}
-                                    <div class="col-lg-3 col-md-4 col-sm-6">
-                                        <div class="border rounded-8 p-15 h-100 d-flex flex-column shadow-sm hover-shadow-blue position-relative">
-                                            <img src="{{ resource.path }}" class="w-100 rounded-4" style="height: 180px; object-fit: cover;">
-                                            <div class="text-14 mt-15 fw-500 text-truncate">Image #{{ loop.index }}</div>
-                                            <div class="text-12 text-light-1 mb-15">Activity Image</div>
-                                            <div class="d-flex justify-between mt-auto">
-                                                <div class="form-check">
-                                                    <input type="checkbox" id="delete_{{ resource.id }}" name="deleted_images[]" value="{{ resource.id }}" class="delete-image-check form-check-input rounded-4">
-                                                    <label for="delete_{{ resource.id }}" class="text-14 cursor-pointer form-check-label">Mark for Deletion</label>
-                                                </div>
-                                            </div>
-                                            <div class="deletion-indicator bg-red-1 rounded-8 text-white text-center p-5 text-12 fw-500 mt-10" style="display: none;">Will be deleted</div>
+                        {% elseif resources|length == 1 %}
+                            <!-- Single Image Layout -->
+                            <div class="mt-15">
+                                <div class="row">
+                                    <div>
+                                        {% set resource = resources[0] %}
+                                        <!-- Featured Image -->
+                                        <div class="featured-image-container">
+                                            <img src="{{ resource.path }}" alt="Activity Featured Image" class="rounded-12 w-100 img-fluid">
+                                            <div class="image-overlay"></div>
+                                            <a href="javascript:void(0)" onclick="showImagePopup('{{ resource.path }}')" class="view-full-btn">
+                                                <i class="icon-search mr-5"></i> View Full Size
+                                            </a>
                                         </div>
                                     </div>
-                                {% endfor %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <!-- Multiple Images Layout -->
+                            <div class="mt-15">
+                                <div class="row g-20">
+                                    {% for resource in resources %}
+                                        <div class="col-lg-3 col-md-4 col-sm-6">
+                                            <!-- Image Card -->
+                                            <div class="activity-image-card">
+                                                <!-- Image Preview -->
+                                                <div class="img-container">
+                                                    <img src="{{ resource.path }}" alt="Activity Image #{{ loop.index }}">
+                                                    <div class="img-number">{{ loop.index }}</div>
+                                                </div>
+                                                
+                                                <!-- Card Content -->
+                                                <div class="card-content">
+                                                    <div class="d-flex justify-between align-items-center mb-10">
+                                                        <h6 class="card-title mb-0">Activity Image</h6>
+                                                        <span class="badge bg-blue-1 text-white py-5 px-10 rounded-100">Image</span>
+                                                    </div>
+                                                    
+                                                    <!-- Action Buttons -->
+                                                    <div class="d-flex justify-between mt-5">
+                                                        <a href="{{ resource.path }}" target="_blank" class="btn-action view-btn">
+                                                            <i class="icon-search"></i> View
+                                                        </a>
+                                                        
+                                                        <div class="form-check delete-check">
+                                                            <input type="checkbox" id="delete_{{ resource.id }}" name="deleted_images[]" value="{{ resource.id }}" class="delete-image-check form-check-input visually-hidden">
+                                                            <label for="delete_{{ resource.id }}" class="delete-label">
+                                                                <i class="icon-trash"></i> Delete
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Delete Indicator -->
+                                                    <div class="delete-indicator">
+                                                        <i class="icon-trash mr-5"></i> Marked for deletion
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
                             </div>
                         {% endif %}
                     </div>
@@ -431,25 +472,47 @@
                 <div class="col-12 mt-30">
                     <div class="file-upload-container mb-15">
                         <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Upload New Images</label>
-
-                        <div class="px-20 py-20 rounded-8 border-light bg-white position-relative">
+                        
+                        <div class="px-30 py-30 rounded-8 border-light bg-blue-1-05 position-relative">
                             <div class="row y-gap-20">
-                                <div class="col-12">
-                                    {{ form_widget(form.activity_images, {'attr': {'class': 'visually-hidden', 'id': 'activity_images', 'multiple': 'multiple'}}) }}
-
-                                    <label for="activity_images" class="button -md h-60 bg-blue-1 text-white rounded-8 w-100">
-                                        <div class="d-flex items-center justify-center h-100">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" class="mr-10" viewBox="0 0 16 16">
-                                                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                                                <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                                <div class="col-12 text-center">
+                                    <div class="size-70 flex-center bg-white rounded-full mx-auto mb-15 shadow-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="#3554D1" viewBox="0 0 16 16">
+                                            <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                            <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="text-center text-15 fw-500 text-dark-1 mb-20">Click button to upload your activity images</div>
+                                    
+                                    <style>
+                                        .file-upload-btn {
+                                            position: relative;
+                                            overflow: hidden;
+                                            display: inline-flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            cursor: pointer;
+                                            transition: all 0.3s ease;
+                                        }
+                                        .file-upload-btn:hover {
+                                            transform: translateY(-3px);
+                                            box-shadow: 0 10px 30px rgba(53, 84, 209, 0.25);
+                                        }
+                                    </style>
+                                    
+                                    <div class="d-flex justify-center">
+                                        {{ form_widget(form.activity_images, {'attr': {'class': 'd-none', 'multiple': 'multiple', 'accept': 'image/*'}}) }}
+                                        <label for="{{ form.activity_images.vars.id }}" class="file-upload-btn button h-60 px-35 -dark-1 bg-blue-1 text-white rounded-8 shadow-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-10" viewBox="0 0 16 16">
+                                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                                             </svg>
                                             <span class="text-16 fw-500">Select Images</span>
-                                        </div>
-                                    </label>
+                                        </label>
+                                    </div>
                                 </div>
                                 
-                                <div id="imageCountContainer" class="col-12 d-none">
-                                    <div class="py-10 px-15 bg-blue-1-05 rounded-8 text-blue-1 fw-500">
+                                <div id="imageCountContainer" class="col-12 text-center mt-15 d-none">
+                                    <div class="py-12 px-15 bg-white rounded-8 text-blue-1 fw-500 d-inline-block shadow-sm">
                                         <span>No file selected</span>
                                     </div>
                                 </div>
@@ -505,8 +568,25 @@
             }
         });
 
+        // Function to show image in SweetAlert popup
+        window.showImagePopup = function(imagePath) {
+            Swal.fire({
+                html: `<img src="${imagePath}" alt="Activity Image" class="img-fluid rounded-8" style="max-height: 80vh;">`,
+                showCloseButton: true,
+                showConfirmButton: false,
+                padding: '0',
+                width: 'auto',
+                background: 'transparent',
+                backdrop: 'rgba(0,0,0,0.85)',
+                customClass: {
+                    popup: 'swal-image-popup',
+                    closeButton: 'swal-image-close-btn'
+                }
+            });
+        };
+        
         // File Input functionality
-        const fileInput = document.getElementById('activity_images');
+        const fileInput = document.querySelector('input[name="activity_form[activity_images][]"]');
         const previewsContainer = document.getElementById('previewsContainer');
         const imageCountContainer = document.getElementById('imageCountContainer');
         
@@ -686,6 +766,10 @@
         top: 50%;
         transform: translateY(-50%);
         z-index: 5;
+        width: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .input-border-focus:focus {
@@ -813,10 +897,289 @@
     /* Image previews */
     #previewsContainer img {
         transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
     }
     
     #previewsContainer img:hover {
         transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(53, 84, 209, 0.15);
+    }
+    
+    /* File upload container */
+    .file-upload-container {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    /* Activity Image Card Styling */
+    .activity-image-card {
+        border: 1px solid #e5e5e5;
+        border-radius: 12px;
+        overflow: hidden;
+        background-color: #fff;
+        transition: all 0.25s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .activity-image-card:hover {
+        transform: translateY(-3px);
+        border-color: #3554D1;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* Image Container */
+    .img-container {
+        height: 180px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+    
+    .activity-image-card:hover .img-container img {
+        transform: scale(1.05);
+    }
+    
+    /* Image Number Badge */
+    .img-number {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 28px;
+        height: 28px;
+        background-color: #3554D1;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 2px 8px rgba(53, 84, 209, 0.3);
+    }
+    
+    /* Featured Image Container (Single Image) */
+    .featured-image-container {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 100%;
+        min-height: 300px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* SweetAlert Image Popup Styling */
+    .swal-image-popup {
+        border-radius: 12px;
+        overflow: hidden;
+        max-width: 90vw;
+    }
+    
+    .swal-image-close-btn {
+        color: white !important;
+        font-size: 2rem;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        border-radius: 50%;
+        margin-right: -10px;
+        margin-top: -30px;
+    }
+    
+    .featured-image-container img {
+        object-fit: cover;
+        height: 100%;
+        min-height: 300px;
+        transition: transform 0.5s ease;
+    }
+    
+    .featured-image-container:hover img {
+        transform: scale(1.03);
+    }
+    
+    .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .featured-image-container:hover .image-overlay {
+        opacity: 1;
+    }
+    
+    .view-full-btn {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background-color: rgba(255, 255, 255, 0.9);
+        color: #333;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 14px;
+        font-weight: 500;
+        opacity: 0;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        z-index: 2;
+    }
+    
+    .featured-image-container:hover .view-full-btn {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    
+    .view-full-btn:hover {
+        background-color: #3554D1;
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* Image Details Card */
+    .image-details-card {
+        background-color: white;
+        border-radius: 12px;
+        border: 1px solid #e5e5e5;
+        padding: 25px;
+        height: 100%;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .image-icon-badge {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: rgba(53, 84, 209, 0.1);
+        color: #3554D1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .image-icon-badge i {
+        font-size: 24px;
+    }
+    
+    /* Delete Control */
+    .delete-control .form-check-label {
+        cursor: pointer;
+    }
+    
+    .delete-control .icon-container {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: rgba(228, 87, 87, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    
+    .delete-control .form-check-label:hover .icon-container {
+        background-color: rgba(228, 87, 87, 0.2);
+    }
+    
+    .delete-warning {
+        animation: fadeIn 0.3s ease forwards;
+    }
+    
+    /* Card Content */
+    .card-content {
+        padding: 15px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .card-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    /* Action Buttons */
+    .btn-action {
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .view-btn {
+        color: #3554D1;
+        background-color: rgba(53, 84, 209, 0.08);
+    }
+    
+    .view-btn:hover {
+        background-color: #3554D1;
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* Delete Check */
+    .delete-check {
+        display: flex;
+        align-items: center;
+    }
+    
+    .delete-label {
+        color: #e45757;
+        font-size: 13px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        background-color: rgba(228, 87, 87, 0.08);
+        transition: all 0.2s ease;
+    }
+    
+    .delete-label:hover {
+        background-color: rgba(228, 87, 87, 0.15);
+    }
+    
+    .form-check-input:checked ~ .delete-label {
+        background-color: rgba(228, 87, 87, 0.2);
+    }
+    
+    .form-check-input {
+        display: none;
+    }
+    
+    /* Delete Indicator */
+    .delete-indicator {
+        display: none;
+        background-color: #e45757;
+        color: white;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-top: 12px;
+        text-align: center;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
     /* Overall page animation */
