@@ -374,7 +374,7 @@ class ActivitiesController extends AbstractController
             
             // Handle new image uploads
             $imageFiles = $form->get('activity_images')->getData();
-            if ($imageFiles) {
+            if ($imageFiles && !empty($imageFiles[0])) {
                 $uploadsDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads/activities';
                 
                 // Create directory if it doesn't exist
@@ -382,25 +382,35 @@ class ActivitiesController extends AbstractController
                     mkdir($uploadsDirectory, 0777, true);
                 }
                 
-                foreach ($imageFiles as $imageFile) {
-                    if ($imageFile) {
-                        // Generate unique filename
-                        $newFilename = 'activity-' . uniqid() . '-' . time() . '.' . $imageFile->guessExtension();
-                        
-                        try {
-                            // Move the file to the uploads directory
-                            $imageFile->move($uploadsDirectory, $newFilename);
-                            
-                            // Create a new resource for this image
-                            $resource = new Resources();
-                            $resource->setPath('/uploads/activities/' . $newFilename);
-                            $resource->setActivity($activity);
-                            
-                            $this->entityManager->persist($resource);
-                        } catch (\Exception $e) {
-                            $this->addFlash('error', 'Failed to upload image: ' . $e->getMessage());
+                // Get the first image (we only allow one image per activity now)
+                $imageFile = $imageFiles[0];
+                
+                // Generate unique filename
+                $newFilename = 'activity-' . uniqid() . '-' . time() . '.' . $imageFile->guessExtension();
+                
+                try {
+                    // Move the file to the uploads directory
+                    $imageFile->move($uploadsDirectory, $newFilename);
+                    
+                    // Remove all existing images for this activity that aren't in the deletedImages array
+                    // because we're replacing the image, not adding to it
+                    $existingResources = $activity->getResources();
+                    $deletedImageIds = $request->request->all('deleted_images') ?? [];
+                    
+                    foreach ($existingResources as $existingResource) {
+                        if (!in_array($existingResource->getId(), $deletedImageIds)) {
+                            $this->entityManager->remove($existingResource);
                         }
                     }
+                    
+                    // Create a new resource for this image
+                    $resource = new Resources();
+                    $resource->setPath('/uploads/activities/' . $newFilename);
+                    $resource->setActivity($activity);
+                    
+                    $this->entityManager->persist($resource);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Failed to upload image: ' . $e->getMessage());
                 }
             }
             

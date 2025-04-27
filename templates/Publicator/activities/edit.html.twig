@@ -471,7 +471,7 @@
                 <!-- Add New Images -->
                 <div class="col-12 mt-30">
                     <div class="file-upload-container mb-15">
-                        <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Upload New Images</label>
+                        <label class="text-16 lh-1 fw-500 text-dark-1 mb-10">Replace Image</label>
                         
                         <div class="px-30 py-30 rounded-8 border-light bg-blue-1-05 position-relative">
                             <div class="row y-gap-20">
@@ -482,7 +482,7 @@
                                             <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
                                         </svg>
                                     </div>
-                                    <div class="text-center text-15 fw-500 text-dark-1 mb-20">Click button to upload your activity images</div>
+                                    <div class="text-center text-15 fw-500 text-dark-1 mb-20">Upload a new image to replace the current one</div>
                                     
                                     <style>
                                         .file-upload-btn {
@@ -501,12 +501,12 @@
                                     </style>
                                     
                                     <div class="d-flex justify-center">
-                                        {{ form_widget(form.activity_images, {'attr': {'class': 'd-none', 'multiple': 'multiple', 'accept': 'image/*'}}) }}
+                                        {{ form_widget(form.activity_images, {'attr': {'class': 'd-none', 'accept': 'image/*'}}) }}
                                         <label for="{{ form.activity_images.vars.id }}" class="file-upload-btn button h-60 px-35 -dark-1 bg-blue-1 text-white rounded-8 shadow-1">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="mr-10" viewBox="0 0 16 16">
                                                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                                             </svg>
-                                            <span class="text-16 fw-500">Select Images</span>
+                                            <span class="text-16 fw-500">Replace Image</span>
                                         </label>
                                     </div>
                                 </div>

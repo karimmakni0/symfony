@@ -3,28 +3,37 @@
 {% block title %}Activity Details{% endblock %}
 
 {% block body %}
-<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+<div class="row y-gap-20 justify-between items-end pb-40 lg:pb-30 md:pb-24">
     <div class="col-auto">
-        <h1 class="text-30 lh-14 fw-600">Activity Details</h1>
-        <div class="text-15 text-light-1">View and manage activity information</div>
+        <div class="d-flex items-center">
+            <div class="size-50 flex-center bg-blue-1-05 rounded-full mr-10">
+                <i class="icon-ticket text-24 text-blue-1"></i>
+            </div>
+            <div>
+                <h1 class="text-30 lh-14 fw-600">Activity Details</h1>
+                <div class="text-15 text-light-1 mt-5">View and manage activity information</div>
+            </div>
+        </div>
     </div>
     <div class="col-auto">
-        <a href="{{ path('app_publicator_activities') }}" class="button h-50 px-24 -blue-1-05 text-blue-1 hover-animation">
+        <a href="{{ path('app_publicator_activities') }}" class="button h-50 px-30 -blue-1-05 text-blue-1 hover-animation rounded-8 transition-shadow shadow-hover">
             <i class="icon-arrow-left mr-10"></i>
-            Back to Activities
+            <span class="fw-500">Back to Activities</span>
         </a>
     </div>
 </div>
 
 {% for label, messages in app.flashes %}
     {% for message in messages %}
-        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30 fade-in">
-            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-4">
+        <div class="alert mb-30 fade-in">
+            <div class="px-24 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-8 shadow-1">
                 <div class="row x-gap-10 y-gap-10 items-center">
                     <div class="col-auto">
                         <div class="d-flex items-center">
-                            <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
-                            <div class="fw-500">{{ message }}</div>
+                            <div class="size-40 flex-center bg-white bg-opacity-20 rounded-full mr-10">
+                                <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-18"></i>
+                            </div>
+                            <div class="fw-500 text-16">{{ message }}</div>
                         </div>
                     </div>
                 </div>
@@ -33,67 +42,123 @@
     {% endfor %}
 {% endfor %}
 
-<div class="py-30 px-30 rounded-4 bg-white shadow-3 fade-in">
+<div class="py-40 px-40 rounded-8 bg-white shadow-4 fade-in">
     {% if activity %}
-        <div class="row y-gap-30">
+        <div class="row y-gap-40">
             <!-- Activity Details -->
             <div class="col-xl-8">
                 <div class="row">
                     <div class="col-12">
-                        <h2 class="text-22 fw-600 mb-15">{{ activity.activityName }}</h2>
+                        <div class="d-flex justify-between items-center mb-20">
+                            <h2 class="text-24 fw-600">{{ activity.activityName }}</h2>
+                            <div class="py-8 px-20 rounded-100 bg-blue-1 text-white text-14 fw-500">
+                                Regular Activity
+                            </div>
+                        </div>
                         
-                        <div class="row x-gap-10 y-gap-10 items-center pb-20">
-                            <div class="col-auto">
+                        <div class="row x-gap-20 y-gap-15 items-center pb-30">
+                            <div class="col-md-6">
                                 <div class="d-flex items-center">
-                                    <i class="icon-location text-16 mr-5 text-light-1"></i>
-                                    <div class="text-15">{{ activity.activityDestination }}</div>
+                                    <div class="size-40 flex-center rounded-full bg-blue-1-05 mr-10">
+                                        <i class="icon-location text-16 text-blue-1"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-14 text-light-1">Destination</div>
+                                        <div class="text-16 fw-500 text-dark-1">{{ activity.activityDestination }}</div>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="col-auto">
+                            <div class="col-md-6">
                                 <div class="d-flex items-center">
-                                    <i class="icon-clock text-16 mr-5 text-light-1"></i>
-                                    <div class="text-15">{{ activity.activityDuration ?: 'Not specified' }}</div>
+                                    <div class="size-40 flex-center rounded-full bg-blue-1-05 mr-10">
+                                        <i class="icon-clock text-16 text-blue-1"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-14 text-light-1">Duration</div>
+                                        <div class="text-16 fw-500 text-dark-1">{{ activity.activityDuration ?: 'Not specified' }}</div>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="col-auto">
+                            <div class="col-md-6">
                                 <div class="d-flex items-center">
-                                    <i class="icon-tag text-16 mr-5 text-light-1"></i>
-                                    <div class="text-15">{{ activity.activityGenre ?: 'Not specified' }}</div>
+                                    <div class="size-40 flex-center rounded-full bg-blue-1-05 mr-10">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#3554D1" class="bi bi-tag" viewBox="0 0 16 16">
+                                          <path d="M6 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-1 0a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
+                                          <path d="M2 1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 1 6.586V2a1 1 0 0 1 1-1zm0 5.586 7 7L13.586 9l-7-7H2v4.586z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-14 text-light-1">Genre</div>
+                                        <div class="text-16 fw-500 text-dark-1">{{ activity.activityGenre ?: 'Not specified' }}</div>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="col-auto">
+                            <div class="col-md-6">
                                 <div class="d-flex items-center">
-                                    <i class="icon-dollar text-16 mr-5 text-light-1"></i>
-                                    <div class="text-15">${{ activity.activityPrice ?: '0.00' }}</div>
+                                    <div class="size-40 flex-center rounded-full bg-blue-1-05 mr-10">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#3554D1" class="bi bi-cash" viewBox="0 0 16 16">
+                                          <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+                                          <path d="M0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V4zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V6a2 2 0 0 1-2-2H3z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-14 text-light-1">Price</div>
+                                        <div class="text-16 fw-500 text-dark-1">${{ activity.activityPrice ?: '0.00' }}</div>
+                                    </div>
                                 </div>
                             </div>
-                             <div class="col-auto">
+                            
+                            <div class="col-md-6">
                                 <div class="d-flex items-center">
-                                    <i class="icon-user text-16 mr-5 text-light-1"></i>
-                                    <div class="text-15">{{ activity.MaxNumber ?: '50' }}</div>
+                                    <div class="size-40 flex-center rounded-full bg-blue-1-05 mr-10">
+                                        <i class="icon-user text-16 text-blue-1"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-14 text-light-1">Capacity</div>
+                                        <div class="text-16 fw-500 text-dark-1">{{ activity.MaxNumber ?: '50' }} participants</div>
+                                    </div>
                                 </div>
                             </div>
+                            
                             {% if activity.activityDate %}
-                                <div class="col-auto">
+                                <div class="col-md-6">
                                     <div class="d-flex items-center">
-                                        <i class="icon-calendar text-16 mr-5 text-light-1"></i>
-                                        <div class="text-15">{{ activity.activityDate|date('Y-m-d') }}</div>
+                                        <div class="size-40 flex-center rounded-full bg-blue-1-05 mr-10">
+                                            <i class="icon-calendar text-16 text-blue-1"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-14 text-light-1">Date</div>
+                                            <div class="text-16 fw-500 text-dark-1">{{ activity.activityDate|date('F d, Y') }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             {% endif %}
                         </div>
                         
-                        <div class="border-top-light py-20">
-                            <h3 class="text-18 fw-500 mb-10">Description</h3>
-                            <div class="text-15 lh-16 text-dark-1">
-                                {% if activity.activityDescription %}
-                                    {{ activity.activityDescription|nl2br }}
-                                {% else %}
-                                    <p class="text-light-1">No description provided</p>
-                                {% endif %}
+                        <div class="border-top-light pt-30 mt-10">
+                            <div class="d-flex items-center mb-15">
+                                <div class="size-40 flex-center rounded-full bg-blue-1-05 mr-10">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#3554D1" class="bi bi-file-text" viewBox="0 0 16 16">
+                                      <path d="M5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z"/>
+                                      <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm10-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-18 fw-600">Description</h3>
+                            </div>
+                            <div class="text-15 text-dark-1 mt-20 line-height-md">
+                                <div class="px-30 py-30 bg-blue-1-05 rounded-8 shadow-1">
+                                    {% if activity.activityDescription %}
+                                        <p>{{ activity.activityDescription|raw }}</p>
+                                    {% else %}
+                                        <div class="d-flex items-center">
+                                            <i class="icon-alert-circle text-16 text-light-1 mr-10"></i>
+                                            <p class="text-15 text-light-1">No description provided</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -102,24 +167,63 @@
             
             <!-- Sidebar Actions -->
             <div class="col-xl-4">
-                <div class="px-30 py-30 rounded-4 border-light shadow-2">
+                <div class="px-30 py-35 rounded-8 border-light shadow-3 bg-white">
                     <div class="row y-gap-20">
                         <div class="col-12">
-                            <h3 class="text-18 fw-500 mb-10">Actions</h3>
+                            <div class="d-flex justify-between items-center pb-20 border-bottom-light">
+                                <div class="d-flex items-center">
+                                    <div class="size-40 flex-center rounded-full bg-blue-1-05 mr-10">
+                                        <i class="icon-ticket text-16 text-blue-1"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-14 text-light-1">Activity ID</div>
+                                        <div class="text-16 fw-600 text-dark-1">#{{ activity.id }}</div>
+                                    </div>
+                                </div>
+                                <div class="py-6 px-15 rounded-100 bg-blue-1 text-white text-14 fw-500">
+                                    Regular
+                                </div>
+                            </div>
                         </div>
                         
+                        {% if activity.bookings is defined %}
                         <div class="col-12">
-                            <a href="{{ path('app_publicator_edit_activity', {'id': activity.id}) }}" class="button -md -dark-1 bg-blue-1 text-white w-100 rounded-4">
-                                <i class="icon-edit text-16 mr-10"></i>
-                                Edit Activity
-                            </a>
+                            <div class="d-flex items-center py-10 border-bottom-light">
+                                <div class="size-40 flex-center rounded-full bg-green-1-05 mr-10">
+                                    <i class="icon-ticket text-16 text-green-1"></i>
+                                </div>
+                                <div>
+                                    <div class="text-14 text-light-1">Bookings</div>
+                                    <div class="text-16 fw-600 text-dark-1">{{ activity.bookings|length ?: 0 }} bookings</div>
+                                </div>
+                            </div>
                         </div>
+                        {% endif %}
                         
                         <div class="col-12">
-                            <button type="button" class="button -md -outline-red-1 text-red-1 w-100 rounded-4 delete-activity" data-id="{{ activity.id }}">
-                                <i class="icon-trash text-16 mr-10"></i>
-                                Delete Activity
-                            </button>
+                            <div class="row y-gap-15 pt-20">
+                                <div class="col-12">
+                                    <div class="text-16 fw-500 mb-15">Activity Actions</div>
+                                </div>
+                                
+                                <div class="col-12 mb-15">
+                                    <div class="w-100 action-button-container">
+                                        <a href="{{ path('app_publicator_edit_activity', {'id': activity.id}) }}" class="action-button bg-blue-1">
+                                            <i class="icon-edit text-16 mr-10"></i>
+                                            <span class="fw-500">Edit Activity</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <div class="w-100 action-button-container">
+                                        <button type="button" class="action-button bg-red-1 delete-activity" data-id="{{ activity.id }}">
+                                            <i class="icon-trash text-16 mr-10"></i>
+                                            <span class="fw-500">Delete Activity</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -127,36 +231,85 @@
             
             <!-- Activity Images -->
             <div class="col-12">
-                <div class="border-top-light pt-30">
-                    <h3 class="text-18 fw-500 mb-15">Activity Images ({{ activity.resources|length }})</h3>
+                <div class="border-top-light pt-40 mt-20">
+                    <div class="d-flex justify-between items-center mb-20">
+                        <div class="d-flex items-center">
+                            <div class="size-40 flex-center rounded-full bg-blue-1-05 mr-10">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#3554D1" class="bi bi-images" viewBox="0 0 16 16">
+                                  <path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                                  <path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2zM14 2H4a1 1 0 0 0-1 1h9.002a2 2 0 0 1 2 2v7A1 1 0 0 0 15 11V3a1 1 0 0 0-1-1zM2.002 4a1 1 0 0 0-1 1v8l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V5a1 1 0 0 0-1-1h-10z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-18 fw-600">Activity Images</h3>
+                        </div>
+                        <div class="py-6 px-15 rounded-100 bg-dark-4 text-white text-14 fw-500">
+                            {{ activity.resources|length }} photo{% if activity.resources|length != 1 %}s{% endif %}
+                        </div>
+                    </div>
                     
                     {% if activity.resources is empty %}
-                        <div class="py-20 px-20 rounded-4 bg-blue-1-05 text-center">
-                            <div class="text-15">No images available for this activity</div>
+                        <div class="py-40 px-30 rounded-8 bg-blue-1-05 text-center shadow-1">
+                            <div class="size-60 flex-center bg-white rounded-full mx-auto mb-15 shadow-2">
+                                <i class="icon-alert-circle text-24 text-light-1"></i>
+                            </div>
+                            <div class="text-15 fw-500 text-light-1">No images available for this activity</div>
+                            <div class="d-inline-block mt-20">
+                                <a href="{{ path('app_publicator_edit_activity', {'id': activity.id}) }}#images" class="button -sm px-20 bg-blue-1 text-white rounded-8">
+                                    <i class="icon-plus text-14 mr-10"></i>
+                                    <span class="fw-500">Add Image</span>
+                                </a>
+                            </div>
                         </div>
                     {% else %}
-                        <div class="row x-gap-20 y-gap-20">
-                            {% for resource in activity.resources %}
-                                <div class="col-lg-3 col-md-4 col-sm-6">
-                                    <div class="ratio ratio-1:1 rounded-4 border-light overflow-hidden">
-                                        <img src="{{ asset(resource.path) }}" alt="Activity Image" class="img-ratio object-cover">
+                        <!-- Single image case - special layout -->
+                        {% if activity.resources|length == 1 %}
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="ratio ratio-16:9 rounded-8 border-light overflow-hidden shadow-2 hover-shadow-4 transition-shadow">
+                                        <img src="{{ asset(activity.resources[0].path) }}" alt="{{ activity.activityName }}" class="img-ratio object-cover">
+                                        <div class="d-flex justify-center items-center absolute-full-center opacity-0 hover-opacity-100 bg-dark-3 bg-opacity-30 transition-all pointer z-2">
+                                            <a href="javascript:void(0)" onclick="showImagePopup('{{ asset(activity.resources[0].path) }}')" class="button -sm px-20 bg-white text-dark-1 rounded-8 shadow-1">
+                                                <i class="icon-eye text-14 mr-10"></i>
+                                                <span class="fw-500">View Full Size</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            {% endfor %}
-                        </div>
+                            </div>
+                        <!-- Multiple images case - grid layout -->
+                        {% else %}
+                            <div class="row x-gap-20 y-gap-20">
+                                {% for resource in activity.resources %}
+                                    <div class="col-lg-3 col-md-4 col-sm-6">
+                                        <div class="ratio ratio-1:1 rounded-8 border-light overflow-hidden shadow-2 hover-shadow-4 transition-shadow" style="position: relative;">
+                                            <img src="{{ asset(resource.path) }}" alt="Activity Image" class="img-ratio object-cover">
+                                            <div class="d-flex justify-center items-center absolute-full-center opacity-0 hover-opacity-100 bg-dark-3 bg-opacity-30 transition-all pointer z-2">
+                                                <a href="javascript:void(0)" onclick="showImagePopup('{{ asset(resource.path) }}')" class="button -sm px-16 bg-white text-dark-1 rounded-8 shadow-1">
+                                                    <i class="icon-eye text-14 mr-8"></i>
+                                                    <span class="fw-500">View</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
         </div>
     {% else %}
-        <div class="row justify-center">
-            <div class="col-auto">
-                <div class="text-18 fw-500 text-center mb-10">Activity Not Found</div>
-                <div class="text-15 text-light-1 text-center mb-30">The requested activity could not be found.</div>
+        <div class="row justify-center py-50">
+            <div class="col-lg-6 col-md-8 text-center">
+                <div class="size-80 flex-center bg-blue-1-05 rounded-full mx-auto mb-30 shadow-1">
+                    <i class="icon-search-minus text-40 text-blue-1"></i>
+                </div>
+                <h2 class="text-24 fw-600 text-center mb-15">Activity Not Found</h2>
+                <div class="text-15 text-light-1 text-center mb-30 max-w-500 mx-auto">The activity you're looking for could not be found. It may have been deleted or the ID you provided doesn't exist.</div>
                 <div class="d-flex justify-center">
-                    <a href="{{ path('app_publicator_activities') }}" class="button px-30 h-50 -dark-1 bg-blue-1 text-white">
+                    <a href="{{ path('app_publicator_activities') }}" class="button px-30 h-60 -dark-1 bg-blue-1 text-white rounded-8 transition-shadow shadow-1 hover-shadow-4">
                         <i class="icon-arrow-left mr-10"></i>
-                        Back to Activities
+                        <span class="fw-500">Back to Activities</span>
                     </a>
                 </div>
             </div>
@@ -166,18 +319,53 @@
 {% endblock %}
 
 {% block javascripts %}
+<!-- SweetAlert2 Library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Delete activity with confirmation
+        // Delete activity with SweetAlert confirmation
         const deleteButton = document.querySelector('.delete-activity');
         if (deleteButton) {
             deleteButton.addEventListener('click', function() {
                 const activityId = this.getAttribute('data-id');
-                if (confirm('Are you sure you want to delete this activity? This action cannot be undone.\n\nNote: Activities with associated tickets cannot be deleted.')) {
-                    window.location.href = '{{ path("app_publicator_activities") }}/delete/' + activityId;
-                }
+                
+                Swal.fire({
+                    title: 'Delete Activity?',
+                    text: 'Are you sure you want to delete this activity? This action cannot be undone. Activities with associated tickets cannot be deleted.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        confirmButton: 'btn btn-danger',
+                        cancelButton: 'btn btn-primary'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '{{ path("app_publicator_activities") }}/delete/' + activityId;
+                    }
+                });
             });
         }
+        
+        // Function to show image in SweetAlert popup
+        window.showImagePopup = function(imagePath) {
+            Swal.fire({
+                html: `<img src="${imagePath}" alt="Activity Image" class="img-fluid rounded-8" style="max-height: 80vh;">`,
+                showCloseButton: true,
+                showConfirmButton: false,
+                padding: '0',
+                width: 'auto',
+                background: 'transparent',
+                backdrop: 'rgba(0,0,0,0.85)',
+                customClass: {
+                    popup: 'swal-image-popup',
+                    closeButton: 'swal-image-close-btn'
+                }
+            });
+        };
     });
 </script>
 <style>
@@ -209,6 +397,91 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+    }
+    
+    /* Hover effects */
+    .hover-shadow-4:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .hover-opacity-100:hover {
+        opacity: 1 !important;
+    }
+    
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+    
+    .transition-shadow {
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .shadow-hover:hover {
+        box-shadow: 0 10px 30px rgba(53, 84, 209, 0.25);
+    }
+    
+    /* SweetAlert customization */
+    .swal-image-popup {
+        background: transparent !important;
+        box-shadow: none !important;
+        max-width: 90vw !important;
+    }
+    
+    .swal2-close {
+        color: white !important;
+        font-size: 2rem !important;
+        font-weight: 400 !important;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2) !important;
+    }
+    
+    .absolute-full-center {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .bg-opacity-30 {
+        opacity: 0.7;
+    }
+    
+    .z-2 {
+        z-index: 2;
+    }
+    
+    .line-height-md {
+        line-height: 1.7;
+    }
+    
+    /* Activity action buttons styling */
+    .action-button-container {
+        width: 100%;
+        display: block;
+    }
+    
+    .action-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 60px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        text-align: center;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .action-button:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        transform: translateY(-3px);
     }
 </style>
 {% endblock %}
