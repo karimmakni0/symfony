@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Activities;
 use App\Entity\Billet;
 use App\Entity\Resources;
-use App\Entity\User;
 use App\Entity\Reservation;
 use App\Entity\Users;
 use App\Form\ActivityFormType;
@@ -14,11 +13,12 @@ use App\Repository\BilletRepository;
 use App\Repository\DestinationsRepository;
 use App\Repository\ResourcesRepository;
 use App\Repository\ReservationRepository;
+use App\Service\EmailService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Stripe;
 
@@ -30,6 +30,7 @@ class ActivitiesController extends AbstractController
     private $resourcesRepository;
     private $billetRepository;
     private $reservationRepository;
+    private $emailService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -37,7 +38,8 @@ class ActivitiesController extends AbstractController
         DestinationsRepository $destinationsRepository,
         ResourcesRepository $resourcesRepository,
         BilletRepository $billetRepository,
-        ReservationRepository $reservationRepository
+        ReservationRepository $reservationRepository,
+        EmailService $emailService
     ) {
         $this->entityManager = $entityManager;
         $this->activitiesRepository = $activitiesRepository;
@@ -45,6 +47,7 @@ class ActivitiesController extends AbstractController
         $this->resourcesRepository = $resourcesRepository;
         $this->billetRepository = $billetRepository;
         $this->reservationRepository = $reservationRepository;
+        $this->emailService = $emailService;
     }
 
     #[Route("/api/activities", name: 'api_activities_index', methods: ['GET'])]
@@ -160,7 +163,7 @@ class ActivitiesController extends AbstractController
     }
     
     #[Route('/publicator/activities', name: 'app_publicator_activities')]
-    public function publicatorActivities(): Response
+    public function publicatorActivities(Request $request): Response
     {
         // Check if user has the appropriate role
         $user = $this->getUser();
@@ -168,12 +171,52 @@ class ActivitiesController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
         
-        // Get activities created by this publicator
-        $activities = $this->activitiesRepository
-            ->findBy(['user' => $user], ['created_at' => 'DESC']);
+        // Set up pagination parameters
+        $page = $request->query->getInt('page', 1);
+        $limit = 5; // Number of activities per page
+        
+        // Get total activities count for pagination
+        $totalActivities = $this->activitiesRepository->count(['user' => $user]);
+        $maxPages = ceil($totalActivities / $limit);
+        
+        // Get all activities for statistics
+        $allActivities = $this->activitiesRepository->findBy(['user' => $user]);
+        
+        // Get unique destinations for statistics
+        $uniqueDestinations = [];
+        $upcomingActivitiesCount = 0;
+        $today = new \DateTime();
+        
+        foreach ($allActivities as $activity) {
+            // Count unique destinations
+            if (!empty($activity->getActivityDestination()) && !in_array($activity->getActivityDestination(), $uniqueDestinations)) {
+                $uniqueDestinations[] = $activity->getActivityDestination();
+            }
+            
+            // Count upcoming activities
+            if ($activity->getActivityDate() && $activity->getActivityDate() > $today) {
+                $upcomingActivitiesCount++;
+            }
+        }
+        
+        // Get paginated activities created by this publicator
+        $pagedActivities = $this->activitiesRepository->findBy(
+            ['user' => $user], 
+            ['created_at' => 'DESC'],
+            $limit,
+            ($page - 1) * $limit
+        );
         
         return $this->render('publicator/activities/index.html.twig', [
-            'activities' => $activities,
+            'activities' => $pagedActivities,
+            'current_page' => $page,
+            'max_pages' => $maxPages,
+            'total_items' => $totalActivities,
+            'items_per_page' => $limit,
+            'all_activities_count' => count($allActivities),
+            'unique_destinations_count' => count($uniqueDestinations),
+            'unique_destinations' => $uniqueDestinations,
+            'upcoming_activities_count' => $upcomingActivitiesCount
         ]);
     }
     
@@ -276,6 +319,22 @@ class ActivitiesController extends AbstractController
                 
                 // Save all resources
                 $this->entityManager->flush();
+            }
+            
+            // Send email notification to all users about the new activity
+            try {
+                // Add a flag to check if this code block is executed
+                file_put_contents(__DIR__ . '/../../var/log/email_notification_attempt.log', date('Y-m-d H:i:s') . " - Attempting to send notification for activity ID: " . $activity->getId() . "\n", FILE_APPEND);
+                
+                $this->emailService->sendNewActivityNotification($activity);
+                
+                // Log success
+                file_put_contents(__DIR__ . '/../../var/log/email_notification_success.log', date('Y-m-d H:i:s') . " - Successfully sent notification for activity ID: " . $activity->getId() . "\n", FILE_APPEND);
+            } catch (\Exception $e) {
+                // Log the detailed error information
+                $errorMessage = 'Failed to send email notification: ' . $e->getMessage() . "\n";
+                $errorMessage .= 'Stack trace: ' . $e->getTraceAsString() . "\n";
+                file_put_contents(__DIR__ . '/../../var/log/email_notification_error.log', date('Y-m-d H:i:s') . " - " . $errorMessage, FILE_APPEND);
             }
             
             // Redirect with success parameter instead of flash message

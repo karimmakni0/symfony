@@ -12,6 +12,7 @@ use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
 use App\Repository\BlogRatingRepository;
 use App\Repository\UsersRepository;
+use App\Service\GeminiAIService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -37,6 +38,7 @@ class BlogController extends AbstractController
     private $security;
     private $httpClient;
     private $logger;
+    private $geminiService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -47,7 +49,8 @@ class BlogController extends AbstractController
         BlogRatingRepository $blogRatingRepository,
         Security $security,
         HttpClientInterface $httpClient = null,
-        LoggerInterface $logger = null
+        LoggerInterface $logger = null,
+        GeminiAIService $geminiService = null
     ) {
         $this->entityManager = $entityManager;
         $this->postRepository = $postRepository;
@@ -58,6 +61,7 @@ class BlogController extends AbstractController
         $this->security = $security;
         $this->httpClient = $httpClient;
         $this->logger = $logger;
+        $this->geminiService = $geminiService;
     }
 
     #[Route('/blog', name: 'app_blog_index')]
@@ -687,8 +691,35 @@ class BlogController extends AbstractController
             return new JsonResponse(['error' => 'Activity not found'], Response::HTTP_NOT_FOUND);
         }
         
-        // Try different AI services for content generation
-        $contentServices = [
+        // Get the uploaded image if available
+        $image = $request->files->get('image');
+        
+        // Use our GeminiAIService to generate content
+        if ($this->geminiService) {
+            try {
+                $generatedContent = $this->geminiService->generateBlogContent(
+                    $activity->getActivityName(),
+                    $activity->getActivityDestination() ?? 'unknown location',
+                    $image
+                );
+                
+                if ($generatedContent) {
+                    return new JsonResponse(['content' => $generatedContent]);
+                }
+            } catch (\Exception $e) {
+                $this->logger?->warning("Error with Gemini AI service", [
+                    'error' => $e->getMessage(),
+                    'activity' => $activity->getActivityName()
+                ]);
+            }
+        }
+        
+        // If Gemini service fails or doesn't exist, try fallback services
+        $generatedContent = null;
+        $lastError = null;
+        
+        // Define fallback content generation services
+        $fallbackServices = [
             'openai' => function() use ($activity) {
                 return $this->generateWithOpenAI($activity);
             },
@@ -700,12 +731,9 @@ class BlogController extends AbstractController
             }
         ];
         
-        $generatedContent = null;
-        $lastError = null;
-        
-        // Try each service until one succeeds
-        foreach ($contentServices as $serviceName => $serviceFunction) {
-            if ($this->httpClient) {
+        // Try each fallback service until one succeeds
+        if ($this->httpClient) {
+            foreach ($fallbackServices as $serviceName => $serviceFunction) {
                 try {
                     $generatedContent = $serviceFunction();
                     if ($generatedContent) {
@@ -735,21 +763,7 @@ class BlogController extends AbstractController
     // Helper methods for AI content generation
     private function generateWithOpenAI($activity)
     {
-        if (!$this->httpClient) {
-            return null;
-        }
-        
-        $apiKey = $this->getParameter('openai_api_key');
-        if (!$apiKey) {
-            $this->logger?->warning('OpenAI API key not configured');
-            return null;
-        }
-        
-        $endpoint = 'https://api.openai.com/v1/chat/completions';
-        
-        try {
-            $response = $this->httpClient->request('POST', $endpoint, [
-                'headers' => [
+        // ... (rest of the code remains the same)
                     'Authorization' => 'Bearer ' . $apiKey,
                     'Content-Type' => 'application/json',
                 ],
@@ -842,20 +856,6 @@ class BlogController extends AbstractController
             throw $e;
         }
         
-        return null;
-    }
-    
-    private function generateWithLocalAI($activity)
-    {
-        if (!$this->httpClient) {
-            return null;
-        }
-        
-        $endpoint = $this->getParameter('localai_endpoint');
-        if (!$endpoint) {
-            $this->logger?->warning('LocalAI endpoint not configured');
-            return null;
-        }
         
         try {
             $response = $this->httpClient->request('POST', $endpoint, [

@@ -58,7 +58,7 @@ class DestinationsController extends AbstractController
     }
 
     #[Route('/publicator/destinations', name: 'app_publicator_destinations')]
-    public function publicatorDestinations(): Response
+    public function publicatorDestinations(Request $request): Response
     {
         // Check if user has the appropriate role
         $user = $this->getUser();
@@ -66,12 +66,42 @@ class DestinationsController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
         
-        // Get destinations created by this publicator
-        $destinations = $this->destinationsRepository
-            ->findBy(['user' => $user], ['created_at' => 'DESC']);
+        // Set up pagination parameters
+        $page = $request->query->getInt('page', 1);
+        $limit = 5; // Number of destinations per page
+        
+        // Get total destinations count for pagination
+        $totalDestinations = $this->destinationsRepository->count(['user' => $user]);
+        $maxPages = ceil($totalDestinations / $limit);
+        
+        // Get all destinations for statistics
+        $allDestinations = $this->destinationsRepository->findBy(['user' => $user]);
+        
+        // Get unique locations for statistics
+        $uniqueLocations = [];
+        foreach ($allDestinations as $dest) {
+            if (!empty($dest->getLocation()) && !in_array($dest->getLocation(), $uniqueLocations)) {
+                $uniqueLocations[] = $dest->getLocation();
+            }
+        }
+        
+        // Get paginated destinations created by this publicator
+        $pagedDestinations = $this->destinationsRepository->findBy(
+            ['user' => $user], 
+            ['created_at' => 'DESC'],
+            $limit,
+            ($page - 1) * $limit
+        );
         
         return $this->render('publicator/destinations/index.html.twig', [
-            'destinations' => $destinations,
+            'destinations' => $pagedDestinations,
+            'current_page' => $page,
+            'max_pages' => $maxPages,
+            'total_items' => $totalDestinations,
+            'items_per_page' => $limit,
+            'all_destinations_count' => count($allDestinations),
+            'unique_locations_count' => count($uniqueLocations),
+            'unique_locations' => $uniqueLocations
         ]);
     }
     

@@ -48,7 +48,7 @@
                     </svg>
                 </div>
             </div>
-            <div class="stats-card-value">{{ activities|length }}</div>
+            <div class="stats-card-value">{{ all_activities_count }}</div>
             <div class="stats-card-label">Total Activities</div>
         </div>
     </div>
@@ -62,13 +62,7 @@
                     </svg>
                 </div>
             </div>
-            {% set uniqueDestinations = [] %}
-            {% for activity in activities %}
-                {% if activity.activityDestination is not empty and activity.activityDestination not in uniqueDestinations %}
-                    {% set uniqueDestinations = uniqueDestinations|merge([activity.activityDestination]) %}
-                {% endif %}
-            {% endfor %}
-            <div class="stats-card-value">{{ uniqueDestinations|length }}</div>
+            <div class="stats-card-value">{{ unique_destinations_count }}</div>
             <div class="stats-card-label">Unique Destinations</div>
         </div>
     </div>
@@ -83,13 +77,7 @@
                     </svg>
                 </div>
             </div>
-            {% set upcomingActivities = 0 %}
-            {% for activity in activities %}
-                {% if activity.activityDate is not empty and activity.activityDate > 'now'|date('Y-m-d') %}
-                    {% set upcomingActivities = upcomingActivities + 1 %}
-                {% endif %}
-            {% endfor %}
-            <div class="stats-card-value">{{ upcomingActivities }}</div>
+            <div class="stats-card-value">{{ upcoming_activities_count }}</div>
             <div class="stats-card-label">Upcoming Activities</div>
         </div>
     </div>
@@ -122,13 +110,7 @@
                         </div>
                         <select id="destinationFilter" class="form-select">
                             <option value="">Filter by destination...</option>
-                            {% set uniqueDestinations = [] %}
-                            {% for activity in activities %}
-                                {% if activity.activityDestination is not empty and activity.activityDestination not in uniqueDestinations %}
-                                    {% set uniqueDestinations = uniqueDestinations|merge([activity.activityDestination]) %}
-                                {% endif %}
-                            {% endfor %}
-                            {% for destination in uniqueDestinations|sort %}
+                            {% for destination in unique_destinations|sort %}
                                 <option value="{{ destination }}">{{ destination }}</option>
                             {% endfor %}
                         </select>
@@ -193,7 +175,7 @@
                                         data-name="{{ activity.activityName|lower }}" 
                                         data-destination="{{ activity.activityDestination|lower }}" 
                                         data-genre="{{ activity.activityGenre|lower }}">
-                                        <td class="py-15 px-15">{{ loop.index }}</td>
+                                        <td class="py-15 px-15">{{ ((current_page - 1) * items_per_page) + loop.index }}</td>
                                         <td class="py-15 px-15">
                                             <div class="fw-500 lh-14">{{ activity.activityName }}</div>
                                         </td>
@@ -243,6 +225,36 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Pagination Controls -->
+        {% if max_pages > 1 %}
+        <div class="d-flex justify-center pt-30">
+            <div class="pagination -buttons">
+                {% if current_page > 1 %}
+                    <a href="{{ path('app_publicator_activities', {'page': current_page - 1}) }}" class="pagination__button button -blue-1 text-blue-1">
+                        <i class="icon-chevron-left text-12 mr-10"></i>
+                        Previous
+                    </a>
+                {% endif %}
+                
+                <div class="pagination__count">
+                    {% for i in 1..max_pages %}
+                        <a href="{{ path('app_publicator_activities', {'page': i}) }}" 
+                           class="pagination__item {{ current_page == i ? 'is-active' : '' }}">
+                            {{ i }}
+                        </a>
+                    {% endfor %}
+                </div>
+                
+                {% if current_page < max_pages %}
+                    <a href="{{ path('app_publicator_activities', {'page': current_page + 1}) }}" class="pagination__button button -blue-1 text-blue-1">
+                        Next
+                        <i class="icon-chevron-right text-12 ml-10"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
         
         <!-- No Results Message -->
         <div id="noResults" class="empty-state" style="display: none;">
