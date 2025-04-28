@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Face ID Authentication{% endblock %}
+
+{% block body %}
+<div class="layout-pt-lg layout-pb-lg bg-blue-2">
+    <div class="container">
+        <div class="row justify-center">
+            <div class="col-xl-6 col-lg-7 col-md-9">
+                <div class="px-50 py-50 sm:px-20 sm:py-20 bg-white shadow-4 rounded-4 text-center">
+                    <i class="fa fa-check-circle text-success" style="font-size: 64px;"></i>
+                    <h2 class="text-30 fw-600 mt-20">Face ID Authentication Successful</h2>
+                    <p class="mt-10">Please wait while we log you in...</p>
+                    
+                    <div class="progress mt-20">
+                        <div id="loginProgress" class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                            role="progressbar" style="width: 0%" aria-valuenow="0" 
+                            aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                    
+                    <!-- Auto-submit form to complete the login -->
+                    <form id="loginForm" action="{{ path('app_login') }}" method="post" class="d-none">
+                        <input type="hidden" name="email" value="{{ email }}">
+                        <input type="hidden" name="password" value="{{ password }}">
+                        <input type="hidden" name="faceid_token" value="{{ token }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                        <button type="submit" id="submitButton">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate progress bar
+        const progressBar = document.getElementById('loginProgress');
+        let width = 0;
+        const interval = setInterval(() => {
+            if (width >= 100) {
+                clearInterval(interval);
+                // Auto-submit the form
+                document.getElementById('submitButton').click();
+            } else {
+                width += 10;
+                progressBar.style.width = width + '%';
+                progressBar.setAttribute('aria-valuenow', width);
+                progressBar.textContent = width + '%';
+            }
+        }, 100);
+    });
+</script>
+{{ parent() }}
+{% endblock %}

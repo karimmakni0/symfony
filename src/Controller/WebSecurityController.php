@@ -77,17 +77,18 @@ class WebSecurityController extends AbstractController
             $password = $request->request->get('password');
             $lastUsername = $email;
             
-            // Verify hCaptcha response
-            $hCaptchaResponse = $request->request->get('h-captcha-response');
-            $clientIp = $request->getClientIp();
+            // Check if this is a Face ID authentication request
+            $faceidLogin = $request->request->get('faceid_login');
             
-            if (!$this->hCaptchaService->verify($hCaptchaResponse, $clientIp)) {
-                $customError = 'Please verify that you are not a robot.';
-                return $this->render('security/login.html.twig', [
-                    'last_username' => $lastUsername,
-                    'error' => null,
-                    'custom_error' => $customError,
-                ]);
+            // Skip hCaptcha verification for Face ID login
+            if (!$faceidLogin && $password) {
+                // Only verify hCaptcha for regular password login
+                $hCaptchaResponse = $request->request->get('h-captcha-response');
+                $clientIp = $request->getClientIp();
+                
+                if (!$this->hCaptchaService->verify($hCaptchaResponse, $clientIp)) {
+                    $customError = 'Please verify that you are not a robot.';
+                }
             }
             
             // Find user by email
@@ -95,17 +96,45 @@ class WebSecurityController extends AbstractController
             
             if (!$user) {
                 $customError = 'Email not found. Please create an account.';
+            } elseif (!$user->isEnabled()) {
+                $customError = 'Your account is not yet activated. Please complete the registration process.';
             } else {
-                // Check password
-                $isPasswordValid = $this->passwordHasher->isPasswordValid($user, $password);
-                
-                if (!$isPasswordValid) {
-                    $customError = 'Wrong password. Please try again.';
-                } else {
-                    // Check if user is enabled
-                    if (!$user->isEnabled()) {
-                        $customError = 'Your account is not yet activated. Please complete the registration process.';
+                // Process authentication based on login type
+                if ($faceidLogin === 'true') {
+                    // FACE ID LOGIN FLOW
+                    if (!$user->isFaceidEnabled()) {
+                        $customError = 'Face ID is not enabled for this account. Please login with your password.';
                     } else {
+                        // Create authentication token
+                        $token = new UsernamePasswordToken(
+                            $user,
+                            null,
+                            'main',
+                            $user->getRoles()
+                        );
+                        
+                        // Set security token
+                        $this->tokenStorage->setToken($token);
+                        $this->session->set('_security_main', serialize($token));
+                        
+                        // Success message
+                        $this->addFlash('success', 'Welcome back! Logged in with Face ID.');
+                        
+                        // Redirect based on role
+                        $role = $user->getRole();
+                        if ($role === 'admin') {
+                            return $this->redirectToRoute('admin_dashboard');
+                        } elseif ($role === 'Publicitaire') {
+                            return $this->redirectToRoute('app_publicator');
+                        } else {
+                            return $this->redirectToRoute('app_home');
+                        }
+                    }
+                } elseif ($password) {
+                    // PASSWORD LOGIN FLOW
+                    $isPasswordValid = $this->passwordHasher->isPasswordValid($user, $password);
+                    
+                    if ($isPasswordValid) {
                         // Password is valid, save user ID for 2FA verification
                         $this->session->set('pending_login_user_id', $user->getId());
                         $this->session->set('pending_login_remember_me', $request->request->get('_remember_me', false));
@@ -115,7 +144,12 @@ class WebSecurityController extends AbstractController
                         
                         // Redirect to 2FA verification page
                         return $this->redirectToRoute('app_totp_verify_page');
+                    } else {
+                        $customError = 'Wrong password. Please try again.';
                     }
+                } else {
+                    // NEITHER FACE ID NOR PASSWORD PROVIDED
+                    $customError = 'Password is required';
                 }
             }
         }
@@ -157,5 +191,52 @@ class WebSecurityController extends AbstractController
     {
         // This method can be empty - it will be intercepted by the logout key on your firewall
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    }
+    
+    /**
+     * Direct handler for the old Face ID login URL to catch any cached redirects
+     * 
+     * @Route("/direct-faceid-login/{email}", name="direct_faceid_login_fallback")
+     */
+    public function directFaceIdLogin(string $email): Response
+    {
+        // Find the user by email
+        $user = $this->usersRepository->findOneBy(['email' => $email]);
+        
+        if (!$user) {
+            $this->addFlash('error', 'Email not found. Please create an account.');
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Check if Face ID is enabled for this user
+        if (!$user->isFaceidEnabled()) {
+            $this->addFlash('error', 'Face ID is not enabled for this account. Please login with your password.');
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Create authentication token
+        $token = new UsernamePasswordToken(
+            $user,
+            null,
+            'main',
+            $user->getRoles()
+        );
+        
+        // Set security token
+        $this->tokenStorage->setToken($token);
+        $this->session->set('_security_main', serialize($token));
+        
+        // Success message
+        $this->addFlash('success', 'Welcome back! Logged in with Face ID.');
+        
+        // Redirect based on role
+        $role = $user->getRole();
+        if ($role === 'admin') {
+            return $this->redirectToRoute('admin_dashboard');
+        } elseif ($role === 'Publicitaire') {
+            return $this->redirectToRoute('app_publicator');
+        } else {
+            return $this->redirectToRoute('app_home');
+        }
     }
 }

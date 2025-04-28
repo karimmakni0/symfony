@@ -67,6 +67,12 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface, TwoFac
     
     #[ORM\Column(type: "boolean", options: ["default" => false])]
     private $totpEnabled = false;
+    
+    #[ORM\Column(type: "boolean", options: ["default" => false])]
+    private $faceidEnabled = false;
+    
+    #[ORM\Column(type: "text", nullable: true)]
+    private $faceidData;
 
     public function __construct()
     {
@@ -311,6 +317,40 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface, TwoFac
     public function isTotpAuthenticationEnabled(): bool
     {
         return $this->totpEnabled && null !== $this->totpSecret;
+    }
+    
+    /**
+     * Check if Face ID authentication is enabled
+     */
+    public function isFaceidEnabled(): ?bool
+    {
+        return $this->faceidEnabled;
+    }
+
+    /**
+     * Enable/disable Face ID authentication
+     */
+    public function setFaceidEnabled(bool $faceidEnabled): self
+    {
+        $this->faceidEnabled = $faceidEnabled;
+        return $this;
+    }
+    
+    /**
+     * Get Face ID data
+     */
+    public function getFaceidData(): ?string
+    {
+        return $this->faceidData;
+    }
+
+    /**
+     * Set Face ID data
+     */
+    public function setFaceidData(?string $faceidData): self
+    {
+        $this->faceidData = $faceidData;
+        return $this;
     }
 
     /**

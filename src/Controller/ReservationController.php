@@ -149,7 +149,9 @@ class ReservationController extends AbstractController
             $ticketStmt = $conn->prepare($ticketCountSql);
             $ticketStmt->bindValue(1, $id, \PDO::PARAM_INT);
             $ticketResult = $ticketStmt->executeQuery();
-            $totalBookedTickets = (int)($ticketResult->fetchAssociative()['total_booked'] ?? 0);
+            // Use fetch method for older Doctrine DBAL versions
+            $fetchResult = $ticketResult->fetch(\PDO::FETCH_ASSOC);
+            $totalBookedTickets = (int)($fetchResult['total_booked'] ?? 0);
             
             $availableTickets = $activity->getMaxNumber() - $totalBookedTickets;
             
