@@ -6,6 +6,7 @@
 parameters:
     posts_directory: '%kernel.project_dir%/public/uploads/posts'
     hcaptcha_sitekey: '%env(HCAPTCHA_SITEKEY)%'
+    OPENWEATHERMAP_API_KEY: '%env(OPENWEATHERMAP_API_KEY)%'
 
 services:
     # default configuration for services in *this* file

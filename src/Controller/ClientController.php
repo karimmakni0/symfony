@@ -231,10 +231,15 @@ class ClientController extends AbstractController
         // Create a QR code that links to the activity page
         $activityUrl = $this->generateUrl('app_client_activity_detail', ['id' => $activity->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         
-        // For now, use a placeholder QR code image to ensure the PDF works
-        // This is a blue QR code for demo purposes
-        $qrDataUri = 'data:image/png;base64,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';
+        // Use QR code API directly - works reliably in PDFs as the image is loaded from the external URL
+        // This will render directly in the PDF without any additional processing
+        $qrDataUri = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($activityUrl);
+        
+        // Note: We're using the direct URL to the QR code service
+        // This will ensure that the QR code appears in the PDF as the URL is accessible
+        // during the PDF generation process
 
+        
         // Get Activity image if available
         $activityImage = null;
         if ($activity->getResources() && count($activity->getResources()) > 0) {
@@ -255,10 +260,13 @@ class ClientController extends AbstractController
         // Configure PDF options
         $options = new Options();
         $options->set('defaultFont', 'Helvetica');
-        $options->setIsRemoteEnabled(true);
-        $options->set('isHtml5ParserEnabled', true);
+        $options->set('fontDir', $this->getParameter('kernel.project_dir') . '/public/fonts');
+        $options->set('fontCache', $this->getParameter('kernel.project_dir') . '/var/cache/fonts');
+        $options->setIsRemoteEnabled(true); // Allow loading images from remote URLs (for QR code)
+        $options->set('isPhpEnabled', true); // Enable PHP processing
+        $options->set('isHtml5ParserEnabled', true); // Enable HTML5 parsing
 
-        // Create PDF
+        // Create PDF with specific page size to ensure content fits
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');

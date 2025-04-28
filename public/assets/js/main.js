@@ -1601,35 +1601,76 @@ const Events = (function() {
   }
 
   function ddInit() {
-    const targets = document.querySelectorAll(".js-form-dd")
-    if (!targets) return
+    try {
+      const targets = document.querySelectorAll(".js-form-dd")
+      if (!targets || targets.length === 0) return
 
-    targets.forEach((el) => {
-      const eventTarget = el.querySelector('[data-x-dd-click]')
-      const attributes = eventTarget.getAttribute('data-x-dd-click').split(', ')
-      
-      attributes.forEach((el2) => {
-        const target = el.querySelector(`[data-x-dd=${el2}]`)
-        const toggleClass = target.getAttribute('data-x-dd-toggle')
-        
-        eventTarget.addEventListener('click', () => {
-          if (eventTarget.querySelector('.js-dd-focus'))
-            eventTarget.querySelector('.js-dd-focus').focus()
-
-          if (target.classList.contains(toggleClass)) {
-            target.classList.remove(toggleClass)
-            el.classList.remove("-is-dd-wrap-active")
-          } else {
-            closeAllDropdowns()
-            target.classList.add(toggleClass)
-            el.classList.add("-is-dd-wrap-active")
+      targets.forEach((el) => {
+        try {
+          // Get the clickable element that triggers the dropdown
+          const eventTarget = el.querySelector('[data-x-dd-click]')
+          if (!eventTarget) return
+          
+          // Safely get the click attribute
+          let clickAttribute = ''
+          try {
+            clickAttribute = eventTarget.getAttribute('data-x-dd-click')
+            if (!clickAttribute) return
+          } catch (err) {
+            console.warn('Error getting click attribute', err)
+            return
           }
-        })
+          
+          const attributes = clickAttribute.split(', ')
+          
+          attributes.forEach((el2) => {
+            try {
+              // Find the target dropdown element
+              const target = el.querySelector(`[data-x-dd=${el2}]`)
+              if (!target) return
+              
+              // Get the toggle class safely
+              let toggleClass = ''
+              try {
+                toggleClass = target.getAttribute('data-x-dd-toggle')
+                if (!toggleClass) return
+              } catch (err) {
+                console.warn('Error getting toggle class', err)
+                return
+              }
+        
+              eventTarget.addEventListener('click', () => {
+                try {
+                  if (eventTarget.querySelector('.js-dd-focus'))
+                    eventTarget.querySelector('.js-dd-focus').focus()
+                  
+                  if (target.classList.contains(toggleClass)) {
+                    target.classList.remove(toggleClass)
+                    el.classList.remove("-is-dd-wrap-active")
+                  } else {
+                    closeAllDropdowns()
+                    target.classList.add(toggleClass)
+                    el.classList.add("-is-dd-wrap-active")
+                  }
+                } catch (err) {
+                  console.warn('Error in click handler', err)
+                }
+              })
+            } catch (err) {
+              console.warn('Error in attributes forEach', err)
+            }
+          })
+        } catch (err) {
+          console.warn('Error in targets forEach', err)
+        }
       })
-    })
+    } catch (err) {
+      console.warn('Error in ddInit', err)
+    }
   }
 
   function closeAllDropdowns() {
+    // First clear active states on wrappers
     const classes = document.querySelectorAll(".-is-dd-wrap-active")
     if (classes) {
       classes.forEach(el => {
@@ -1637,19 +1678,33 @@ const Events = (function() {
       });
     }
 
+    // Then handle the dropdown elements
     const targets = document.querySelectorAll(".js-form-dd")
-    if (!targets) return
+    if (!targets || targets.length === 0) return
   
     targets.forEach((el) => {
       const eventElement = el.querySelector('[data-x-dd]')
       const eventTarget = el.querySelector('[data-x-dd-click]')
-      const attributes = eventTarget.getAttribute('data-x-dd-click').split(', ')
       
-      attributes.forEach((el) => {
-        eventElement.classList.remove('-is-active')
-        const target = document.querySelector(`[data-x-dd=${el}]`)
+      // Skip if we can't find the required elements
+      if (!eventTarget || !eventElement) return
+      
+      // Safely get the click attribute
+      const clickAttribute = eventTarget.getAttribute('data-x-dd-click')
+      if (!clickAttribute) return
+      
+      const attributes = clickAttribute.split(', ')
+      
+      attributes.forEach((attrEl) => {
+        // Remove active class from event element
+        if (eventElement) eventElement.classList.remove('-is-active')
+        
+        // Try to find the target and safely remove classes
+        const target = document.querySelector(`[data-x-dd=${attrEl}]`)
+        if (!target) return
+        
         const toggleClass = target.getAttribute('data-x-dd-toggle')
-        target.classList.remove(toggleClass)
+        if (toggleClass) target.classList.remove(toggleClass)
       })
     })
   }

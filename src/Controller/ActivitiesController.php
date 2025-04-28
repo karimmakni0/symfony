@@ -15,9 +15,10 @@ use App\Repository\DestinationsRepository;
 use App\Repository\ResourcesRepository;
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Stripe;
 
@@ -145,9 +146,16 @@ class ActivitiesController extends AbstractController
         // Get total booked tickets for this activity
         $totalBookedTickets = $this->billetRepository->getTotalBookedTicketsForActivity($id);
         
+        // Fetch weather data for the activity location from OpenWeatherMap
+        $weatherData = null;
+        if ($activity->getActivityDestination()) {
+            $weatherData = $this->getWeatherForLocation($activity->getActivityDestination());
+        }
+        
         return $this->render('client/Activities/Details.html.twig', [
             'activity' => $activity,
-            'totalBookedTickets' => $totalBookedTickets
+            'totalBookedTickets' => $totalBookedTickets,
+            'weatherData' => $weatherData
         ]);
     }
     
@@ -692,6 +700,223 @@ class ActivitiesController extends AbstractController
         }
     }
 
+    /**
+     * Get weather data for a location using OpenWeatherMap API
+     */
+    private function getWeatherForLocation(string $location): ?array
+    {
+        // Get the OpenWeatherMap API key from environment variables
+        $apiKey = $this->getParameter('OPENWEATHERMAP_API_KEY');
+        
+        // If no API key is set, return null to avoid errors
+        if (!$apiKey || $apiKey === 'your_api_key_here') {
+            error_log('No OpenWeatherMap API key is set in .env file');
+            return null;
+        }
+        
+        try {
+            // URL encode the location for the API request
+            $encodedLocation = urlencode($location);
+            
+            // Make API request to OpenWeatherMap
+            $url = "https://api.openweathermap.org/data/2.5/weather?q={$encodedLocation}&units=metric&appid={$apiKey}";
+            $response = file_get_contents($url);
+            
+            if ($response) {
+                $weatherData = json_decode($response, true);
+                
+                // Format the data for easy use in template
+                if (isset($weatherData['main']) && isset($weatherData['weather'][0])) {
+                    return [
+                        'temp' => round($weatherData['main']['temp']),
+                        'feels_like' => round($weatherData['main']['feels_like']),
+                        'humidity' => $weatherData['main']['humidity'],
+                        'description' => ucfirst($weatherData['weather'][0]['description']),
+                        'icon' => $weatherData['weather'][0]['icon'],
+                        'wind_speed' => $weatherData['wind']['speed'] ?? null,
+                        'location' => $weatherData['name'],
+                        'country' => $weatherData['sys']['country'] ?? null,
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            // Log error but don't break page rendering
+            error_log('Error fetching weather: ' . $e->getMessage());
+        }
+        
+        return null;
+    }
+    
+    /**
+     * API endpoint to get weather forecast for a date
+     */
+    #[Route('/api/weather-forecast', name: 'api_weather_forecast', methods: ['GET'])]
+    public function getWeatherForecast(Request $request): JsonResponse
+    {
+        try {
+            // Get location and date from query parameters
+            $location = $request->query->get('location');
+            $date = $request->query->get('date');
+            
+            if (!$location || !$date) {
+                return $this->json(['error' => 'Location and date are required', 'weather' => $this->getFallbackWeather()], 400);
+            }
+            
+            // Get the OpenWeatherMap API key
+            $apiKey = $this->getParameter('OPENWEATHERMAP_API_KEY');
+            
+            if (!$apiKey || $apiKey === 'your_api_key_here') {
+                return $this->json([
+                    'error' => 'API key not configured', 
+                    'weather' => $this->getFallbackWeather()
+                ], 200); // Return 200 to avoid breaking the UI
+            }
+            
+            // Calculate the number of days from today to the requested date
+            $today = new \DateTime();
+            $targetDate = new \DateTime($date);
+            $interval = $today->diff($targetDate);
+            $days = $interval->days;
+            
+            // If date is more than 5 days in the future, use estimated weather
+            if ($days > 5) {
+                return $this->json([
+                    'warning' => 'Weather forecast is only available for up to 5 days in advance',
+                    'estimatedForecast' => true,
+                    'weather' => $this->getEstimatedWeather($location)
+                ]);
+            }
+            
+            // For dates within 5 days, use the OpenWeatherMap 5-day forecast API
+            $encodedLocation = urlencode($location);
+            $forecastUrl = "https://api.openweathermap.org/data/2.5/forecast?q={$encodedLocation}&units=metric&appid={$apiKey}";
+            
+            $context = [
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                ],
+            ];
+            
+            $response = @file_get_contents($forecastUrl, false, stream_context_create($context));
+            
+            if (!$response) {
+                return $this->json([
+                    'error' => 'Failed to fetch weather forecast', 
+                    'weather' => $this->getEstimatedWeather($location)
+                ]);
+            }
+            
+            $forecastData = json_decode($response, true);
+            
+            // Check if the API returned an error
+            if (isset($forecastData['cod']) && $forecastData['cod'] != '200') {
+                return $this->json([
+                    'error' => $forecastData['message'] ?? 'Error fetching forecast', 
+                    'weather' => $this->getEstimatedWeather($location)
+                ]);
+            }
+            
+            if (!isset($forecastData['list']) || empty($forecastData['list'])) {
+                return $this->json([
+                    'error' => 'Invalid forecast data received', 
+                    'weather' => $this->getEstimatedWeather($location)
+                ]);
+            }
+            
+            // Find the forecast closest to our target date
+            $targetDateFormatted = $targetDate->format('Y-m-d');
+            $matchingForecasts = array_filter($forecastData['list'], function($item) use ($targetDateFormatted) {
+                $forecastDate = substr($item['dt_txt'], 0, 10); // Extract date part (YYYY-MM-DD)
+                return $forecastDate === $targetDateFormatted;
+            });
+            
+            if (empty($matchingForecasts)) {
+                // If no exact match, use the current weather as a fallback
+                return $this->json([
+                    'warning' => 'No specific forecast available for the selected date',
+                    'estimatedForecast' => true,
+                    'weather' => $this->getEstimatedWeather($location)
+                ]);
+            }
+            
+            // Take midday forecast if available (around 12:00-15:00), or the first forecast of the day
+            $middayForecasts = array_filter($matchingForecasts, function($item) {
+                $time = substr($item['dt_txt'], 11, 5); // Extract time part (HH:MM)
+                return $time === '12:00' || $time === '15:00';
+            });
+            
+            $forecast = !empty($middayForecasts) ? reset($middayForecasts) : reset($matchingForecasts);
+            
+            // Format the forecast data
+            $weather = [
+                'temp' => round($forecast['main']['temp']),
+                'feels_like' => round($forecast['main']['feels_like']),
+                'humidity' => $forecast['main']['humidity'],
+                'description' => ucfirst($forecast['weather'][0]['description']),
+                'icon' => $forecast['weather'][0]['icon'],
+                'wind_speed' => $forecast['wind']['speed'] ?? null,
+                'location' => $forecastData['city']['name'],
+                'country' => $forecastData['city']['country'] ?? null,
+                'forecast_time' => $forecast['dt_txt'],
+            ];
+            
+            return $this->json(['weather' => $weather]);
+            
+        } catch (\Exception $e) {
+            // Log the error and return a fallback response that won't break the UI
+            error_log('Error fetching weather forecast: ' . $e->getMessage());
+            
+            return $this->json([
+                'error' => 'Error fetching weather forecast: ' . $e->getMessage(), 
+                'estimatedForecast' => true,
+                'weather' => $this->getFallbackWeather()
+            ], 200); // Use 200 status code to prevent fetch() errors
+        }
+    }
+    
+    /**
+     * Get estimated weather when forecast is not available
+     */
+    private function getEstimatedWeather(string $location): array
+    {
+        try {
+            // Try to get current weather as a fallback
+            $currentWeather = $this->getWeatherForLocation($location);
+            
+            if ($currentWeather) {
+                return array_merge($currentWeather, [
+                    'estimated' => true,
+                    'notice' => 'This is an estimate based on current weather',
+                ]);
+            }
+        } catch (\Exception $e) {
+            // If getWeatherForLocation fails, continue to default values
+            error_log('Error in getEstimatedWeather: ' . $e->getMessage());
+        }
+        
+        // If even current weather fails, return default values
+        return $this->getFallbackWeather($location);
+    }
+    
+    /**
+     * Get default weather values when all else fails
+     */
+    private function getFallbackWeather(string $location = 'Unknown'): array
+    {
+        return [
+            'temp' => 25,
+            'feels_like' => 26,
+            'humidity' => 60,
+            'description' => 'Weather data unavailable',
+            'icon' => '01d', // default sunny icon
+            'estimated' => true,
+            'notice' => 'Weather information is currently unavailable',
+            'location' => $location,
+            'wind_speed' => 5,
+        ];
+    }
+    
     #[Route('/activities/map', name: 'app_activities_map')]
     public function activitiesMap(): Response
     {

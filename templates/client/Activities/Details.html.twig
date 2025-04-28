@@ -283,6 +283,55 @@
                 <i class="fas fa-directions me-1"></i> Get Directions
               </a>
             </div>
+            
+            {# Weather Information Section #}
+            {% if weatherData is defined and weatherData is not null %}
+            <div class="weather-info p-3 bg-gradient-primary-to-secondary text-white">
+              <div class="row align-items-center">
+                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                  <h5 class="mb-1"><i class="fas fa-cloud me-2"></i>Current Weather</h5>
+                  <p class="mb-0 small text-white-50">Weather information for {{ weatherData.location }}</p>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="d-flex align-items-center">
+                    <div class="weather-icon me-3">
+                      <img src="https://openweathermap.org/img/wn/{{ weatherData.icon }}@2x.png" alt="{{ weatherData.description }}" width="64" height="64">
+                    </div>
+                    <div class="weather-details">
+                      <div class="temperature fs-3 fw-bold">{{ weatherData.temp }}°C</div>
+                      <div class="description">{{ weatherData.description }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="weather-details-extended mt-3 pt-3 border-top border-white border-opacity-25">
+                <div class="row text-center g-2">
+                  <div class="col-4">
+                    <div class="weather-detail-item p-2">
+                      <i class="fas fa-temperature-high text-warning me-1"></i>
+                      <span class="label">Feels like</span>
+                      <div class="value">{{ weatherData.feels_like }}°C</div>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="weather-detail-item p-2">
+                      <i class="fas fa-tint text-info me-1"></i>
+                      <span class="label">Humidity</span>
+                      <div class="value">{{ weatherData.humidity }}%</div>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="weather-detail-item p-2">
+                      <i class="fas fa-wind text-light me-1"></i>
+                      <span class="label">Wind</span>
+                      <div class="value">{{ weatherData.wind_speed }} m/s</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            
             <div class="map-container">
               <div class="full-map-wrapper">
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25864.76992860789!2d10.17991905!3d36.79177545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd337f5e7ef543%3A0xd671924e714a0275!2z2KrZiNmG2LPYjCDYqtmI2YbYsw!5e0!3m2!1sar!2stn!4v1682169865368!5m2!1sar!2stn" class="full-map" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -323,7 +372,7 @@
               </div>
             </div>
             
-            <form action="{{ path('app_payment_reservation', {'id': activity.id}) }}" method="post" class="booking-form">
+            <form action="{{ path('app_payment_reservation', {'id': activity.id}) }}" method="post" class="booking-form" id="bookingForm">
               <!-- Participants Selector -->
               <div class="mb-4">
                 <div class="booking-form-label">
@@ -443,62 +492,27 @@
   </div>
 </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Get necessary elements
-    const participantsInput = document.getElementById('directParticipantsInput');
-    const summaryTicketCount = document.getElementById('summaryTicketCount');
-    const summaryTotalPrice = document.getElementById('summaryTotalPrice');
-    const hiddenTotalPrice = document.getElementById('hiddenTotalPrice');
-    const decreaseButton = document.getElementById('decreaseParticipants');
-    const increaseButton = document.getElementById('increaseParticipants');
-    const spotsLeftElement = document.getElementById('spotsLeft');
-    const bookNowButton = document.querySelector('.book-now-btn');
-    
-    const pricePerPerson = {{ activity.activityPrice }};
-    const maxParticipants = {{ activity.maxNumber }};
-    const bookedTickets = {{ totalBookedTickets }};
-    
-    function updatePrices() {
-      const participants = parseInt(participantsInput.value, 10);
-      const totalPrice = (participants * pricePerPerson).toFixed(2);
-      
-      // Apply animation effects
-      summaryTicketCount.classList.add('highlight-text');
-      summaryTotalPrice.classList.add('highlight-text');
-      
-      // Update text content
-      summaryTicketCount.textContent = participants;
-      summaryTotalPrice.textContent = totalPrice + ' TND';
-      hiddenTotalPrice.value = totalPrice;
-      
-      // Update spots left
-      spotsLeftElement.textContent = maxParticipants - bookedTickets - participants + 1;
-      
-      // Add urgency message if spots are limited
-      if (maxParticipants - bookedTickets - participants + 1 < 5) {
-        spotsLeftElement.classList.add('text-danger');
-        spotsLeftElement.classList.add('fw-bold');
-      } else {
-        spotsLeftElement.classList.remove('text-danger');
-        spotsLeftElement.classList.remove('fw-bold');
-      }
-      
-      // Remove animation classes after short delay
-      setTimeout(function() {
-        summaryTicketCount.classList.remove('highlight-text');
-        summaryTotalPrice.classList.remove('highlight-text');
-      }, 500);
-    }
-    
-    decreaseButton.addEventListener('click', function() {
-      if (participantsInput.value > 1) {
-        participantsInput.classList.add('pulse-animation');
-        participantsInput.value = parseInt(participantsInput.value, 10) - 1;
-        updatePrices();
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Target our elements
+      const participantsInput = document.getElementById('directParticipantsInput');
+      const decreaseButton = document.getElementById('decreaseParticipants');
+      const increaseButton = document.getElementById('increaseParticipants');
+      const spotsLeftDisplay = document.getElementById('spotsLeft');
+      const summaryTotalPrice = document.getElementById('summaryTotalPrice');
+      const hiddenTotalPrice = document.getElementById('hiddenTotalPrice');
+      const basePrice = {{ activity.activityPrice|json_encode|raw }}; // Get the base price
+      const maxNumber = {{ activity.maxNumber|json_encode|raw }}; // Get max participants
+      const spotsLeft = {{ (activity.maxNumber - totalBookedTickets)|json_encode|raw }}; // Available spots
+
+      // Update function to recalculate price based on participants
+      function updateSummaryTotal() {
+        const participants = parseInt(participantsInput.value);
+        const totalPrice = (basePrice * participants).toFixed(2);
         
-        setTimeout(function() {
-          participantsInput.classList.remove('pulse-animation');
+        // Update displays
+        summaryTotalPrice.textContent = `${totalPrice} TND`;
+        hiddenTotalPrice.value = totalPrice;
         }, 300);
       }
     });
@@ -555,32 +569,429 @@
         this.classList.remove('btn-lg-pulse');
       });
     }
-  });
-</script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const progressBar = document.querySelector('.progress-bar');
-    const percentBooked = progressBar.getAttribute('data-percent');
-    progressBar.style.width = `${percentBooked}%`;
-  });
-</script>
+    
+    // Focus the searchbar when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      setMinDate();
+      updateSummaryTotal(); // Initialize summary total
+      
+      // Add event listener for the booking form submission
+      document.getElementById('bookingForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        
+        // Get the selected date and location
+        const selectedDate = document.getElementById('reservationDate').value;
+        const location = "{{ activity.activityDestination }}"; // Get from the activity
+        
+        // Show loading state
+        Swal.fire({
+          title: 'Checking Weather...',
+          text: 'Getting weather forecast for your booking date...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+        
+        // Call the weather forecast API
+        fetch(`/api/weather-forecast?location=${encodeURIComponent(location)}&date=${selectedDate}`)
+          .then(response => response.json())
+          .then(data => {
+            // Extract weather info
+            const weather = data.weather;
+            const isEstimated = data.estimatedForecast || weather.estimated;
+            const warningText = data.warning || '';
+            
+            // Format date for display
+            const formattedDate = new Date(selectedDate).toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            });
+            
+            // Create HTML content for the weather alert
+            let weatherHtml = `
+              <div class="swal-weather-container">
+                <div class="swal-weather-header">
+                  <img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="${weather.description}">
+                  <div class="swal-temperature">${weather.temp}°C</div>
+                </div>
+                <div class="swal-weather-details">
+                  <div class="swal-weather-description">${weather.description}</div>
+                  <div class="swal-weather-location">${weather.location}</div>
+                  <div class="swal-weather-stats">
+                    <span>Humidity: ${weather.humidity}%</span>
+                    <span>Wind: ${weather.wind_speed || 0} m/s</span>
+                  </div>
+                </div>
+              </div>
+            `;
+            
+            // Show notice if this is an estimated forecast
+            if (isEstimated && weather.notice) {
+              weatherHtml += `<div class="swal-weather-notice">${weather.notice}</div>`;
+            }
+            
+            if (warningText) {
+              weatherHtml += `<div class="swal-weather-warning">${warningText}</div>`;
+            }
+            
+            // Show SweetAlert with weather information
+            Swal.fire({
+              title: `Weather Forecast for ${formattedDate}`,
+              html: weatherHtml,
+              showCancelButton: true,
+              confirmButtonText: 'Continue with Booking',
+              cancelButtonText: 'Cancel Booking',
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              allowOutsideClick: false,
+              customClass: {
+                container: 'swal-weather-modal-container'
+              }
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // User confirmed, submit the form
+                document.getElementById('bookingForm').submit();
+              } else {
+                // User canceled booking
+                Swal.fire(
+                  'Booking Canceled',
+                  'Your booking has been canceled.',
+                  'info'
+                );
+              }
+            });
+          })
+          .catch(error => {
+            console.error('Error fetching weather data:', error);
+            
+            // If there's an error, still give the user the option to continue
+            Swal.fire({
+              title: 'Weather Information Unavailable',
+              text: 'We couldn\'t retrieve the weather forecast for your booking date. Would you like to continue anyway?',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Continue with Booking',
+              cancelButtonText: 'Cancel Booking'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // User confirmed, submit the form
+                document.getElementById('bookingForm').submit();
+              }
+            });
+          });
+      });
+    });
+    
+    // Add styles for the SweetAlert weather container
+    document.head.insertAdjacentHTML('beforeend', `
+      <style>
+        .swal-weather-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 15px;
+          background-color: rgba(0, 123, 255, 0.05);
+          border-radius: 10px;
+          padding: 15px;
+        }
+        
+        .swal-weather-header {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 10px;
+        }
+        
+        .swal-temperature {
+          font-size: 2.5rem;
+          font-weight: bold;
+          margin-left: 10px;
+          color: #007bff;
+        }
+        
+        .swal-weather-details {
+          text-align: center;
+        }
+        
+        .swal-weather-description {
+          font-size: 1.2rem;
+          margin-bottom: 5px;
+          text-transform: capitalize;
+        }
+        
+        .swal-weather-location {
+          font-size: 1rem;
+          color: #6c757d;
+          margin-bottom: 10px;
+        }
+        
+        .swal-weather-stats {
+          display: flex;
+          justify-content: space-around;
+          width: 100%;
+        }
+        
+        .swal-weather-stats span {
+          margin: 0 10px;
+          color: #6c757d;
+        }
+        
+        .swal-weather-notice, .swal-weather-warning {
+          margin-top: 10px;
+          padding: 5px 10px;
+          border-radius: 5px;
+          font-size: 0.9rem;
+          text-align: center;
+        }
+        
+        .swal-weather-notice {
+          background-color: rgba(255, 193, 7, 0.2);
+          color: #856404;
+        }
+        
+        .swal-weather-warning {
+          background-color: rgba(220, 53, 69, 0.2);
+          color: #721c24;
+        }
+        
+        .swal-weather-modal-container {
+          z-index: 2000;
+        }
+      </style>
+    `);
+  </script>
+  
 
 {% endblock %}
 
-{% block stylesheets %}
-{{ parent() }}
-<!-- Font Awesome CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<style>
-  /* Modern Hero Section Styles */
-  .hero-section {
-    margin-top: 0;
-    background-color: #fff;
-  }
+{% block javascripts %}
+  {{ parent() }}
+  <!-- Add SweetAlert2 for beautiful alerts -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    // Set minimum date on the date input to today
+    function setMinDate() {
+      const today = new Date();
+      const dd = String(today.getDate()).padStart(2, '0');
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const yyyy = today.getFullYear();
+      const formattedDate = yyyy + '-' + mm + '-' + dd;
+      
+      const reservationDateInput = document.getElementById('reservationDate');
+      if (reservationDateInput) {
+        reservationDateInput.min = formattedDate;
+        reservationDateInput.value = formattedDate;
+      }
+    }
+    
+    // Function to handle weather forecast display
+    function setupWeatherForecastAlert() {
+      // Add event listener for the booking form submission
+      const bookingForm = document.getElementById('bookingForm');
+      if (bookingForm) {
+        bookingForm.addEventListener('submit', function(event) {
+          event.preventDefault(); // Prevent default form submission
+          
+          // Get the selected date and location
+          const selectedDate = document.getElementById('reservationDate').value;
+          const location = "{{ activity.activityDestination }}"; // Get from the activity
+          
+          // Show loading state
+          Swal.fire({
+            title: 'Checking Weather...',
+            text: 'Getting weather forecast for your booking date...',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+          
+          // Call the weather forecast API
+          fetch(`/api/weather-forecast?location=${encodeURIComponent(location)}&date=${selectedDate}`)
+            .then(response => response.json())
+            .then(data => {
+              // Extract weather info
+              const weather = data.weather;
+              const isEstimated = data.estimatedForecast || weather.estimated;
+              const warningText = data.warning || '';
+              
+              // Format date for display
+              const formattedDate = new Date(selectedDate).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              });
+              
+              // Create HTML content for the weather alert
+              let weatherHtml = `
+                <div class="swal-weather-container">
+                  <div class="swal-weather-header">
+                    <img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="${weather.description}">
+                    <div class="swal-temperature">${weather.temp}°C</div>
+                  </div>
+                  <div class="swal-weather-details">
+                    <div class="swal-weather-description">${weather.description}</div>
+                    <div class="swal-weather-location">${weather.location}</div>
+                    <div class="swal-weather-stats">
+                      <span>Humidity: ${weather.humidity}%</span>
+                      <span>Wind: ${weather.wind_speed || 0} m/s</span>
+                    </div>
+                  </div>
+                </div>
+              `;
+              
+              // Show notice if this is an estimated forecast
+              if (isEstimated && weather.notice) {
+                weatherHtml += `<div class="swal-weather-notice">${weather.notice}</div>`;
+              }
+              
+              if (warningText) {
+                weatherHtml += `<div class="swal-weather-warning">${warningText}</div>`;
+              }
+              
+              // Show SweetAlert with weather information
+              Swal.fire({
+                title: `Weather Forecast for ${formattedDate}`,
+                html: weatherHtml,
+                showCancelButton: true,
+                confirmButtonText: 'Continue with Booking',
+                cancelButtonText: 'Cancel Booking',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                allowOutsideClick: false,
+                customClass: {
+                  container: 'swal-weather-modal-container'
+                }
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  // User confirmed, submit the form
+                  document.getElementById('bookingForm').submit();
+                } else {
+                  // User canceled booking
+                  Swal.fire(
+                    'Booking Canceled',
+                    'Your booking has been canceled.',
+                    'info'
+                  );
+                }
+              });
+            })
+            .catch(error => {
+              console.error('Error fetching weather data:', error);
+              
+              // If there's an error, still give the user the option to continue
+              Swal.fire({
+                title: 'Weather Information Unavailable',
+                text: 'We couldn\'t retrieve the weather forecast for your booking date. Would you like to continue anyway?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Continue with Booking',
+                cancelButtonText: 'Cancel Booking'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  // User confirmed, submit the form
+                  document.getElementById('bookingForm').submit();
+                }
+              });
+            });
+        });
+      }
+    }
+    
+    // Initialize everything when document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      setMinDate();
+      setupWeatherForecastAlert();
+    });
+  </script>
   
+  <!-- Weather alert styling -->
+  <style>
+    .swal-weather-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 15px;
+      background-color: rgba(0, 123, 255, 0.05);
+      border-radius: 10px;
+      padding: 15px;
+    }
+    
+    .swal-weather-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    
+    .swal-temperature {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-left: 10px;
+      color: #007bff;
+    }
+    
+    .swal-weather-details {
+      text-align: center;
+    }
+    
+    .swal-weather-description {
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+      text-transform: capitalize;
+    }
+    
+    .swal-weather-location {
+      font-size: 1rem;
+      color: #6c757d;
+      margin-bottom: 10px;
+    }
+    
+    .swal-weather-stats {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+    }
+    
+    .swal-weather-stats span {
+      margin: 0 10px;
+      color: #6c757d;
+    }
+    
+    .swal-weather-notice, .swal-weather-warning {
+      margin-top: 10px;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    
+    .swal-weather-notice {
+      background-color: rgba(255, 193, 7, 0.2);
+      color: #856404;
+    }
+    
+    .swal-weather-warning {
+      background-color: rgba(220, 53, 69, 0.2);
+      color: #721c24;
+    }
+    
+    .swal-weather-modal-container {
+      z-index: 2000;
+    }
+  </style>
+{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
   .hero-banner {
     height: 500px;
+    position: relative;
     overflow: hidden;
   }
   
@@ -1344,6 +1755,46 @@
       height: 300px;
       object-fit: contain;
     }
+  }
+  
+  /* Weather Information Styles */
+  .bg-gradient-primary-to-secondary {
+    background: linear-gradient(to right, #1e88e5, #512da8);
+  }
+  
+  .weather-info {
+    border-radius: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .weather-details .temperature {
+    line-height: 1;
+  }
+  
+  .weather-details .description {
+    text-transform: capitalize;
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+  
+  .weather-details-extended {
+    font-size: 0.85rem;
+  }
+  
+  .weather-detail-item {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    height: 100%;
+  }
+  
+  .weather-detail-item .label {
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+  
+  .weather-detail-item .value {
+    font-weight: 600;
+    font-size: 1.1rem;
   }
 </style>
 {% endblock %}
