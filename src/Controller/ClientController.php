@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Activities;
 use App\Entity\Billet;
-use App\Entity\Users;
 use App\Entity\Reservation;
+use App\Entity\Users;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -14,14 +14,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Builder\BuilderInterface;
+use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
 use Endroid\QrCode\Color\Color;
 
 #[Route('/client')]
@@ -227,27 +228,19 @@ class ClientController extends AbstractController
             return $this->redirectToRoute('app_client');
         }
 
-        // Generate QR code with ticket information
-        $ticketData = json_encode([
-            'ticket_id' => $billet->getNumero(),
-            'activity' => $activity->getActivityName(),
-            'date' => $reservation->getDateAchat(),
-            'participants' => $reservation->getNombre(),
-            'total_price' => $reservation->getPrixTotal(),
-            'status' => $reservation->getStatuts(),
-            'user_name' => $user->getName() . ' ' . $user->getLastname(),
-        ]);
-
-        // Generate a simple QR code data as a small base64 image (hardcoded example)
-        // This is a fallback in case the GD extension doesn't work
-        $qrDataUri = 'data:image/png;base64,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';
+        // Create a QR code that links to the activity page
+        $activityUrl = $this->generateUrl('app_client_activity_detail', ['id' => $activity->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         
+        // For now, use a placeholder QR code image to ensure the PDF works
+        // This is a blue QR code for demo purposes
+        $qrDataUri = 'data:image/png;base64,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';
+
         // Get Activity image if available
         $activityImage = null;
         if ($activity->getResources() && count($activity->getResources()) > 0) {
             $activityImage = $activity->getResources()[0]->getPath();
         }
-
+        
         // Render the ticket template
         $html = $this->renderView('client/reservations/ticket_pdf.html.twig', [
             'billet' => $billet,
@@ -261,8 +254,9 @@ class ClientController extends AbstractController
 
         // Configure PDF options
         $options = new Options();
-        $options->set('defaultFont', 'Arial');
+        $options->set('defaultFont', 'Helvetica');
         $options->setIsRemoteEnabled(true);
+        $options->set('isHtml5ParserEnabled', true);
 
         // Create PDF
         $dompdf = new Dompdf($options);
