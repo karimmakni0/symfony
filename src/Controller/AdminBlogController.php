@@ -372,4 +372,76 @@ class AdminBlogController extends AbstractController
         // For direct access (not AJAX), redirect to details page
         return $this->redirectToRoute('app_admin_blog_details', ['id' => $id]);
     }
+    
+    #[Route('/new', name: 'app_admin_blog_new')]
+    public function new(Request $request): Response
+    {
+        // Check if user has admin role
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('error', 'You do not have permission to access this page');
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Handle form submission
+        if ($request->isMethod('POST')) {
+            try {
+                // Create a new post entity
+                $post = new Post();
+                $post->setTitle($request->request->get('title'));
+                $post->setDescription($request->request->get('description'));
+                
+                // Get the current user ID
+                $currentUser = $this->security->getUser();
+                $post->setUserId($currentUser->getId());
+                
+                // Set activity ID if provided
+                $activityId = $request->request->get('activityId');
+                if ($activityId) {
+                    $post->setActivityId($activityId);
+                }
+                
+                // Set the current date
+                $post->setDate(new \DateTime());
+                
+                // Handle image upload
+                $pictureFile = $request->files->get('picture');
+                if ($pictureFile) {
+                    // Generate a unique filename
+                    $newFilename = uniqid() . '.' . $pictureFile->guessExtension();
+                    
+                    // Make sure the directory exists
+                    $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/posts';
+                    if (!file_exists($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+                    
+                    // Move the file to the posts directory
+                    try {
+                        $pictureFile->move($uploadDir, $newFilename);
+                        
+                        // Set the picture for the post entity
+                        $post->setPicture($newFilename);
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', 'Error uploading image: ' . $e->getMessage());
+                        return $this->render('admin/blog/new.html.twig', [
+                            'post' => $post,
+                            'error' => 'Error uploading image: ' . $e->getMessage()
+                        ]);
+                    }
+                }
+                
+                // Save the new post
+                $this->entityManager->persist($post);
+                $this->entityManager->flush();
+                
+                $this->addFlash('success', 'Blog post created successfully');
+                return $this->redirectToRoute('app_admin_blog_index');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Error creating post: ' . $e->getMessage());
+            }
+        }
+        
+        // Render the new post form
+        return $this->render('admin/blog/new.html.twig', []);
+    }
 }

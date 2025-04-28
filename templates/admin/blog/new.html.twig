@@ -1,0 +1,287 @@
+{% extends 'AdminBase.html.twig' %}
+
+{% block title %}Create New Blog Post{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('assets/css/admin-blog.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-blog-post-details.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/admin-pagination.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<!-- Include SweetAlert for better UX -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    .form-input-wrapper {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .form-input-wrapper .icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #3554D1;
+        font-size: 18px;
+    }
+    
+    .form-input-wrapper input,
+    .form-input-wrapper textarea,
+    .form-input-wrapper select {
+        width: 100%;
+        padding: 15px 15px 15px 45px;
+        border: 1px solid #e9e9e9;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s;
+    }
+    
+    .form-input-wrapper input:focus,
+    .form-input-wrapper textarea:focus,
+    .form-input-wrapper select:focus {
+        border-color: #3554D1;
+        box-shadow: 0 0 0 3px rgba(53, 84, 209, 0.15);
+        outline: none;
+    }
+    
+    .form-input-wrapper textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+    
+    .image-upload-container {
+        border: 2px dashed #e0e0e0;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s;
+        margin-bottom: 25px;
+        background-color: #fafafa;
+    }
+    
+    .image-upload-container:hover {
+        border-color: #3554D1;
+        background-color: #f6f9ff;
+    }
+    
+    .image-upload-icon {
+        display: block;
+        margin: 0 auto 15px;
+        color: #3554D1;
+        font-size: 40px;
+    }
+    
+    .image-upload-text {
+        color: #697488;
+        margin-bottom: 15px;
+    }
+    
+    .custom-file-input {
+        display: none;
+    }
+    
+    .custom-file-label {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #3554D1;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .custom-file-label:hover {
+        background-color: #2a43a7;
+    }
+    
+    .image-preview {
+        max-width: 100%;
+        max-height: 300px;
+        margin-top: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        display: none;
+    }
+    
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    
+    .button-container button {
+        padding: 12px 30px;
+        margin: 0 10px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    
+    .submit-button {
+        background-color: #3554D1;
+        color: white;
+        border: none;
+    }
+    
+    .submit-button:hover {
+        background-color: #2a43a7;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(53, 84, 209, 0.3);
+    }
+    
+    .cancel-button {
+        background-color: white;
+        color: #3554D1;
+        border: 1px solid #3554D1;
+    }
+    
+    .cancel-button:hover {
+        background-color: #f6f9ff;
+        transform: translateY(-2px);
+    }
+    
+    .form-section-title {
+        color: #051036;
+        font-weight: 600;
+        margin-bottom: 20px;
+        font-size: 18px;
+        border-bottom: 1px solid #e9e9e9;
+        padding-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Page title section -->
+<div class="row y-gap-20 justify-between items-end pb-30 lg:pb-20 md:pb-15">
+  <div class="col-auto">
+    <h1 class="text-30 lh-14 fw-600">Create New Blog Post</h1>
+    <div class="text-15 text-light-1">Add a new post to your blog</div>
+  </div>
+  <div class="col-auto">
+    <a href="{{ path('app_admin_blog_index') }}" class="button -md h-50 bg-blue-1 text-white">
+      <i class="icon-list text-15 mr-10"></i>
+      Back to Posts
+    </a>
+  </div>
+</div>
+
+<!-- Form Section -->
+<div class="py-30 px-30 rounded-4 bg-white shadow-3">
+  <form method="POST" enctype="multipart/form-data">
+    {% if error is defined and error %}
+      <div class="alert alert-danger mb-30">
+        {{ error }}
+      </div>
+    {% endif %}
+    
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="form-section-title">Post Details</div>
+        
+        <!-- Title -->
+        <div class="form-input-wrapper">
+          <i class="icon-edit icon"></i>
+          <input type="text" name="title" placeholder="Post Title" required value="{{ post.title ?? '' }}">
+        </div>
+        
+        <!-- Description -->
+        <div class="form-input-wrapper">
+          <i class="icon-text icon" style="top: 25px;"></i>
+          <textarea name="description" placeholder="Post Content" required>{{ post.description ?? '' }}</textarea>
+        </div>
+        
+        <!-- Activity Association -->
+        <div class="form-input-wrapper">
+          <i class="icon-calendar icon"></i>
+          <select name="activityId">
+            <option value="">-- Select Associated Activity (Optional) --</option>
+            <!-- You would populate this from your database -->
+            <option value="1">Activity 1</option>
+            <option value="2">Activity 2</option>
+            <option value="3">Activity 3</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="col-lg-4">
+        <div class="form-section-title">Featured Image</div>
+        
+        <!-- Image Upload -->
+        <div class="image-upload-container">
+          <i class="icon-image image-upload-icon"></i>
+          <p class="image-upload-text">Upload a featured image for your post</p>
+          
+          <input type="file" name="picture" id="picture" class="custom-file-input" accept="image/*">
+          <label for="picture" class="custom-file-label">Choose File</label>
+          
+          <img id="image-preview" class="image-preview" alt="Image Preview">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Buttons -->
+    <div class="button-container">
+      <a href="{{ path('app_admin_blog_index') }}" class="button cancel-button">
+        Cancel
+      </a>
+      <button type="submit" class="button submit-button">
+        <i class="icon-check mr-10"></i>
+        Create Post
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Image preview functionality
+    const inputFile = document.getElementById('picture');
+    const imagePreview = document.getElementById('image-preview');
+    
+    inputFile.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          imagePreview.src = e.target.result;
+          imagePreview.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+    
+    // Form validation with SweetAlert
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(event) {
+      const title = form.querySelector('input[name="title"]').value;
+      const description = form.querySelector('textarea[name="description"]').value;
+      
+      if (title.trim() === '' || description.trim() === '') {
+        event.preventDefault();
+        
+        Swal.fire({
+          title: 'Validation Error',
+          text: 'Please fill in all required fields',
+          icon: 'error',
+          confirmButtonColor: '#3554D1'
+        });
+      } else {
+        // Show loading state
+        Swal.fire({
+          title: 'Creating Post...',
+          html: 'Please wait while we create your post',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+      }
+    });
+  });
+</script>
+{% endblock %}

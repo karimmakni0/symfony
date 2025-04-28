@@ -14,6 +14,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
+use Symfony\Component\Mailer\MailerInterface;
 
 #[Route('/admin')]
 class AdminController extends AbstractController
@@ -625,5 +629,100 @@ class AdminController extends AbstractController
             'totalItems' => $totalItems,
             'limit' => $limit
         ]);
+    }
+    
+    #[Route('/export-users-csv', name: 'admin_export_users_csv')]
+    public function exportUsersCsv(MailerInterface $mailer): Response
+    {
+        // Get the current user (admin)
+        $admin = $this->getUser();
+        if (!$admin || $admin->getRole() !== 'admin') {
+            return $this->json([
+                'success' => false,
+                'message' => 'You do not have permission to export user data.'
+            ]);
+        }
+        
+        // Get all users
+        $users = $this->entityManager->getRepository(Users::class)->findAll();
+        $userCount = count($users);
+    
+        // Create CSV content - Use semicolons as delimiters to better handle commas in content
+        $csvContent = "ID;Name;Last Name;Email;Role;Phone;Gender;Status\n";
+        
+        foreach ($users as $user) {
+            // Prepare data
+            $id = $user->getId();
+            $name = $user->getName() ?: '';
+            $lastName = $user->getLastname() ?: '';
+            $email = $user->getEmail();
+            $role = $user->getRole();
+            $phone = $user->getPhone() ?: '';
+            $gender = $user->getGender() ?: '';
+            $status = $user->getIsBanned() ? 'Banned' : 'Active';
+            
+            // Add row to CSV with semicolon delimiters
+            $csvContent .= "{$id};{$name};{$lastName};{$email};{$role};{$phone};{$gender};{$status}\n";
+        }
+        
+        // Get current timestamp for unique filename
+        $now = new \DateTime();
+        $timestamp = $now->format('Y-m-d_H-i-s');
+        $filename = "users_export_{$timestamp}.csv";
+        
+        // Save CSV file temporarily
+        $tempPath = sys_get_temp_dir() . '/' . $filename;
+        file_put_contents($tempPath, $csvContent);
+    
+        try {
+            // Get admin email
+            $adminEmail = $admin->getEmail();
+            
+            // Format date for email template
+            $exportDate = $now->format('F j, Y \\a\\t h:i A');
+            
+            // Create email with CSV attachment
+            $email = (new Email())
+                ->from(new \Symfony\Component\Mime\Address('hala.omran@jameiconseil.org', 'TripMakers'))
+                ->to($adminEmail)
+                ->subject('Go Trip - Users Data Export')
+                ->attachFromPath($tempPath, $filename, 'text/csv')
+                ->html(
+                    $this->renderView('emails/csv_export.html.twig', [
+                        'userCount' => $userCount,
+                        'exportDate' => $exportDate
+                    ])
+                );
+            
+            // Send the email
+            $mailer->send($email);
+            
+            // Log email sent
+            error_log("CSV export sent to admin email: {$adminEmail}");
+            
+            // Clean up temp file
+            if (file_exists($tempPath)) {
+                unlink($tempPath);
+            }
+            
+            return $this->json([
+                'success' => true,
+                'message' => "User data has been exported and sent to your email address: {$adminEmail}",
+            ]);
+        
+        } catch (\Exception $e) {
+            // Log the error
+            error_log("Error sending CSV export: " . $e->getMessage());
+            
+            // Clean up temp file on error
+            if (file_exists($tempPath)) {
+                unlink($tempPath);
+            }
+            
+            return $this->json([
+                'success' => false,
+                'message' => 'An error occurred while sending the export: ' . $e->getMessage(),
+            ]);
+        }
     }
 }

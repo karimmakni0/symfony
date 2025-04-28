@@ -32,12 +32,6 @@ var savePostUrl = "{{ path('app_admin_blog_edit', {'id': '0'}) }}";
     <h1 class="text-30 lh-14 fw-600">Blog Management</h1>
     <div class="text-15 text-light-1">Manage your blog posts and content</div>
   </div>
-  <div class="col-auto">
-    <a href="/admin/blog/new" class="button -md -dark-1 bg-blue-1 text-white">
-      <i class="icon-plus text-15 mr-10"></i>
-      Add New Post
-    </a>
-  </div>
 </div>
 
 <!-- Filter section -->
@@ -104,7 +98,7 @@ var savePostUrl = "{{ path('app_admin_blog_edit', {'id': '0'}) }}";
         <div class="stats-card">
           <i class="icon-file-text stats-icon"></i>
           <div class="stats-content">
-            <span class="stats-number">{{ posts|length }}</span>
+            <span class="stats-number">{{ totalItems }}</span>
             <span class="stats-label">Total Posts</span>
           </div>
         </div>
@@ -130,12 +124,7 @@ var savePostUrl = "{{ path('app_admin_blog_edit', {'id': '0'}) }}";
           </div>
         </div>
       </div>
-      <div class="dashboard-buttons">
-        <a href="/admin/blog/new" class="button -md -dark-1 bg-blue-1 text-white">
-          <i class="icon-plus text-15 mr-10"></i>
-          Add New Post
-        </a>
-      </div>
+
     </div>
   </div>
 </div>
@@ -351,11 +340,7 @@ var savePostUrl = "{{ path('app_admin_blog_edit', {'id': '0'}) }}";
           <i class="icon-file-text"></i>
         </div>
         <h4 class="text-18 fw-500 mb-10">No Blog Posts Found</h4>
-        <p class="empty-state-text">No blog posts match your search criteria. Try adjusting your filters or create a new post.</p>
-        <a href="#" class="button -md -dark-1 bg-blue-1 text-white mt-20">
-          <i class="icon-plus text-15 mr-10"></i>
-          Create New Post
-        </a>
+        <p class="empty-state-text">No blog posts match your search criteria. Try adjusting your filters.</p>
       </div>
     </div>
   {% endif %}

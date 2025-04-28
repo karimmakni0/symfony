@@ -156,6 +156,12 @@
         <h1 class="text-30 lh-14 fw-600">Manage Users</h1>
         <div class="text-15 text-light-1">Manage all user accounts in the system</div>
     </div>
+    <div class="col-auto">
+        <button id="exportUsersBtn" class="button -md h-50 bg-blue-1 text-white">
+            <i class="icon-file-text text-15 mr-10"></i>
+            Export Users to CSV
+        </button>
+    </div>
 </div>
 
 <!-- Filter Section -->
@@ -516,5 +522,77 @@
             }
         });
     }
+    
+    function confirmChangeRole(url) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You are about to change this user's role!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3554D1',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, change it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+    
+    // Handle export users button click
+    document.getElementById('exportUsersBtn').addEventListener('click', function() {
+        // Show confirmation dialog
+        Swal.fire({
+            title: 'Export Users to CSV',
+            text: 'The CSV file will be sent to your admin email for security reasons rather than being downloaded directly.',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#3554D1',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, export it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading state
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Exporting users and sending email...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Send export request
+                fetch('{{ path("admin_export_users_csv") }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonColor: '#3554D1'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#3554D1'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'There was a problem exporting the users data.',
+                            icon: 'error',
+                            confirmButtonColor: '#3554D1'
+                        });
+                    });
+            }
+        });
+    });
 </script>
 {% endblock %}

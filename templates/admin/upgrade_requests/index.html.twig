@@ -8,11 +8,19 @@
 <link rel="stylesheet" href="{{ asset('assets/css/admin-pagination.css') }}">
 {% endblock %}
 
+
+
 {% block body %}
 <div class="row y-gap-20 justify-between items-end pb-30 lg:pb-20 md:pb-15">
   <div class="col-auto">
     <h1 class="text-30 lh-14 fw-600">Upgrade Requests</h1>
     <div class="text-15 text-light-1">Manage user requests to become Publicators</div>
+  </div>
+  <div class="col-auto">
+    <button id="exportRequestsBtn" class="button -md h-50 bg-blue-1 text-white">
+      <i class="icon-file-text text-15 mr-10"></i>
+      Export Requests to CSV
+    </button>
   </div>
 </div>
 
@@ -175,4 +183,72 @@
 {% block javascripts %}
 {{ parent() }}
 <script src="{{ asset('assets/js/admin-upgrade-requests.js') }}"></script>
+<!-- Include SweetAlert2 for better UX -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle export requests button click
+        document.getElementById('exportRequestsBtn').addEventListener('click', function() {
+            // Show confirmation dialog
+            Swal.fire({
+                title: 'Export Upgrade Requests to CSV',
+                text: 'The CSV file will be sent to your admin email for security reasons rather than being downloaded directly.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#3554D1',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, export it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading state
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Exporting requests and sending email...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Send export request
+                    fetch('{{ path("admin_export_upgrade_requests_csv") }}')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    confirmButtonColor: '#3554D1'
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonColor: '#3554D1'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'There was a problem exporting the upgrade requests data.',
+                                icon: 'error',
+                                confirmButtonColor: '#3554D1'
+                            });
+                        });
+                }
+            });
+        });
+
+        // Auto-submit filter form when selects change
+        document.querySelectorAll('.js-filter-status').forEach(select => {
+            select.addEventListener('change', function() {
+                document.querySelector('.js-filter-form').submit();
+            });
+        });
+    });
+</script>
 {% endblock %}
