@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Apr 28, 2025 at 03:01 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Hôte : 127.0.0.1
+-- Généré le : lun. 28 avr. 2025 à 21:07
+-- Version du serveur : 10.4.32-MariaDB
+-- Version de PHP : 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `applicationpi`
+-- Base de données : `applicationpi`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `activities`
+-- Structure de la table `activities`
 --
 
 CREATE TABLE `activities` (
@@ -44,35 +44,35 @@ CREATE TABLE `activities` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `activities`
+-- Déchargement des données de la table `activities`
 --
 
 INSERT INTO `activities` (`id`, `activity_name`, `activity_description`, `activity_destination`, `activity_duration`, `activity_price`, `activity_genre`, `user_id`, `activity_date`, `created_at`, `max_number`, `latitude`, `longitude`) VALUES
-(100, 'Colosseum Guided Tour', 'Discover the secrets of the Colosseum with an expert historian.', 'Rome', 'Half Day', 150.00, 'Cultural', 28, '2025-06-10', '2025-04-25 10:53:22', 30, 41.90280000, 12.49640000),
-(101, 'Vatican Museums Visit', 'Explore the treasures of the Vatican including the Sistine Chapel.', 'Rome', 'Half Day', 120.00, 'Cultural', 28, '2025-06-11', '2025-04-25 10:53:22', 25, 41.90280000, 12.49640000),
-(102, 'Statue of Liberty Cruise', 'Sail around Manhattan and admire the Statue of Liberty.', 'New York', '2 Hours', 70.00, 'Cultural', 28, '2025-06-12', '2025-04-25 10:53:22', 80, 40.71280000, -74.00600000),
-(103, 'Broadway Show Night', 'Enjoy a classic Broadway musical in Times Square.', 'New York', 'Evening', 180.00, 'Cultural', 28, '2025-06-13', '2025-04-25 10:53:22', 50, 40.71280000, -74.00600000),
-(104, 'Gaudi Architecture Tour', 'Visit the magnificent Sagrada Familia and Park Güell.', 'Barcelona', 'Full Day', 160.00, 'Cultural', 28, '2025-06-14', '2025-04-25 10:53:22', 40, 41.38510000, 2.17340000),
-(105, 'Barcelona Beach Chill', 'Relax at Barceloneta Beach with cocktails and sunshine.', 'Barcelona', 'Half Day', 90.00, 'Beach', 28, '2025-06-15', '2025-04-25 10:53:22', 60, 41.38510000, 2.17340000),
-(106, 'Desert Safari', 'Thrilling 4x4 ride through Dubai’s golden sand dunes.', 'Dubai', '1 Day', 200.00, 'Adventure', 28, '2025-06-16', '2025-04-25 10:53:22', 50, 25.20480000, 55.27080000),
-(107, 'Burj Khalifa VIP Tour', 'Ascend to the top of the tallest building in the world.', 'Dubai', '2 Hours', 110.00, 'Cultural', 28, '2025-06-17', '2025-04-25 10:53:22', 20, 25.20480000, 55.27080000),
-(108, 'Bosphorus Dinner Cruise', 'Enjoy a luxurious dinner while cruising Istanbul’s Bosphorus.', 'Istanbul', 'Evening', 130.00, 'Relaxation', 28, '2025-06-18', '2025-04-25 10:53:22', 70, 41.00820000, 28.97840000),
-(109, 'Grand Bazaar Shopping Tour', 'Shop at one of the world’s oldest and largest covered markets.', 'Istanbul', 'Half Day', 80.00, 'Cultural', 28, '2025-06-19', '2025-04-25 10:53:22', 50, 41.00820000, 28.97840000),
-(110, 'Blue Mountains Adventure', 'Hike and explore the Blue Mountains outside Sydney.', 'Sydney', 'Full Day', 220.00, 'Nature', 28, '2025-06-20', '2025-04-25 10:53:22', 20, -33.86880000, 151.20930000),
-(111, 'Sydney Opera House Tour', 'Behind-the-scenes tour of Australia’s most famous icon.', 'Sydney', '2 Hours', 95.00, 'Cultural', 28, '2025-06-21', '2025-04-25 10:53:22', 40, -33.86880000, 151.20930000),
-(112, 'Table Mountain Hike', 'Climb or cable-car to Cape Town’s famous flat mountain.', 'Cape Town', 'Half Day', 150.00, 'Adventure', 28, '2025-06-22', '2025-04-25 10:53:22', 30, -33.92490000, 18.42410000),
-(113, 'Cape Winelands Tour', 'Taste world-class wines in the Cape countryside.', 'Cape Town', '1 Day', 170.00, 'Food', 28, '2025-06-23', '2025-04-25 10:53:22', 20, -33.92490000, 18.42410000),
-(114, 'Canal Biking Tour', 'Bike alongside the beautiful canals of Amsterdam.', 'Amsterdam', 'Half Day', 60.00, 'Cultural', 28, '2025-06-24', '2025-04-25 10:53:22', 50, 52.36760000, 4.90410000),
-(115, 'Tulip Gardens Visit', 'Explore the colorful Keukenhof gardens in spring.', 'Amsterdam', 'Half Day', 100.00, 'Nature', 28, '2025-06-25', '2025-04-25 10:53:22', 40, 52.36760000, 4.90410000),
-(116, 'Pyramids Camel Ride', 'Ride camels around the majestic pyramids of Giza.', 'Cairo', '2 Hours', 90.00, 'Adventure', 28, '2025-06-26', '2025-04-25 10:53:22', 30, 30.04440000, 31.23570000),
-(117, 'Egyptian Museum Tour', 'See ancient artifacts including Tutankhamun’s treasures.', 'Cairo', 'Half Day', 110.00, 'Cultural', 28, '2025-06-27', '2025-04-25 10:53:22', 30, 30.04440000, 31.23570000),
-(118, 'Old Town Walking Tour', 'Explore Prague’s historic Old Town and Charles Bridge.', 'Prague', 'Half Day', 85.00, 'Cultural', 28, '2025-06-28', '2025-04-25 10:53:22', 40, 50.07550000, 14.43780000),
-(119, 'Prague Castle Visit', 'Tour the largest ancient castle complex in the world.', 'Prague', 'Half Day', 95.00, 'Cultural', 28, '2025-06-29', '2025-04-25 10:53:22', 30, 50.07550000, 14.43780000),
-(120, 'Sugarloaf Mountain Cable Car', 'Ride to the top for the best view of Rio de Janeiro.', 'Rio de Janeiro', '2 Hours', 75.00, 'Adventure', 28, '2025-06-30', '2025-04-25 10:53:22', 60, -22.90680000, -43.17290000),
-(121, 'Samba Dance Show', 'Experience the lively rhythms of Brazil with a samba show.', 'Rio de Janeiro', 'Evening', 120.00, 'Cultural', 28, '2025-07-01', '2025-04-25 10:53:22', 80, -22.90680000, -43.17290000),
-(122, 'Lisbon Tram 28 Ride', 'Take a scenic historic tram ride through Lisbon’s neighborhoods.', 'Lisbon', '2 Hours', 40.00, 'Cultural', 28, '2025-07-02', '2025-04-25 10:53:22', 70, 38.71690000, -9.13990000),
-(123, 'Fado Music Dinner', 'Enjoy a traditional Portuguese dinner with live Fado music.', 'Lisbon', 'Evening', 100.00, 'Cultural', 28, '2025-07-03', '2025-04-25 10:53:22', 50, 38.71690000, -9.13990000),
-(124, 'Bangkok Floating Market Tour', 'Shop at lively markets floating along Bangkok\'s canals.', 'Bangkok', 'Half Day', 60.00, 'Cultural', 28, '2025-07-04', '2025-04-25 10:53:22', 50, 13.75630000, 100.50180000),
+(100, 'Colosseum Guided Tour', 'Discover the secrets of the Colosseum with an expert historian.', 'Rome', 'Half Day', 150.00, 'Cultural', 4, '2025-06-10', '2025-04-25 10:53:22', 30, 41.90280000, 12.49640000),
+(101, 'Vatican Museums Visit', 'Explore the treasures of the Vatican including the Sistine Chapel.', 'Rome', 'Half Day', 120.00, 'Cultural', 4, '2025-06-11', '2025-04-25 10:53:22', 25, 41.90280000, 12.49640000),
+(102, 'Statue of Liberty Cruise', 'Sail around Manhattan and admire the Statue of Liberty.', 'New York', '2 Hours', 70.00, 'Cultural', 4, '2025-06-12', '2025-04-25 10:53:22', 80, 40.71280000, -74.00600000),
+(103, 'Broadway Show Night', 'Enjoy a classic Broadway musical in Times Square.', 'New York', 'Evening', 180.00, 'Cultural', 4, '2025-06-13', '2025-04-25 10:53:22', 50, 40.71280000, -74.00600000),
+(104, 'Gaudi Architecture Tour', 'Visit the magnificent Sagrada Familia and Park Güell.', 'Barcelona', 'Full Day', 160.00, 'Cultural', 4, '2025-06-14', '2025-04-25 10:53:22', 40, 41.38510000, 2.17340000),
+(105, 'Barcelona Beach Chill', 'Relax at Barceloneta Beach with cocktails and sunshine.', 'Barcelona', 'Half Day', 90.00, 'Beach', 4, '2025-06-15', '2025-04-25 10:53:22', 60, 41.38510000, 2.17340000),
+(106, 'Desert Safari', 'Thrilling 4x4 ride through Dubai’s golden sand dunes.', 'Dubai', '1 Day', 200.00, 'Adventure', 4, '2025-06-16', '2025-04-25 10:53:22', 50, 25.20480000, 55.27080000),
+(107, 'Burj Khalifa VIP Tour', 'Ascend to the top of the tallest building in the world.', 'Dubai', '2 Hours', 110.00, 'Cultural', 4, '2025-06-17', '2025-04-25 10:53:22', 20, 25.20480000, 55.27080000),
+(108, 'Bosphorus Dinner Cruise', 'Enjoy a luxurious dinner while cruising Istanbul’s Bosphorus.', 'Istanbul', 'Evening', 130.00, '', 4, '2025-06-18', '2025-04-25 10:53:22', 70, 41.00820000, 28.97840000),
+(109, 'Grand Bazaar Shopping Tour', 'Shop at one of the world’s oldest and largest covered markets.', 'Istanbul', 'Half Day', 80.00, 'Cultural', 4, '2025-06-19', '2025-04-25 10:53:22', 50, 41.00820000, 28.97840000),
+(110, 'Blue Mountains Adventure', 'Hike and explore the Blue Mountains outside Sydney.', 'Sydney', 'Full Day', 220.00, 'Nature', 4, '2025-06-20', '2025-04-25 10:53:22', 20, -33.86880000, 151.20930000),
+(111, 'Sydney Opera House Tour', 'Behind-the-scenes tour of Australia’s most famous icon.', 'Sydney', '2 Hours', 95.00, 'Cultural', 4, '2025-06-21', '2025-04-25 10:53:22', 40, -33.86880000, 151.20930000),
+(112, 'Table Mountain Hike', 'Climb or cable-car to Cape Town’s famous flat mountain.', 'Cape Town', 'Half Day', 150.00, 'Adventure', 4, '2025-06-22', '2025-04-25 10:53:22', 30, -33.92490000, 18.42410000),
+(113, 'Cape Winelands Tour', 'Taste world-class wines in the Cape countryside.', 'Cape Town', '1 Day', 170.00, 'Food', 4, '2025-06-23', '2025-04-25 10:53:22', 20, -33.92490000, 18.42410000),
+(114, 'Canal Biking Tour', 'Bike alongside the beautiful canals of Amsterdam.', 'Amsterdam', 'Half Day', 60.00, 'Cultural', 4, '2025-06-24', '2025-04-25 10:53:22', 50, 52.36760000, 4.90410000),
+(115, 'Tulip Gardens Visit', 'Explore the colorful Keukenhof gardens in spring.', 'Amsterdam', 'Half Day', 100.00, 'Nature', 4, '2025-06-25', '2025-04-25 10:53:22', 40, 52.36760000, 4.90410000),
+(116, 'Pyramids Camel Ride', 'Ride camels around the majestic pyramids of Giza.', 'Cairo', '2 Hours', 90.00, 'Adventure', 4, '2025-06-26', '2025-04-25 10:53:22', 30, 30.04440000, 31.23570000),
+(117, 'Egyptian Museum Tour', 'See ancient artifacts including Tutankhamun’s treasures.', 'Cairo', 'Half Day', 110.00, 'Cultural', 4, '2025-06-27', '2025-04-25 10:53:22', 30, 30.04440000, 31.23570000),
+(118, 'Old Town Walking Tour', 'Explore Prague’s historic Old Town and Charles Bridge.', 'Prague', 'Half Day', 85.00, 'Cultural', 4, '2025-06-28', '2025-04-25 10:53:22', 40, 50.07550000, 14.43780000),
+(119, 'Prague Castle Visit', 'Tour the largest ancient castle complex in the world.', 'Prague', 'Half Day', 95.00, 'Cultural', 4, '2025-06-29', '2025-04-25 10:53:22', 30, 50.07550000, 14.43780000),
+(120, 'Sugarloaf Mountain Cable Car', 'Ride to the top for the best view of Rio de Janeiro.', 'Rio de Janeiro', '2 Hours', 75.00, 'Adventure', 4, '2025-06-30', '2025-04-25 10:53:22', 60, -22.90680000, -43.17290000),
+(121, 'Samba Dance Show', 'Experience the lively rhythms of Brazil with a samba show.', 'Rio de Janeiro', 'Evening', 120.00, 'Cultural', 4, '2025-07-01', '2025-04-25 10:53:22', 80, -22.90680000, -43.17290000),
+(122, 'Lisbon Tram 28 Ride', 'Take a scenic historic tram ride through Lisbon’s neighborhoods.', 'Lisbon', '2 Hours', 40.00, 'Cultural', 4, '2025-07-02', '2025-04-25 10:53:22', 70, 38.71690000, -9.13990000),
+(123, 'Fado Music Dinner', 'Enjoy a traditional Portuguese dinner with live Fado music.', 'Lisbon', 'Evening', 100.00, 'Cultural', 4, '2025-07-03', '2025-04-25 10:53:22', 50, 38.71690000, -9.13990000),
+(124, 'Bangkok Floating Market Tour', 'Shop at lively markets floating along Bangkok\'s canals.', 'Bangkok', 'Half Day', 60.00, 'Cultural', 4, '2025-07-04', '2025-04-25 10:53:22', 50, 13.75630000, 100.50180000),
 (125, 'Thai Cooking Class', 'Learn to prepare authentic Thai dishes with a local chef.', 'Bangkok', 'Half Day', 90.00, 'Food', 28, '2025-07-05', '2025-04-25 10:53:22', 20, 13.75630000, 100.50180000),
 (126, 'Hollywood Sign Hike', 'Get up close to LA’s iconic Hollywood sign.', 'Los Angeles', 'Half Day', 70.00, 'Adventure', 28, '2025-07-06', '2025-04-25 10:53:22', 50, 34.05220000, -118.24370000),
 (127, 'Venice Beach Bike Ride', 'Cycle along the colorful Venice Beach boardwalk.', 'Los Angeles', 'Half Day', 65.00, 'Beach', 28, '2025-07-07', '2025-04-25 10:53:22', 40, 34.05220000, -118.24370000),
@@ -93,7 +93,7 @@ INSERT INTO `activities` (`id`, `activity_name`, `activity_description`, `activi
 -- --------------------------------------------------------
 
 --
--- Table structure for table `billet`
+-- Structure de la table `billet`
 --
 
 CREATE TABLE `billet` (
@@ -105,7 +105,7 @@ CREATE TABLE `billet` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `billet`
+-- Déchargement des données de la table `billet`
 --
 
 INSERT INTO `billet` (`id`, `prix`, `numero`, `activiteId`, `nb`) VALUES
@@ -148,12 +148,13 @@ INSERT INTO `billet` (`id`, `prix`, `numero`, `activiteId`, `nb`) VALUES
 (165, 80, 'TICKET-680bfe67e9432', 138, 1),
 (166, 90, 'TICKET-680c019907f29', 139, 3),
 (167, 90, 'TICKET-680c01a79b746', 139, 3),
-(168, 409, 'TICKET-680e088496e9a', 145, 2);
+(168, 409, 'TICKET-680e088496e9a', 145, 2),
+(169, 409, 'TICKET-680f5fc3a4eed', 145, 1);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `blogs_rating`
+-- Structure de la table `blogs_rating`
 --
 
 CREATE TABLE `blogs_rating` (
@@ -166,7 +167,7 @@ CREATE TABLE `blogs_rating` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `blogs_rating`
+-- Déchargement des données de la table `blogs_rating`
 --
 
 INSERT INTO `blogs_rating` (`id`, `user_id`, `post_id`, `is_like`, `created_at`, `updated_at`) VALUES
@@ -207,7 +208,7 @@ INSERT INTO `blogs_rating` (`id`, `user_id`, `post_id`, `is_like`, `created_at`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `comments`
+-- Structure de la table `comments`
 --
 
 CREATE TABLE `comments` (
@@ -219,7 +220,7 @@ CREATE TABLE `comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `comments`
+-- Déchargement des données de la table `comments`
 --
 
 INSERT INTO `comments` (`id`, `post_id`, `user_id`, `date`, `comment`) VALUES
@@ -260,7 +261,7 @@ INSERT INTO `comments` (`id`, `post_id`, `user_id`, `date`, `comment`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `destinations`
+-- Structure de la table `destinations`
 --
 
 CREATE TABLE `destinations` (
@@ -274,35 +275,35 @@ CREATE TABLE `destinations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `destinations`
+-- Déchargement des données de la table `destinations`
 --
 
 INSERT INTO `destinations` (`id`, `name`, `location`, `description`, `image_path`, `user_id`, `created_at`) VALUES
-(26, 'Rome', 'Italy', 'Walk through ancient history with the Colosseum, Roman Forum, and the timeless beauty of the Vatican.', 'uploads/destinations/destination-1.jpg', 28, '2025-04-23 09:00:00'),
-(27, 'New York', 'USA', 'Experience the bustling energy of Times Square, Central Park, and the skyline of Manhattan.', 'uploads/destinations/destination-2.jpg', 28, '2025-04-23 10:00:00'),
-(28, 'Barcelona', 'Spain', 'Admire Gaudi\'s architecture, relax on Mediterranean beaches, and explore the vibrant Catalan culture.', 'uploads/destinations/destination-3.jpg', 28, '2025-04-23 11:00:00'),
-(29, 'Dubai', 'United Arab Emirates', 'Marvel at futuristic skyscrapers, luxurious shopping malls, and desert adventures.', 'uploads/destinations/destination-4.jpg', 28, '2025-04-23 12:00:00'),
-(30, 'Istanbul', 'Turkey', 'Where East meets West: discover historic mosques, bazaars, and rich cultural traditions.', 'uploads/destinations/destination-5.jpg', 28, '2025-04-23 13:00:00'),
-(31, 'Sydney', 'Australia', 'Famous for its harbor, beaches, and iconic Opera House — a must-visit Down Under.', 'uploads/destinations/destination-6.jpg', 28, '2025-04-23 14:00:00'),
-(32, 'Cape Town', 'South Africa', 'Enjoy stunning coastal views, Table Mountain hikes, and vibrant city life.', 'uploads/destinations/destination-7.jpg', 28, '2025-04-23 15:00:00'),
-(33, 'Amsterdam', 'Netherlands', 'Cruise through canals, visit the Anne Frank House, and enjoy beautiful tulip fields.', 'uploads/destinations/destination-8.jpg', 28, '2025-04-23 16:00:00'),
-(34, 'Cairo', 'Egypt', 'Visit the awe-inspiring Pyramids of Giza, Sphinx, and bustling souks.', 'uploads/destinations/destination-9.jpg', 28, '2025-04-23 17:00:00'),
-(35, 'Prague', 'Czech Republic', 'Explore the fairy-tale old town, castles, and charming medieval streets.', 'uploads/destinations/destination-10.jpg', 28, '2025-04-23 18:00:00'),
-(36, 'Rio de Janeiro', 'Brazil', 'Celebrate life with vibrant festivals, Sugarloaf Mountain, and Copacabana beach.', 'uploads/destinations/destination-11.jpg', 28, '2025-04-23 19:00:00'),
-(37, 'Lisbon', 'Portugal', 'Colorful streets, historic trams, and Atlantic coastlines await you in Lisbon.', 'uploads/destinations/destination-12.jpg', 28, '2025-04-23 20:00:00'),
-(38, 'Bangkok', 'Thailand', 'Dive into street food, golden temples, and a vibrant nightlife.', 'uploads/destinations/destination-68079b483e86f-1745328968.jpg', 28, '2025-04-23 21:00:00'),
-(39, 'Los Angeles', 'USA', 'Hollywood, beaches, and endless sunshine — the dream city of stars.', 'uploads/destinations/destination-14.jpg', 28, '2025-04-23 22:00:00'),
-(40, 'Reykjavik', 'Iceland', 'Gateway to the Northern Lights, geysers, and stunning ice landscapes.', 'uploads/destinations/destination-15.jpg', 28, '2025-04-24 09:00:00'),
-(41, 'Edinburgh', 'Scotland', 'Explore medieval castles, vibrant festivals, and rolling green hills.', 'uploads/destinations/destination-16.jpg', 28, '2025-04-24 10:00:00'),
-(42, 'Petra', 'Jordan', 'Wander through the rose-red ancient city carved into the cliffs.', 'uploads/destinations/destination-17.jpg', 28, '2025-04-24 11:00:00'),
-(43, 'Seoul', 'South Korea', 'Modern skyscrapers meet centuries-old palaces and street markets.', 'uploads/destinations/destination-18.jpg', 28, '2025-04-24 12:00:00'),
-(44, 'Venice', 'Italy', 'Romantic gondola rides, charming canals, and timeless architecture.', 'uploads/destinations/destination-19.jpg', 28, '2025-04-24 13:00:00'),
-(45, 'Havana', 'Cuba', 'Colorful streets, salsa rhythms, and a nostalgic trip back in time.', 'uploads/destinations/destination-20.jpg', 28, '2025-04-24 14:00:00'),
-(46, 'Zurich', 'Switzerland', 'Discover scenic lakes, luxury shopping, and stunning Alpine views.', 'uploads/destinations/destination-21.jpg', 28, '2025-04-24 15:00:00'),
-(47, 'Cusco', 'Peru', 'The ancient capital of the Inca Empire, gateway to Machu Picchu.', 'uploads/destinations/destination-22.jpg', 28, '2025-04-24 16:00:00'),
-(48, 'Auckland', 'New Zealand', 'Adventures in nature, Maori culture, and spectacular coastlines.', 'uploads/destinations/destination-23.jpg', 28, '2025-04-24 17:00:00'),
-(49, 'Budapest', 'Hungary', 'Relax in thermal baths and admire grand architecture by the Danube River.', 'uploads/destinations/destination-24.jpg', 28, '2025-04-24 18:00:00'),
-(50, 'Vienna', 'Austria', 'City of music, art, imperial palaces, and delightful coffee houses.', 'uploads/destinations/destination-25.jpg', 28, '2025-04-24 19:00:00'),
+(26, 'Rome', 'Italy', 'Walk through ancient history with the Colosseum, Roman Forum, and the timeless beauty of the Vatican.', 'uploads/destinations/destination-680fd1550a82c-1745867093.jpg', 4, '2025-04-23 09:00:00'),
+(27, 'New York', 'USA', 'Experience the bustling energy of Times Square, Central Park, and the skyline of Manhattan.', 'uploads/destinations/destination-680fd12a3b49a-1745867050.jpg', 4, '2025-04-23 10:00:00'),
+(28, 'Barcelona', 'Spain', 'Admire Gaudi\'s architecture, relax on Mediterranean beaches, and explore the vibrant Catalan culture.', 'uploads/destinations/destination-680fd0fe69264-1745867006.jpg', 4, '2025-04-23 11:00:00'),
+(29, 'Dubai', 'United Arab Emirates', 'Marvel at futuristic skyscrapers, luxurious shopping malls, and desert adventures.', 'uploads/destinations/destination-680fd0d30fb9d-1745866963.jpg', 4, '2025-04-23 12:00:00'),
+(30, 'Istanbul', 'Turkey', 'Where East meets West: discover historic mosques, bazaars, and rich cultural traditions.', 'uploads/destinations/destination-680fd0ab7e876-1745866923.jpg', 4, '2025-04-23 13:00:00'),
+(31, 'Sydney', 'Australia', 'Famous for its harbor, beaches, and iconic Opera House — a must-visit Down Under.', 'uploads/destinations/destination-680fd06bdc83f-1745866859.jpg', 4, '2025-04-23 14:00:00'),
+(32, 'Cape Town', 'South Africa', 'Enjoy stunning coastal views, Table Mountain hikes, and vibrant city life.', 'uploads/destinations/destination-680fd0436ac57-1745866819.jpg', 4, '2025-04-23 15:00:00'),
+(33, 'Amsterdam', 'Netherlands', 'Cruise through canals, visit the Anne Frank House, and enjoy beautiful tulip fields.', 'uploads/destinations/destination-680fcff04dd42-1745866736.jpg', 4, '2025-04-23 16:00:00'),
+(34, 'Cairo', 'Egypt', 'Visit the awe-inspiring Pyramids of Giza, Sphinx, and bustling souks.', 'uploads/destinations/destination-680fcfb295178-1745866674.jpg', 4, '2025-04-23 17:00:00'),
+(35, 'Prague', 'Czech Republic', 'Explore the fairy-tale old town, castles, and charming medieval streets.', 'uploads/destinations/destination-680fcf80c1f9b-1745866624.jpg', 4, '2025-04-23 18:00:00'),
+(36, 'Rio de Janeiro', 'Brazil', 'Celebrate life with vibrant festivals, Sugarloaf Mountain, and Copacabana beach.', 'uploads/destinations/destination-680fcf4a7bfc2-1745866570.jpg', 4, '2025-04-23 19:00:00'),
+(37, 'Lisbon', 'Portugal', 'Colorful streets, historic trams, and Atlantic coastlines await you in Lisbon.', 'uploads/destinations/destination-680fcf1400537-1745866516.jpg', 4, '2025-04-23 20:00:00'),
+(38, 'Bangkok', 'Thailand', 'Dive into street food, golden temples, and a vibrant nightlife.', 'uploads/destinations/destination-680fce689cf9e-1745866344.jpg', 4, '2025-04-23 21:00:00'),
+(39, 'Los Angeles', 'USA', 'Hollywood, beaches, and endless sunshine — the dream city of stars.', 'uploads/destinations/destination-680fce38ae8d0-1745866296.jpg', 4, '2025-04-23 22:00:00'),
+(40, 'Reykjavik', 'Iceland', 'Gateway to the Northern Lights, geysers, and stunning ice landscapes.', 'uploads/destinations/destination-680fce055a7f9-1745866245.jpg', 4, '2025-04-24 09:00:00'),
+(41, 'Edinburgh', 'Scotland', 'Explore medieval castles, vibrant festivals, and rolling green hills.', 'uploads/destinations/destination-680fcdcc06085-1745866188.jpg', 4, '2025-04-24 10:00:00'),
+(42, 'Petra', 'Jordan', 'Wander through the rose-red ancient city carved into the cliffs.', 'uploads/destinations/destination-680fcda807757-1745866152.jpg', 4, '2025-04-24 11:00:00'),
+(43, 'Seoul', 'South Korea', 'Modern skyscrapers meet centuries-old palaces and street markets.', 'uploads/destinations/destination-680fcd808a2de-1745866112.jpg', 4, '2025-04-24 12:00:00'),
+(44, 'Venice', 'Italy', 'Romantic gondola rides, charming canals, and timeless architecture.', 'uploads/destinations/destination-680fcd6123193-1745866081.jpg', 4, '2025-04-24 13:00:00'),
+(45, 'Havana', 'Cuba', 'Colorful streets, salsa rhythms, and a nostalgic trip back in time.', 'uploads/destinations/destination-680fcce54d4be-1745865957.jpg', 4, '2025-04-24 14:00:00'),
+(46, 'Zurich', 'Switzerland', 'Discover scenic lakes, luxury shopping, and stunning Alpine views.', 'uploads/destinations/destination-680fcca1f3bf6-1745865889.jpg', 4, '2025-04-24 15:00:00'),
+(47, 'Cusco', 'Peru', 'The ancient capital of the Inca Empire, gateway to Machu Picchu.', 'uploads/destinations/destination-680fcc6e31e09-1745865838.jpg', 4, '2025-04-24 16:00:00'),
+(48, 'Auckland', 'New Zealand', 'Adventures in nature, Maori culture, and spectacular coastlines.', 'uploads/destinations/destination-680fcc0d54e68-1745865741.jpg', 4, '2025-04-24 17:00:00'),
+(49, 'Budapest', 'Hungary', 'Relax in thermal baths and admire grand architecture by the Danube River.', 'uploads/destinations/destination-680fcbc677234-1745865670.jpg', 4, '2025-04-24 18:00:00'),
+(50, 'Vienna', 'Austria', 'City of music, art, imperial palaces, and delightful coffee houses.', 'uploads/destinations/destination-680fcb8107ff7-1745865601.jpg', 4, '2025-04-24 19:00:00'),
 (51, 'Buenos Aires', 'Argentina', 'Tango, vibrant neighborhoods, and grand European-style architecture.', 'uploads/destinations/destination-26.jpg', 28, '2025-04-24 20:00:00'),
 (52, 'Quebec City', 'Canada', 'Charming cobbled streets and the magic of French culture in North America.', 'uploads/destinations/destination-27.jpg', 28, '2025-04-24 21:00:00'),
 (53, 'Moscow', 'Russia', 'Explore Red Square, the Kremlin, and onion-domed cathedrals.', 'uploads/destinations/destination-28.jpg', 28, '2025-04-24 22:00:00'),
@@ -323,7 +324,7 @@ INSERT INTO `destinations` (`id`, `name`, `location`, `description`, `image_path
 -- --------------------------------------------------------
 
 --
--- Table structure for table `doctrine_migration_versions`
+-- Structure de la table `doctrine_migration_versions`
 --
 
 CREATE TABLE `doctrine_migration_versions` (
@@ -333,7 +334,7 @@ CREATE TABLE `doctrine_migration_versions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Dumping data for table `doctrine_migration_versions`
+-- Déchargement des données de la table `doctrine_migration_versions`
 --
 
 INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
@@ -342,7 +343,29 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 -- --------------------------------------------------------
 
 --
--- Table structure for table `messenger_messages`
+-- Structure de la table `faceid_sessions`
+--
+
+CREATE TABLE `faceid_sessions` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `expires_at` timestamp NOT NULL DEFAULT (current_timestamp() + interval 1 day),
+  `device_info` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `faceid_sessions`
+--
+
+INSERT INTO `faceid_sessions` (`id`, `user_id`, `token`, `created_at`, `expires_at`, `device_info`) VALUES
+(33, 40, '191d723a472c40f0f6d8e0f1cfe8b18bea96cca5abd4a3d888902458f961ae10', '2025-04-28 10:46:01', '2025-04-29 10:46:01', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `messenger_messages`
 --
 
 CREATE TABLE `messenger_messages` (
@@ -358,7 +381,7 @@ CREATE TABLE `messenger_messages` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `posts`
+-- Structure de la table `posts`
 --
 
 CREATE TABLE `posts` (
@@ -372,7 +395,7 @@ CREATE TABLE `posts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `posts`
+-- Déchargement des données de la table `posts`
 --
 
 INSERT INTO `posts` (`id`, `user_id`, `activity_id`, `title`, `description`, `picture`, `date`) VALUES
@@ -411,7 +434,7 @@ INSERT INTO `posts` (`id`, `user_id`, `activity_id`, `title`, `description`, `pi
 -- --------------------------------------------------------
 
 --
--- Table structure for table `reservation`
+-- Structure de la table `reservation`
 --
 
 CREATE TABLE `reservation` (
@@ -426,7 +449,7 @@ CREATE TABLE `reservation` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `reservation`
+-- Déchargement des données de la table `reservation`
 --
 
 INSERT INTO `reservation` (`id`, `dateAchat`, `userId`, `billetId`, `nombre`, `prixTotal`, `prixUnite`, `statuts`) VALUES
@@ -469,12 +492,13 @@ INSERT INTO `reservation` (`id`, `dateAchat`, `userId`, `billetId`, `nombre`, `p
 (46, '2025-04-25 21:28:07', 40, 165, 1, 80, 80, 'confirmed'),
 (47, '2025-04-25 21:41:45', 40, 166, 3, 270, 90, 'confirmed'),
 (48, '2025-04-25 21:41:59', 40, 167, 3, 270, 90, 'confirmed'),
-(49, '2025-04-27 10:35:48', 40, 168, 2, 818, 409, 'confirmed');
+(49, '2025-04-27 10:35:48', 40, 168, 2, 818, 409, 'confirmed'),
+(50, '2025-04-28 11:00:19', 42, 169, 1, 409, 409, 'confirmed');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `resources`
+-- Structure de la table `resources`
 --
 
 CREATE TABLE `resources` (
@@ -484,16 +508,38 @@ CREATE TABLE `resources` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `resources`
+-- Déchargement des données de la table `resources`
 --
 
 INSERT INTO `resources` (`id`, `path`, `activity_id`) VALUES
-(80, '/uploads/activities/activity-680e03cc620a8-1745748940.png', 145);
+(80, '/uploads/activities/activity-680e03cc620a8-1745748940.png', 145),
+(101, '/uploads/activities/activity-680f992447724-1745852708.jpg', 100),
+(102, '/uploads/activities/activity-680f9947326b1-1745852743.jpg', 101),
+(103, '/uploads/activities/activity-680f998659da6-1745852806.jpg', 102),
+(104, '/uploads/activities/activity-680f99ab83f10-1745852843.jpg', 103),
+(105, '/uploads/activities/activity-680f99d5d77fa-1745852885.jpg', 104),
+(106, '/uploads/activities/activity-680f9a06ed709-1745852934.jpg', 105),
+(107, '/uploads/activities/activity-680f9a52055ea-1745853010.jpg', 106),
+(108, '/uploads/activities/activity-680f9aa10737b-1745853089.jpg', 107),
+(109, '/uploads/activities/activity-680f9b73f2061-1745853299.png', 108),
+(110, '/uploads/activities/activity-680f9bc8d890e-1745853384.jpg', 109),
+(111, '/uploads/activities/activity-680f9c2688a11-1745853478.jpg', 110),
+(112, '/uploads/activities/activity-680f9c7767a4d-1745853559.jpg', 111),
+(113, '/uploads/activities/activity-680f9d0c1f283-1745853708.jpg', 112),
+(114, '/uploads/activities/activity-680f9d4fa3fa1-1745853775.jpg', 113),
+(115, '/uploads/activities/activity-680f9ddc92a22-1745853916.jpg', 114),
+(116, '/uploads/activities/activity-680f9e470db2d-1745854023.jpg', 115),
+(117, '/uploads/activities/activity-680f9e9795859-1745854103.jpg', 116),
+(118, '/uploads/activities/activity-680f9ecbea540-1745854155.jpg', 117),
+(119, '/uploads/activities/activity-680f9f2362c59-1745854243.jpg', 118),
+(120, '/uploads/activities/activity-680f9f67bf1bf-1745854311.jpg', 122),
+(121, '/uploads/activities/activity-680f9fa41b78c-1745854372.jpg', 123),
+(122, '/uploads/activities/activity-680f9fd99c37c-1745854425.jpg', 124);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `roles`
+-- Structure de la table `roles`
 --
 
 CREATE TABLE `roles` (
@@ -502,7 +548,7 @@ CREATE TABLE `roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `roles`
+-- Déchargement des données de la table `roles`
 --
 
 INSERT INTO `roles` (`id`, `nom`) VALUES
@@ -513,7 +559,7 @@ INSERT INTO `roles` (`id`, `nom`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `upgrade_requests`
+-- Structure de la table `upgrade_requests`
 --
 
 CREATE TABLE `upgrade_requests` (
@@ -526,7 +572,7 @@ CREATE TABLE `upgrade_requests` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `upgrade_requests`
+-- Déchargement des données de la table `upgrade_requests`
 --
 
 INSERT INTO `upgrade_requests` (`id`, `user_id`, `request_date`, `status`, `processed_date`, `message`) VALUES
@@ -536,7 +582,7 @@ INSERT INTO `upgrade_requests` (`id`, `user_id`, `request_date`, `status`, `proc
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Structure de la table `users`
 --
 
 CREATE TABLE `users` (
@@ -555,33 +601,37 @@ CREATE TABLE `users` (
   `image` varchar(255) DEFAULT NULL,
   `is_banned` tinyint(1) NOT NULL DEFAULT 0,
   `totp_secret` varchar(255) DEFAULT NULL,
-  `totp_enabled` tinyint(4) NOT NULL DEFAULT 1
+  `totp_enabled` tinyint(4) NOT NULL DEFAULT 1,
+  `faceid_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `faceid_data` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `users`
+-- Déchargement des données de la table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `lastname`, `email`, `password`, `gender`, `role`, `phone`, `birthday`, `verification_code`, `enabled`, `created_at`, `image`, `is_banned`, `totp_secret`, `totp_enabled`) VALUES
-(1, 'SiAiimir', 'Othman', 'tayebgod@gmail.com', 'qqqqqqx', 'Male', 'Publicitaire', '048294234', '2000-02-16', '5443', 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0),
-(15, 'mihan', 'iihcsa', 'ahmsm3eed@gmail.com', 'qqqqqqx', 'Male', 'user', '06324234234', '1998-02-12', NULL, 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0),
-(16, 'aaaamir', 'othman', 'amir.othman@esprit.tn', 'Amyr2001@', 'Female', 'Publicitaire', '0648324423', '2002-02-14', '1973', 0, '2025-02-23 17:18:28', NULL, 0, NULL, 0),
-(18, 'si amir', 'safadas', 'amir.othaman@esprit.tn', 'aaaaaa', 'Female', 'user', 'Amyr2001@', '2001-02-02', NULL, 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0),
-(19, 'amiro', 'oothmsan', 'therealamirothman@gmail.com', 'qqqqqq', 'Male', 'Publicitaire', '0642834234', '1998-02-05', '8064', 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0),
-(20, 'amir', 'thmsn', 'amyyr.othman@gmail.com', 'aaaaaa', 'Female', 'user', '04723942', '1998-02-05', '1465', 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0),
-(25, 'amid', 'sdfsf', 'aundrea6263@edny.net', 'qwertyu', 'Male', 'user', '075832534', '1997-02-06', NULL, 1, '2025-02-24 18:40:52', NULL, 0, NULL, 0),
-(27, 'aami', 'zzzzz', 'amaltr21@gmail.com', 'Amyr2001@', 'Male', 'user', '0575835345', '1998-02-05', NULL, 1, '2025-02-25 14:17:08', NULL, 0, NULL, 0),
-(28, 'Amir', 'Othman', 'amirothmaneee@gmail.com', '$2y$13$fasEV95xWkDMUknjeKKYPeO3gyV76Y2yM5689p3HFUggd/SGSjm3m', 'Male', 'Publicitaire', '27856958', '2025-03-30', NULL, 1, '2025-03-30 18:03:46', 'WhatsApp-Image-2025-03-02-at-12-27-03-AM-67e987716365c.jpg', 0, NULL, 0),
-(37, 'l 3araf', 'karim', 'nihedabdworks@gmail.com', '$2y$13$rGhg7gTOcj5mddXTAk9EVeCseAlGyJDXt6CDW2iiXCjGHJHddN2kO', 'Male', 'Publicitaire', 'nihedabdworks@gmail.', '2002-02-11', '33dcb5346c7c117661cbe7dfe98fc35b', 1, '2025-04-19 12:25:07', NULL, 0, '45YKIDMOHGXOENT5WVMXTABBJXCLJ52A3JNZKZ46ZMXDLFWY4KYQ====', 1),
-(38, 'l 3araf', 'karim', 'crackxtn07@gmail.com', '$2y$13$tb/nc4sH7GzDkeStdlFHx.V07ld2q4a2Zan2dqBvIENCw95U3gpO2', 'Male', 'user', '27582038', '2002-01-11', '9952a39bc1f72a8d5ed4e2d07bf48f5c', 1, '2025-04-19 14:05:23', NULL, 0, 'YO7EA4E6HQLFHWUV4RPV4NMEBA4V2XSG62WLGNJ6CJPOKHRYUD5Q====', 1),
-(39, 'l 3araf', 'karim', 'hello@gmail.com', '$2y$13$F5DGL9D5ojvVVL9uJC94E.t0hloejBccI10pav8GjQnOQ1yJQ7v2i', 'Male', 'user', '27582038', '2002-01-11', 'fff5347f92b1601d01e1cba5590d62c8', 1, '2025-04-19 15:31:49', NULL, 0, 'MTRAJB72FJFCOFVZKT3LSP5BIUMSE5PABH755N4ZTVRHUPLWXYRQ====', 1),
-(40, 'amirboo', 'othman', 'aronxothman@gmail.com', '$2y$13$SgH.DPj1F3HOZkKEgijeCe.QgykSRH/D39NIhZEnDXsU6X30elfcu', 'Male', 'Publicitaire', '+21655590348', '2025-04-18', '6054e431c235d58711b589baf9f3f183', 1, '2025-04-22 10:20:58', NULL, 0, 'X6G5YMJRMM4T7VZUMWT6MXP46KAHLEHBDWLMKSTPZFOMTUYMLCAA====', 1),
-(41, 'usual', 'muire', 'usualmuire@indigobook.com', '$2y$13$nIZzjsmGwdgZtxK3C964B.PhPKOPTrQFXUf5wdKjEhpr1OUENikXe', 'Male', 'admin', '+21650034045', '1999-06-11', 'd755b87a0bd8e261bc663445c33b4bb8', 1, '2025-04-25 18:07:47', NULL, 0, 'WRGTGCEHPTSED4ZQPNYK4CZ3N4N35SHHEZO42PFRMBEJIYXCV3UA====', 1);
+INSERT INTO `users` (`id`, `name`, `lastname`, `email`, `password`, `gender`, `role`, `phone`, `birthday`, `verification_code`, `enabled`, `created_at`, `image`, `is_banned`, `totp_secret`, `totp_enabled`, `faceid_enabled`, `faceid_data`) VALUES
+(1, 'SiAiimir', 'Othman', 'tayebgod@gmail.com', 'qqqqqqx', 'Male', 'Publicitaire', '048294234', '2000-02-16', '5443', 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0, 0, NULL),
+(4, 'amir', 'jabeur', 'amirjabeur0@gmail.com', '$2y$13$CGQ0nL6MUntFbzqcz1itn.S6d5eKvvDh83Yl9BjDNGC5EB///xzWy', NULL, 'Publicitaire', NULL, NULL, NULL, 1, '2025-04-28 14:55:21', NULL, 0, NULL, 1, 0, NULL),
+(15, 'mihan', 'iihcsa', 'ahmsm3eed@gmail.com', 'qqqqqqx', 'Male', 'user', '06324234234', '1998-02-12', NULL, 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0, 0, NULL),
+(16, 'aaaamir', 'othman', 'amir.othman@esprit.tn', 'Amyr2001@', 'Female', 'Publicitaire', '0648324423', '2002-02-14', '1973', 0, '2025-02-23 17:18:28', NULL, 0, NULL, 0, 0, NULL),
+(18, 'si amir', 'safadas', 'amir.othaman@esprit.tn', 'aaaaaa', 'Female', 'user', 'Amyr2001@', '2001-02-02', NULL, 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0, 0, NULL),
+(19, 'amiro', 'oothmsan', 'therealamirothman@gmail.com', 'qqqqqq', 'Male', 'Publicitaire', '0642834234', '1998-02-05', '8064', 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0, 0, NULL),
+(20, 'amir', 'thmsn', 'amyyr.othman@gmail.com', 'aaaaaa', 'Female', 'user', '04723942', '1998-02-05', '1465', 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0, 0, NULL),
+(25, 'amid', 'sdfsf', 'aundrea6263@edny.net', 'qwertyu', 'Male', 'user', '075832534', '1997-02-06', NULL, 1, '2025-02-24 18:40:52', NULL, 0, NULL, 0, 0, NULL),
+(27, 'aami', 'zzzzz', 'amaltr21@gmail.com', 'Amyr2001@', 'Male', 'user', '0575835345', '1998-02-05', NULL, 1, '2025-02-25 14:17:08', NULL, 0, NULL, 0, 0, NULL),
+(28, 'Amir', 'Othman', 'amirothmaneee@gmail.com', '$2y$13$fasEV95xWkDMUknjeKKYPeO3gyV76Y2yM5689p3HFUggd/SGSjm3m', 'Male', 'Publicitaire', '27856958', '2025-03-30', NULL, 1, '2025-03-30 18:03:46', 'WhatsApp-Image-2025-03-02-at-12-27-03-AM-67e987716365c.jpg', 0, NULL, 0, 0, NULL),
+(37, 'l 3araf', 'karim', 'nihedabdworks@gmail.com', '$2y$13$rGhg7gTOcj5mddXTAk9EVeCseAlGyJDXt6CDW2iiXCjGHJHddN2kO', 'Male', 'Publicitaire', 'nihedabdworks@gmail.', '2002-02-11', '33dcb5346c7c117661cbe7dfe98fc35b', 1, '2025-04-19 12:25:07', NULL, 0, '45YKIDMOHGXOENT5WVMXTABBJXCLJ52A3JNZKZ46ZMXDLFWY4KYQ====', 1, 0, NULL),
+(38, 'l 3araf', 'karim', 'crackxtn07@gmail.com', '$2y$13$tb/nc4sH7GzDkeStdlFHx.V07ld2q4a2Zan2dqBvIENCw95U3gpO2', 'Male', 'user', '27582038', '2002-01-11', '9952a39bc1f72a8d5ed4e2d07bf48f5c', 1, '2025-04-19 14:05:23', NULL, 0, 'YO7EA4E6HQLFHWUV4RPV4NMEBA4V2XSG62WLGNJ6CJPOKHRYUD5Q====', 1, 0, NULL),
+(39, 'l 3araf', 'karim', 'hello@gmail.com', '$2y$13$F5DGL9D5ojvVVL9uJC94E.t0hloejBccI10pav8GjQnOQ1yJQ7v2i', 'Male', 'user', '27582038', '2002-01-11', 'fff5347f92b1601d01e1cba5590d62c8', 1, '2025-04-19 15:31:49', NULL, 0, 'MTRAJB72FJFCOFVZKT3LSP5BIUMSE5PABH755N4ZTVRHUPLWXYRQ====', 1, 0, NULL),
+(40, 'amirboo', 'othman', 'aronxothman@gmail.com', '$2y$13$SgH.DPj1F3HOZkKEgijeCe.QgykSRH/D39NIhZEnDXsU6X30elfcu', 'Male', 'Publicitaire', '+21655590348', '2025-04-18', '6054e431c235d58711b589baf9f3f183', 1, '2025-04-22 10:20:58', NULL, 0, 'X6G5YMJRMM4T7VZUMWT6MXP46KAHLEHBDWLMKSTPZFOMTUYMLCAA====', 1, 1, '[-0.09101969003677368,0.05621180310845375,0.06823620945215225,-0.00796710979193449,0.029068470001220703,-0.0671747624874115,0.0380515530705452,-0.03139021620154381,0.19187438488006592,-0.014750045724213123,0.21530748903751373,-0.04585587605834007,-0.2251916080713272,-0.013716773129999638,-0.012400914914906025,0.09665724635124207,-0.16648182272911072,-0.0466231033205986,-0.16958202421665192,-0.13869428634643555,0.039498016238212585,0.004601642023772001,0.027451537549495697,0.06841817498207092,-0.11838299036026001,-0.3278138041496277,-0.03149542585015297,-0.18195486068725586,0.08959534764289856,-0.1428821086883545,0.009174403734505177,-0.02022998221218586,-0.17064210772514343,-0.05691646412014961,-0.044760555028915405,-0.0347156822681427,0.009606297127902508,-0.02870282344520092,0.17581139504909515,0.04638194292783737,-0.1428762823343277,0.07047270238399506,0.014346876181662083,0.2928623855113983,0.13948601484298706,0.13543131947517395,0.01581786572933197,-0.03318842872977257,0.10836894810199738,-0.2521018981933594,0.09867920726537704,0.08591792732477188,0.09168725460767746,0.022156883031129837,0.12599150836467743,-0.18979491293430328,-0.03903734311461449,0.03492341190576553,-0.24141258001327515,0.15042153000831604,0.07395657151937485,0.03471061587333679,-0.08909610658884048,-0.05665525048971176,0.2305142879486084,0.12612025439739227,-0.18356572091579437,-0.05951378121972084,0.0800490602850914,-0.1618833839893341,0.027553923428058624,0.06812775135040283,-0.08558066934347153,-0.15613290667533875,-0.25899645686149597,0.11747337877750397,0.4662856161594391,0.10993050038814545,-0.16597433388233185,-0.01224405039101839,-0.1165815070271492,-0.015079188160598278,0.07426777482032776,0.07675547152757645,-0.11098774522542953,0.02029147744178772,-0.03919195756316185,0.03041800670325756,0.06206792965531349,0.05173986032605171,-0.07462269812822342,0.20900622010231018,-0.04798086732625961,-0.005631290841847658,-0.07565127313137054,0.025548599660396576,-0.1902490258216858,-0.030694512650370598,-0.06222335621714592,-0.045650627464056015,0.06211089715361595,0.005202838685363531,0.016680415719747543,0.03738303482532501,-0.15919694304466248,0.14513981342315674,0.002218682551756501,-0.022758523002266884,0.031797174364328384,0.12384363263845444,-0.1062551736831665,-0.04078623279929161,0.1025049239397049,-0.2976419925689697,0.1784587800502777,0.17565661668777466,0.05979923903942108,0.09383762627840042,0.014327965676784515,0.020642409101128578,0.03400006517767906,0.10321594029664993,-0.15449252724647522,-0.05228870362043381,0.0334889255464077,-0.04254143685102463,0.06097587198019028,0.004967527464032173]'),
+(41, 'usual', 'muire', 'usualmuire@indigobook.com', '$2y$13$nIZzjsmGwdgZtxK3C964B.PhPKOPTrQFXUf5wdKjEhpr1OUENikXe', 'Male', 'user', '+21650034045', '1999-06-11', 'd755b87a0bd8e261bc663445c33b4bb8', 1, '2025-04-25 18:07:47', NULL, 0, 'WRGTGCEHPTSED4ZQPNYK4CZ3N4N35SHHEZO42PFRMBEJIYXCV3UA====', 1, 0, NULL),
+(42, 'joni', 'srose', 'jonisrose@chefalicious.com', '$2y$13$2nY2UWS.a9tAQM8CkFP2XuPI0BfB/teUsNXDmPLwceQDoSwq4nqkK', 'Male', 'user', '+21650034045', '1994-04-17', '984aeb7001a792d8b8ac4e70f0cd094d', 1, '2025-04-28 09:06:15', NULL, 0, 'L36P46AXY4DYW6ZSZY3YABQ244DIC5UOTRDODMOAXLMO7XPB5ILQ====', 1, 0, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user_login_history`
+-- Structure de la table `user_login_history`
 --
 
 CREATE TABLE `user_login_history` (
@@ -596,24 +646,24 @@ CREATE TABLE `user_login_history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Indexes for dumped tables
+-- Index pour les tables déchargées
 --
 
 --
--- Indexes for table `activities`
+-- Index pour la table `activities`
 --
 ALTER TABLE `activities`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
 
 --
--- Indexes for table `billet`
+-- Index pour la table `billet`
 --
 ALTER TABLE `billet`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `blogs_rating`
+-- Index pour la table `blogs_rating`
 --
 ALTER TABLE `blogs_rating`
   ADD PRIMARY KEY (`id`),
@@ -622,7 +672,7 @@ ALTER TABLE `blogs_rating`
   ADD KEY `idx_post` (`post_id`);
 
 --
--- Indexes for table `comments`
+-- Index pour la table `comments`
 --
 ALTER TABLE `comments`
   ADD PRIMARY KEY (`id`),
@@ -630,20 +680,27 @@ ALTER TABLE `comments`
   ADD KEY `idx_user` (`user_id`);
 
 --
--- Indexes for table `destinations`
+-- Index pour la table `destinations`
 --
 ALTER TABLE `destinations`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
 
 --
--- Indexes for table `doctrine_migration_versions`
+-- Index pour la table `doctrine_migration_versions`
 --
 ALTER TABLE `doctrine_migration_versions`
   ADD PRIMARY KEY (`version`);
 
 --
--- Indexes for table `messenger_messages`
+-- Index pour la table `faceid_sessions`
+--
+ALTER TABLE `faceid_sessions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id_idx` (`user_id`);
+
+--
+-- Index pour la table `messenger_messages`
 --
 ALTER TABLE `messenger_messages`
   ADD PRIMARY KEY (`id`),
@@ -652,7 +709,7 @@ ALTER TABLE `messenger_messages`
   ADD KEY `IDX_75EA56E016BA31DB` (`delivered_at`);
 
 --
--- Indexes for table `posts`
+-- Index pour la table `posts`
 --
 ALTER TABLE `posts`
   ADD PRIMARY KEY (`id`),
@@ -660,7 +717,7 @@ ALTER TABLE `posts`
   ADD KEY `idx_activity` (`activity_id`);
 
 --
--- Indexes for table `reservation`
+-- Index pour la table `reservation`
 --
 ALTER TABLE `reservation`
   ADD PRIMARY KEY (`id`),
@@ -668,159 +725,171 @@ ALTER TABLE `reservation`
   ADD KEY `reservation_ibfk_2` (`billetId`);
 
 --
--- Indexes for table `resources`
+-- Index pour la table `resources`
 --
 ALTER TABLE `resources`
   ADD PRIMARY KEY (`id`),
   ADD KEY `activity_id` (`activity_id`);
 
 --
--- Indexes for table `roles`
+-- Index pour la table `roles`
 --
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `nom` (`nom`);
 
 --
--- Indexes for table `upgrade_requests`
+-- Index pour la table `upgrade_requests`
 --
 ALTER TABLE `upgrade_requests`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
 
 --
--- Indexes for table `users`
+-- Index pour la table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- Indexes for table `user_login_history`
+-- Index pour la table `user_login_history`
 --
 ALTER TABLE `user_login_history`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_LOGIN_USER` (`user_id`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT pour les tables déchargées
 --
 
 --
--- AUTO_INCREMENT for table `activities`
+-- AUTO_INCREMENT pour la table `activities`
 --
 ALTER TABLE `activities`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
 
 --
--- AUTO_INCREMENT for table `billet`
+-- AUTO_INCREMENT pour la table `billet`
 --
 ALTER TABLE `billet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=169;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=170;
 
 --
--- AUTO_INCREMENT for table `blogs_rating`
+-- AUTO_INCREMENT pour la table `blogs_rating`
 --
 ALTER TABLE `blogs_rating`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
--- AUTO_INCREMENT for table `comments`
+-- AUTO_INCREMENT pour la table `comments`
 --
 ALTER TABLE `comments`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
--- AUTO_INCREMENT for table `destinations`
+-- AUTO_INCREMENT pour la table `destinations`
 --
 ALTER TABLE `destinations`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
--- AUTO_INCREMENT for table `messenger_messages`
+-- AUTO_INCREMENT pour la table `faceid_sessions`
+--
+ALTER TABLE `faceid_sessions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+
+--
+-- AUTO_INCREMENT pour la table `messenger_messages`
 --
 ALTER TABLE `messenger_messages`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `posts`
+-- AUTO_INCREMENT pour la table `posts`
 --
 ALTER TABLE `posts`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
--- AUTO_INCREMENT for table `reservation`
+-- AUTO_INCREMENT pour la table `reservation`
 --
 ALTER TABLE `reservation`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
--- AUTO_INCREMENT for table `resources`
+-- AUTO_INCREMENT pour la table `resources`
 --
 ALTER TABLE `resources`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123;
 
 --
--- AUTO_INCREMENT for table `roles`
+-- AUTO_INCREMENT pour la table `roles`
 --
 ALTER TABLE `roles`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `upgrade_requests`
+-- AUTO_INCREMENT pour la table `upgrade_requests`
 --
 ALTER TABLE `upgrade_requests`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
--- AUTO_INCREMENT for table `user_login_history`
+-- AUTO_INCREMENT pour la table `user_login_history`
 --
 ALTER TABLE `user_login_history`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- Constraints for dumped tables
+-- Contraintes pour les tables déchargées
 --
 
 --
--- Constraints for table `activities`
+-- Contraintes pour la table `activities`
 --
 ALTER TABLE `activities`
   ADD CONSTRAINT `activities_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
--- Constraints for table `blogs_rating`
+-- Contraintes pour la table `blogs_rating`
 --
 ALTER TABLE `blogs_rating`
   ADD CONSTRAINT `fk_blogs_rating_post` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_blogs_rating_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `destinations`
+-- Contraintes pour la table `destinations`
 --
 ALTER TABLE `destinations`
   ADD CONSTRAINT `destinations_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
--- Constraints for table `resources`
+-- Contraintes pour la table `faceid_sessions`
+--
+ALTER TABLE `faceid_sessions`
+  ADD CONSTRAINT `fk_faceid_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `resources`
 --
 ALTER TABLE `resources`
   ADD CONSTRAINT `resources_ibfk_1` FOREIGN KEY (`activity_id`) REFERENCES `activities` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `upgrade_requests`
+-- Contraintes pour la table `upgrade_requests`
 --
 ALTER TABLE `upgrade_requests`
   ADD CONSTRAINT `upgrade_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
--- Constraints for table `user_login_history`
+-- Contraintes pour la table `user_login_history`
 --
 ALTER TABLE `user_login_history`
   ADD CONSTRAINT `FK_LOGIN_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;

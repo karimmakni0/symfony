@@ -22,8 +22,18 @@
                 <div class="hotelsCard__image">
                   <div class="cardImage ratio ratio-1:1">
                     <div class="cardImage__content">
-                      {% if destination.imagePath %}
-                        <img class="rounded-4 col-12" src="{{ asset(destination.imagePath) }}" alt="{{ destination.name }}">
+                      {% if destination.imagePath is defined and destination.imagePath %}
+                        {% if destination.imagePath starts with 'http' %}
+                          <img class="rounded-4 col-12" src="{{ destination.imagePath }}" alt="{{ destination.name }}">
+                        {% else %}
+                          <img class="rounded-4 col-12" src="{{ asset(destination.imagePath) }}" alt="{{ destination.name }}">
+                        {% endif %}
+                      {% elseif destination.image_path is defined and destination.image_path %}
+                        {% if destination.image_path starts with 'http' %}
+                          <img class="rounded-4 col-12" src="{{ destination.image_path }}" alt="{{ destination.name }}">
+                        {% else %}
+                          <img class="rounded-4 col-12" src="{{ asset(destination.image_path) }}" alt="{{ destination.name }}">
+                        {% endif %}
                       {% else %}
                         <img class="rounded-4 col-12" src="{{ asset('assets/img/hotels/1.png') }}" alt="image">
                       {% endif %}

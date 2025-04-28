@@ -195,7 +195,11 @@
                               {% endif %}
                             {% endfor %}
                             {% if firstResource %}
-                              <img class="rounded-4 col-12" src="{{ asset(firstResource.path) }}" alt="{{ activity.activityName }}">
+                              {% if firstResource.path starts with 'http' %}
+                                <img class="rounded-4 col-12" src="{{ firstResource.path }}" alt="{{ activity.activityName }}">
+                              {% else %}
+                                <img class="rounded-4 col-12" src="{{ asset(firstResource.path) }}" alt="{{ activity.activityName }}">
+                              {% endif %}
                             {% else %}
                               <img class="rounded-4 col-12" src="{{ asset('assets/img/lists/activity/1.png') }}" alt="activity image">
                             {% endif %}
