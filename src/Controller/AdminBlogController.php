@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 
-#[Route('/admin/blog')]
+#[Route('/admin/blog')]   
 class AdminBlogController extends AbstractController
 {
     private $entityManager;
