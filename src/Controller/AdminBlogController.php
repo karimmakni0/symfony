@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 
 #[Route('/admin/blog')]   
-class AdminBlogController extends AbstractController     
+class AdminBlogController extends AbstractController         
 {
     private $entityManager;
     private $postRepository;
