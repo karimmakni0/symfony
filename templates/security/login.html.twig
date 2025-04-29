@@ -274,21 +274,187 @@
         faceIdButton.disabled = false;
         
         faceIdButton.addEventListener('click', async function() {
-            const { value: email } = await Swal.fire({
-                title: 'Enter your email',
-                input: 'email',
-                inputLabel: 'Your email address',
-                inputPlaceholder: 'Enter your email address',
-                confirmButtonText: 'Continue',
-                confirmButtonColor: '#3554D1',
-                showCancelButton: true,
-                cancelButtonText: 'Cancel',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'Please enter your email address!'
+            // Check if browser supports camera
+            if (!isFaceIdSupported) {
+                Swal.fire({
+                    title: 'Camera Not Available',
+                    text: 'Face ID requires camera access, which is not available on your device or browser.',
+                    icon: 'error',
+                    confirmButtonColor: '#3554D1'
+                });
+                return;
+            }
+            
+            // Check if models are loaded
+            if (!faceidModelsLoaded) {
+                Swal.fire({
+                    title: 'Loading Face Recognition',
+                    text: 'Please wait while we prepare the face recognition system...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
                     }
+                });
+                
+                try {
+                    faceidModelsLoaded = await loadFaceIdModels();
+                    Swal.close();
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Could not load face recognition models. Please try again later.',
+                        icon: 'error',
+                        confirmButtonColor: '#3554D1'
+                    });
+                    return;
+                }
+            }
+            
+            // First stage: Ask for email
+            const { value: email } = await Swal.fire({
+                title: '<span class="fw-bold text-primary">Face ID Authentication</span>',
+                html: `
+                    <div class="text-center mb-4">
+                        <i class="fa fa-user-circle text-primary" style="font-size: 48px;"></i>
+                    </div>
+                    <p class="text-center mb-3">Please enter your email to continue</p>
+                    <div class="form-floating mb-3">
+                        <input type="email" id="swal-input-email" class="form-control" placeholder="name@example.com">
+                        <label for="swal-input-email">Email address</label>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa fa-arrow-right me-2"></i>Continue',
+                cancelButtonText: '<i class="fa fa-times me-2"></i>Cancel',
+                confirmButtonColor: '#3554D1',
+                cancelButtonColor: '#6c757d',
+                buttonsStyling: true,
+                focusConfirm: false,
+                customClass: {
+                    confirmButton: 'btn btn-primary btn-lg px-4 py-2',
+                    cancelButton: 'btn btn-secondary btn-lg px-4 py-2',
+                    container: 'face-id-container'
+                },
+                preConfirm: () => {
+                    const emailInput = document.getElementById('swal-input-email');
+                    const email = emailInput.value;
+                    if (!email) {
+                        Swal.showValidationMessage('Please enter your email address');
+                        return false;
+                    }
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                        Swal.showValidationMessage('Please enter a valid email address');
+                        return false;
+                    }
+                    return email;
                 }
             });
+            
+            if (!email) return;
+            
+            // Add some custom styling for SweetAlert
+            const style = document.createElement('style');
+            style.innerHTML = `
+                .face-id-container .swal2-popup {
+                    padding: 2rem;
+                    border-radius: 15px;
+                }
+                .form-floating > .form-control {
+                    padding: 1rem 0.75rem;
+                }
+                .form-floating > label {
+                    padding: 1rem 0.75rem;
+                }
+                .face-capture-container {
+                    position: relative;
+                    width: 100%;
+                    max-width: 400px;
+                    margin: 0 auto;
+                    overflow: hidden;
+                    border-radius: 8px;
+                }
+                .face-guide {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 200px;
+                    height: 200px;
+                    border: 2px dashed rgba(53, 84, 209, 0.6);
+                    border-radius: 50%;
+                    z-index: 10;
+                }
+                #face-canvas {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    z-index: 5;
+                }
+                .face-capture-progress {
+                    margin-top: 10px;
+                    height: 5px;
+                    width: 100%;
+                    background-color: #e9ecef;
+                    border-radius: 3px;
+                    overflow: hidden;
+                }
+                .face-capture-progress-bar {
+                    height: 100%;
+                    background-color: #3554D1;
+                    transition: width 0.3s ease;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Check Face ID status for this email
+            try {
+                // Verify if Face ID is enabled for this user
+                const statusResponse = await fetch('/api/faceid/status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                });
+                
+                const statusData = await statusResponse.json();
+                
+                // If Face ID is not enabled, show error
+                if (!statusData.faceidEnabled) {
+                    Swal.fire({
+                        title: 'Face ID Not Set Up',
+                        text: 'You need to set up Face ID first during registration or in your profile settings.',
+                        icon: 'info',
+                        confirmButtonColor: '#3554D1'
+                    });
+                    return;
+                }
+                
+                // Second stage: Face capture
+                let faceRecognitionResult = await startFaceRecognition(email);
+                
+                if (faceRecognitionResult && faceRecognitionResult.success) {
+                    // Login successful - redirect to appropriate page
+                    window.location.href = '/api/faceid/direct-login/' + encodeURIComponent(email);
+                } else {
+                    // Login failed
+                    Swal.fire({
+                        title: 'Face ID Authentication Failed',
+                        text: faceRecognitionResult?.message || 'Your face could not be verified. Please try again or use password login.',
+                        icon: 'error',
+                        confirmButtonColor: '#3554D1'
+                    });
+                }
+            } catch (error) {
+                console.error('Error checking Face ID status:', error);
+                Swal.fire({
+                    title: 'Authentication Error',
+                    text: 'An error occurred during Face ID authentication. Please try again later.',
+                    icon: 'error',
+                    confirmButtonColor: '#3554D1'
+                });
+            }
             
             if (email) {
                 userEmail = email;

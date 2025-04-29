@@ -133,6 +133,39 @@
                   <div class="price-value participants-count">{{ participants }}</div>
                 </div>
                 
+                <div class="price-row">
+                  <div class="price-label">Subtotal</div>
+                  <div class="price-value">{{ initialTotalPrice }} TND</div>
+                </div>
+                
+                {% if appliedCoupon %}
+                <div class="price-row discount-row">
+                  <div class="price-label">Discount <span class="coupon-code">({{ appliedCoupon.code }})</span></div>
+                  <div class="price-value discount-value">-{{ appliedCoupon.discount }} TND</div>
+                  <div class="remove-coupon">
+                    <a href="{{ path('app_payment_reservation', {'id': activity.id, 'remove_coupon': 1}) }}" class="text-danger">
+                      <i class="fas fa-times-circle"></i>
+                    </a>
+                  </div>
+                </div>
+                {% endif %}
+                
+                <!-- Coupon Form -->
+                {% if not appliedCoupon %}
+                <div class="coupon-form-container">
+                  <div class="coupon-form-header">
+                    <i class="fas fa-tag me-2"></i>
+                    <span>Do you have a coupon?</span>
+                  </div>
+                  <form method="post" action="{{ path('app_payment_reservation', {'id': activity.id}) }}" class="coupon-form">
+                    <div class="input-group">
+                      <input type="text" name="coupon_code" class="form-control" placeholder="Enter coupon code" required>
+                      <button type="submit" class="btn btn-outline-primary">Apply</button>
+                    </div>
+                  </form>
+                </div>
+                {% endif %}
+                
                 <div class="price-total">
                   <div class="total-label">Total amount</div>
                   <div class="total-value">
@@ -2105,6 +2138,65 @@
   .alert-toast-content p {
     margin: 0;
     font-weight: 500;
+  }
+  
+  /* Coupon Styles */
+  .coupon-form-container {
+    margin: 15px 0;
+    padding: 15px;
+    border: 1px dashed #dee2e6;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+  }
+  
+  .coupon-form-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #495057;
+  }
+  
+  .coupon-form-header i {
+    color: #0d6efd;
+  }
+  
+  .coupon-form .input-group {
+    max-width: 100%;
+  }
+  
+  .discount-row {
+    background-color: #e8f4ff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin: 8px 0;
+    position: relative;
+  }
+  
+  .discount-value {
+    color: #0d6efd;
+    font-weight: 600;
+  }
+  
+  .coupon-code {
+    background-color: #0d6efd;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    margin-left: 5px;
+    font-weight: 600;
+  }
+  
+  .remove-coupon {
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .remove-coupon a {
+    font-size: 16px;
   }
   
   @media (max-width: 767px) {

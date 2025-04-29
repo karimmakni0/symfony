@@ -149,24 +149,13 @@ class BlogController extends AbstractController
             }
         }
         
-        // Get rating statistics for all posts
-        $ratingStats = [];
-        foreach ($posts as $post) {
-            $ratings = $this->blogRatingRepository->findBy(['postId' => $post->getId()]);
-            $likes = 0;
-            $dislikes = 0;
-            foreach ($ratings as $rating) {
-                if ($rating->isLike()) {
-                    $likes++;
-                } else {
-                    $dislikes++;
-                }
-            }
-            $ratingStats[$post->getId()] = [
-                'likes' => $likes,
-                'dislikes' => $dislikes
-            ];
-        }
+        // Get rating statistics for all posts more efficiently
+        $postIds = array_map(function($post) {
+            return $post->getId();
+        }, $posts);
+        
+        // Use the optimized repository method to get all ratings in a single query
+        $ratingStats = $this->blogRatingRepository->getRatingStatsForPosts($postIds);
 
         return $this->render('client/Blog/index.html.twig', [
             'posts' => $posts,

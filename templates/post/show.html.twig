@@ -154,7 +154,7 @@
                     <div class="col-12">
                       <div class="text-18 fw-500">{{ activity.activityName }}</div>
                       {% if activity.resources.count > 0 %}
-                        <img src="{{ asset('uploads/resources/' ~ activity.resources[0].getName()) }}" alt="{{ activity.activityName }}" 
+                        <img src="{{ asset('uploads/resources/' ~ activity.resources[0].getPath()) }}" alt="{{ activity.activityName }}" 
                             class="rounded-4 mt-15 w-100 h-200 object-cover">
                       {% endif %}
                       <div class="row x-gap-10 y-gap-10 pt-20">

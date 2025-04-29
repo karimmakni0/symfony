@@ -143,6 +143,138 @@
                                 </button>
                             </div>
                             
+                            <!-- Face ID Setup Section -->
+                            <div class="col-12 mt-20">
+                                <div class="py-30 px-30 rounded-4 bg-white shadow-3">
+                                    <div class="d-flex">
+                                        <div class="size-40 rounded-full d-flex justify-center items-center bg-blue-1">
+                                            <i class="icon-lock text-16 text-white"></i>
+                                        </div>
+                                        <div class="ml-10">
+                                            <div class="text-18 fw-500">Face ID Authentication</div>
+                                            <div class="mt-5 text-15 text-light-1">Set up facial recognition for quick, secure login</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="border-top-light mt-30 mb-30"></div>
+
+                                    <div class="row y-gap-20">
+                                        <div class="col-12">
+                                            <div class="d-flex">
+                                                <div class="size-30 flex-center bg-blue-1-05 rounded-full text-blue-1 text-14 fw-500">1</div>
+                                                <div class="ml-10">
+                                                    <div class="text-15 fw-500 lh-14">Take a clear photo</div>
+                                                    <div class="text-14 text-light-1 lh-14 mt-5">Use good lighting, face the camera directly</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="col-12">
+                                            <div class="d-flex">
+                                                <div class="size-30 flex-center bg-blue-1-05 rounded-full text-blue-1 text-14 fw-500">2</div>
+                                                <div class="ml-10">
+                                                    <div class="text-15 fw-500 lh-14">Secure your account</div>
+                                                    <div class="text-14 text-light-1 lh-14 mt-5">Your face is your password</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="border-top-light mt-30 mb-30"></div>
+                                    
+                                    <div class="face-id-setup-content">
+                                        <!-- Video capture container -->
+                                        <div class="video-container d-none mb-30">
+                                            <div class="ratio ratio-16:9 rounded-8 overflow-hidden" style="box-shadow: 0 10px 30px rgba(5, 16, 54, 0.15);">
+                                                <video id="faceCapture" autoplay playsinline style="display:none"></video>
+                                                <canvas id="faceOverlay" class="position-absolute top-0 start-0 w-100 h-100" style="display:none"></canvas>
+                                                <div id="face-guide-box" class="position-absolute" style="border: 3px dashed rgba(255, 255, 255, 0.8); border-radius: 50%; width: 45%; height: 80%; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.4);"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="face-setup-steps">
+                                            <!-- Step 1: Initial setup button -->
+                                            <div id="step1" class="setup-step">
+                                                <div class="row y-gap-10 x-gap-10">
+                                                    <div class="col-12 col-md-8">
+                                                        <button type="button" id="setupFaceId" class="button -md -dark-1 bg-blue-1 text-white col-12">
+                                                            <i class="icon-user mr-10"></i> Set Up Face ID
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-12 col-md-4">
+                                                        <button type="button" id="skipFaceId" class="button -md -outline-blue-1 text-blue-1 col-12">
+                                                            Skip
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Step 2: Camera and face positioning -->
+                                            <div id="step2" class="setup-step d-none">
+                                                <div class="text-center mb-20">
+                                                    <div class="d-flex justify-center items-center">
+                                                        <div class="text-14 text-light-1 mt-10 mb-10 py-8 px-15 bg-blue-1-05 rounded-8">
+                                                            <i class="icon-info-circle mr-5"></i> Position your face within the circle
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="mt-20 mb-20">
+                                                        <div class="progress-bar -line">
+                                                            <div class="progress-bar__bg bg-blue-1-05 h-4 w-100 rounded-full"></div>
+                                                            <div id="captureProgress" class="progress-bar__bar bg-blue-1 h-4 rounded-full" style="width: 0%"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="row y-gap-10 x-gap-10">
+                                                    <div class="col-12 col-md-8">
+                                                        <button type="button" id="captureFace" class="button -md -dark-1 bg-blue-1 text-white col-12" disabled>
+                                                            <i class="icon-camera mr-10"></i> Take Photo
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-12 col-md-4">
+                                                        <button type="button" id="cancelCapture" class="button -md -outline-red-1 text-red-1 col-12">
+                                                            <i class="icon-arrow-left mr-10"></i> Back
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Step 3: Confirmation screen -->
+                                            <div id="step3" class="setup-step d-none">
+                                                <div class="text-center mb-30">
+                                                    <div class="face-preview-container rounded-full mx-auto mb-20 overflow-hidden bg-light-2 d-flex align-items-center justify-content-center" style="width: 140px; height: 140px; border: 3px solid #0071a6; box-shadow: 0 10px 20px rgba(5, 16, 54, 0.1);">
+                                                        <canvas id="facePreview" width="140" height="140"></canvas>
+                                                    </div>
+                                                    
+                                                    <div class="d-inline-flex y-gap-10 py-10 px-20 bg-green-1 rounded-4">
+                                                        <div class="d-flex items-center text-white">
+                                                            <i class="icon-check text-14 mr-10"></i>
+                                                            <span class="fw-500">Face captured successfully!</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="row y-gap-10 x-gap-10">
+                                                    <div class="col-12 col-md-8">
+                                                        <button type="button" id="confirmFaceId" class="button -md -dark-1 bg-green-1 text-white col-12">
+                                                            <i class="icon-check mr-10"></i> Confirm & Save
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-12 col-md-4">
+                                                        <button type="button" id="retakePhoto" class="button -md -outline-blue-1 text-blue-1 col-12">
+                                                            <i class="icon-refresh mr-10"></i> Retake
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                
+                                                <input type="hidden" name="faceIdData" id="faceIdData">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="col-12 text-center mt-15">
                                 <p class="text-14 text-light-1">By registering, you agree to GoTrip's <a href="#" class="text-blue-1">Terms of Service</a> and <a href="#" class="text-blue-1">Privacy Policy</a>.</p>
                             </div>
@@ -187,234 +319,11 @@ async function loadFaceIdModels() {
     }
 }
 
-async function initializeFaceIdSetup() {
-    const isFaceIdSupported = await checkFaceIdSupport();
-    const faceIdCheckbox = document.getElementById('setup_faceid');
-    const faceIdContainer = document.getElementById('faceIdSetupContainer');
-    const registerForm = document.querySelector('form[action="{{ path('app_register') }}"]');
-    
-    if (!isFaceIdSupported) {
-        faceIdCheckbox.disabled = true;
-        faceIdCheckbox.checked = false;
-        faceIdCheckbox.parentElement.classList.add('opacity-50');
-        faceIdCheckbox.parentElement.title = 'Face ID is not supported on your device';
-        return;
-    }
-    
-    faceIdCheckbox.addEventListener('change', function() {
-        faceIdContainer.style.display = this.checked ? 'block' : 'none';
-        faceidSetupRequested = this.checked;
-    });
-    
-    // If Face ID is requested, handle it after form submission
-    registerForm.addEventListener('submit', async function(e) {
-        // Only intercept if Face ID is requested
-        if (faceidSetupRequested) {
-            e.preventDefault();
-            
-            // Validate form first
-            if (!this.checkValidity()) {
-                this.reportValidity();
-                return;
-            }
-            
-            // Prepare form data
-            const formData = new FormData(this);
-            const formObject = {};
-            formData.forEach((value, key) => {
-                formObject[key] = value;
-            });
-            
-            // Basic client-side validation
-            if (formObject.password !== formObject.confirm_password) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Passwords do not match',
-                    icon: 'error',
-                    confirmButtonColor: '#3554D1'
-                });
-                return;
-            }
-            
-            // Start Face ID setup process
-            await setupFaceId(formObject);
-        }
-    });
-}
-
-async function setupFaceId(formData) {
-    // Check if models are loaded
-    if (!faceidModelsLoaded) {
-        const loadingText = 'Loading Face ID models...';
-        Swal.fire({
-            title: 'Setting Up Face ID',
-            text: loadingText,
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-        
-        const modelsLoaded = await loadFaceIdModels();
-        if (!modelsLoaded) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Failed to load Face ID models',
-                icon: 'error',
-                confirmButtonColor: '#3554D1'
-            });
-            submitFormWithoutFaceId();
-            return;
-        }
-    }
-    
-    Swal.fire({
-        title: 'Face ID Setup',
-        html: `
-            <div class="text-center mb-20">
-                <p>Please position your face in the frame</p>
-                <video id="faceVideo" width="400" height="300" autoplay style="border-radius: 8px; margin: 0 auto;"></video>
-            </div>
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'Register Face ID',
-        confirmButtonColor: '#3554D1',
-        cancelButtonText: 'Skip',
-        allowOutsideClick: false,
-        willOpen: () => {
-            startCamera('faceVideo');
-        },
-        didClose: () => {
-            stopCamera();
-        }
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            const faceData = await captureFaceData();
-            if (faceData) {
-                // Add Face ID data to form data
-                formData.faceIdData = JSON.stringify(faceData);
-                formData.faceidEnabled = true;
-                
-                // Submit the registration with Face ID
-                registerWithFaceId(formData);
-            } else {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Failed to capture your face. Continuing without Face ID.',
-                    icon: 'error',
-                    confirmButtonColor: '#3554D1'
-                }).then(() => {
-                    submitFormWithoutFaceId();
-                });
-            }
-        } else {
-            // User canceled Face ID setup
-            submitFormWithoutFaceId();
-        }
-    });
-}
-
-async function startCamera(videoElementId) {
-    try {
-        const constraints = {
-            video: {
-                width: { ideal: 1280 },
-                height: { ideal: 720 },
-                facingMode: 'user'
-            }
-        };
-        
-        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-        const videoElement = document.getElementById(videoElementId);
-        videoElement.srcObject = currentStream;
-    } catch (error) {
-        console.error('Error starting camera:', error);
-        Swal.fire({
-            title: 'Camera Error',
-            text: 'Could not access your camera. Please check permissions.',
-            icon: 'error',
-            confirmButtonColor: '#3554D1'
-        }).then(() => {
-            submitFormWithoutFaceId();
-        });
-    }
-}
-
-function stopCamera() {
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-        currentStream = null;
-    }
-}
-
-async function captureFaceData() {
-    try {
-        const videoElement = document.getElementById('faceVideo');
-        if (!videoElement || !videoElement.srcObject) return null;
-        
-        // Detect face
-        const detections = await faceapi.detectSingleFace(videoElement)
-            .withFaceLandmarks()
-            .withFaceDescriptor();
-        
-        if (!detections) return null;
-        
-        // Convert to a simpler format for storage
-        return Array.from(detections.descriptor);
-    } catch (error) {
-        console.error('Error capturing face data:', error);
-        return null;
-    }
-}
-
-function submitFormWithoutFaceId() {
-    const form = document.querySelector('form[action="{{ path('app_register') }}"]');
-    form.submit();
-}
-
-async function registerWithFaceId(formData) {
-    Swal.fire({
-        title: 'Registering Account',
-        text: 'Please wait while we create your account with Face ID...',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-    
-    try {
-        // First submit the form normally to create the account
-        const form = document.querySelector('form[action="{{ path('app_register') }}"]');
-        const formDataObj = new FormData(form);
-        
-        // Add Face ID flag to indicate this user wants Face ID
-        formDataObj.append('faceid_setup', 'true');
-        
-        // Submit the form
-        form.submit();
-        
-        // The Face ID data will be passed as a session variable to be used after account verification
-        sessionStorage.setItem('pending_faceid_data', formData.faceIdData);
-        
-        // Note: The actual Face ID registration will happen after email verification
-        // in this flow. The controller needs to be modified to handle this properly.
-    } catch (error) {
-        console.error('Error registering with Face ID:', error);
-        Swal.fire({
-            title: 'Registration Error',
-            text: 'There was an error during registration. Please try again without Face ID.',
-            icon: 'error',
-            confirmButtonColor: '#3554D1'
-        }).then(() => {
-            submitFormWithoutFaceId();
-        });
-    }
-}
+            // REMOVED OLD FACE ID CODE
+            console.log('Old Face ID code removed');
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Face ID setup
-    initializeFaceIdSetup();
-    
+    // Password handling only in this listener - Face ID is handled by its own module
     const passwordInput = document.getElementById('password');
     const confirmInput = document.getElementById('password_confirm');
     const strengthMeter = document.getElementById('password-strength-meter');
@@ -518,6 +427,746 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize
     updatePasswordStrength();
+
+    // Define a simple Face++ integration module
+    const FacePlusPlusModule = (function() {
+        // API Keys
+        const API_KEY = 'vC4FuF4xftz31i5_kIxw4BmzYoYK_uTY';
+        const API_SECRET = 'RErIeLazJRMclv5dckGj5G6lJWQtdEfQ';
+        
+        // Face++ API endpoints
+        const DETECT_API_URL = '/api/faceid/analyze-face';
+        const REGISTER_API_URL = '/api/faceid/register';
+        
+        // DOM elements cache
+        const elements = {
+            setupBtn: null,
+            skipBtn: null,
+            dataInput: null,
+            step1: null,
+        };
+        
+        // State
+        let cameraStream = null;
+        let faceToken = null;
+        
+        // Event handlers
+        const handlers = {
+            // Set up Face ID
+            setupFaceId: function() {
+                console.log('Setup Face ID clicked');
+                
+                Swal.fire({
+                    title: 'Face ID Setup',
+                    html: `
+                        <div class="text-center mb-20">
+                            <p>Please position your face in the frame and look directly at the camera</p>
+                            <video id="faceSetupVideo" width="320" height="240" autoplay playsinline style="border-radius: 8px; margin: 0 auto; border: 2px solid #3554D1;"></video>
+                            <div class="progress mt-10" style="height: 8px;">
+                                <div id="setupProgress" class="progress-bar bg-blue-1" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Capture',
+                    confirmButtonColor: '#3554D1',
+                    cancelButtonText: 'Cancel',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        // Start camera
+                        const video = document.getElementById('faceSetupVideo');
+                        const progress = document.getElementById('setupProgress');
+                        
+                        // Disable confirm button initially
+                        Swal.getConfirmButton().disabled = true;
+                        
+                        // Start camera
+                        startCamera(video).then(stream => {
+                            cameraStream = stream;
+                            
+                            // Simulate progress
+                            let progressValue = 0;
+                            const progressInterval = setInterval(() => {
+                                progressValue += 5;
+                                if (progressValue > 100) progressValue = 100;
+                                progress.style.width = progressValue + '%';
+                                
+                                if (progressValue >= 100) {
+                                    clearInterval(progressInterval);
+                                    Swal.getConfirmButton().disabled = false;
+                                }
+                            }, 200);
+                        }).catch(error => {
+                            console.error('Camera error:', error);
+                            Swal.fire({
+                                title: 'Camera Error',
+                                text: 'Could not access your camera. Please check permissions.',
+                                icon: 'error',
+                                confirmButtonColor: '#3554D1'
+                            });
+                        });
+                    },
+                    willClose: () => {
+                        // Stop camera
+                        if (cameraStream) {
+                            cameraStream.getTracks().forEach(track => track.stop());
+                            cameraStream = null;
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        captureAndAnalyzeFace();
+                    }
+                });
+            },
+            
+            // Skip Face ID
+            skipFaceId: function() {
+                console.log('Skip Face ID clicked');
+                Swal.fire({
+                    title: 'Skip Face ID Setup?',
+                    text: 'You can always set up Face ID later from your profile settings.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, skip for now',
+                    cancelButtonText: 'No, continue setup',
+                    confirmButtonColor: '#3554D1'
+                }).then((result) => {
+                    if (result.isConfirmed && elements.dataInput) {
+                        elements.dataInput.value = '';
+                    }
+                });
+            }
+        };
+        
+        // API functions
+        async function startCamera(videoElement) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    }
+                });
+                
+                videoElement.srcObject = stream;
+                await videoElement.play();
+                
+                return stream;
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                throw error;
+            }
+        }
+        
+        async function captureAndAnalyzeFace() {
+            try {
+                // Show loading
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Analyzing your face, please wait...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Create a canvas to capture the image
+                const video = document.getElementById('faceSetupVideo');
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                // Draw the current video frame to the canvas
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Get the image as base64
+                const imageData = canvas.toDataURL('image/jpeg').split(',')[1];
+                
+                // Make request to Face++ API via our backend proxy
+                const formData = new FormData();
+                formData.append('imageData', imageData);
+                
+                const response = await fetch(DETECT_API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to analyze face');
+                }
+                
+                // Store face token
+                faceToken = result.faceToken;
+                
+                // Show success and preview
+                Swal.fire({
+                    title: 'Face Detected Successfully!',
+                    html: `
+                        <div class="text-center">
+                            <img src="data:image/jpeg;base64,${imageData}" 
+                                style="max-width: 200px; border-radius: 8px; border: 2px solid #3554D1; margin-bottom: 15px;">
+                            <p>Your face has been captured successfully.</p>
+                        </div>
+                    `,
+                    icon: 'success',
+                    confirmButtonText: 'Save Face ID',
+                    confirmButtonColor: '#3554D1',
+                    showCancelButton: true,
+                    cancelButtonText: 'Retake',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        saveFaceToken();
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        // Retake photo
+                        handlers.setupFaceId();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error analyzing face:', error);
+                Swal.fire({
+                    title: 'Face Detection Failed',
+                    text: error.message || 'Could not detect your face. Please try again in better lighting.',
+                    icon: 'error',
+                    confirmButtonColor: '#3554D1'
+                });
+            }
+        }
+        
+        function saveFaceToken() {
+            if (!faceToken || !elements.dataInput) {
+                console.error('No face token or data input element found');
+                return;
+            }
+            
+            try {
+                // Store the face token in the hidden input
+                const faceData = {
+                    face_token: faceToken,
+                    createdAt: new Date().toISOString()
+                };
+                
+                elements.dataInput.value = JSON.stringify(faceData);
+                console.log('Face token stored successfully');
+                
+                // Show success message
+                Swal.fire({
+                    title: 'Face ID Set Up Successfully!',
+                    text: 'You can now use Face ID to log in to your account.',
+                    icon: 'success',
+                    confirmButtonColor: '#3554D1'
+                });
+                
+            } catch (error) {
+                console.error('Error saving face token:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Could not save Face ID. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#3554D1'
+                });
+            }
+        }
+        
+        // Initialize module
+        function init() {
+            console.log('Initializing Face++ Module...');
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initElements);
+            } else {
+                setTimeout(initElements, 100);
+            }
+        }
+        
+        // Initialize DOM elements
+        function initElements() {
+            try {
+                elements.setupBtn = document.getElementById('setupFaceId');
+                elements.skipBtn = document.getElementById('skipFaceId');
+                elements.dataInput = document.getElementById('faceIdData');
+                elements.step1 = document.getElementById('step1');
+                
+                // Verify critical elements
+                if (!elements.setupBtn || !elements.step1) {
+                    console.error('Critical Face ID elements not found');
+                    return false;
+                }
+                
+                // Set up event listeners
+                if (elements.setupBtn) elements.setupBtn.addEventListener('click', handlers.setupFaceId);
+                if (elements.skipBtn) elements.skipBtn.addEventListener('click', handlers.skipFaceId);
+                
+                console.log('Face++ elements initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Face++ elements:', error);
+                return false;
+            }
+        }
+        
+        // Public API
+        return {
+            init: init
+        };
+    })();
+    
+    // Define handler functions for the Face ID setup process
+    async function setupFaceIdHandler() {
+        // Show video container and step 2
+        videoContainer.classList.remove('d-none');
+        step1.classList.add('d-none');
+        step2.classList.remove('d-none');
+        
+        // Start face capture
+        const success = await startFaceCapture();
+        if (!success) {
+            // Go back to step 1 if camera fails
+            videoContainer.classList.add('d-none');
+            step2.classList.add('d-none');
+            step1.classList.remove('d-none');
+        }
+    }
+    
+    function skipFaceIdHandler() {
+        Swal.fire({
+            title: 'Skip Face ID Setup?',
+            text: 'You can always set up Face ID later from your profile settings.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, skip for now',
+            cancelButtonText: 'No, continue setup',
+            confirmButtonColor: '#3554D1'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Clear any face data
+                faceIdDataInput.value = '';
+            }
+        });
+    }
+    
+    async function captureFaceHandler() {
+        const success = await captureFace();
+        if (success) {
+            // Move to step 3
+            step2.classList.add('d-none');
+            step3.classList.remove('d-none');
+        }
+    }
+    
+    function cancelCaptureHandler() {
+        // Stop camera and go back to step 1
+        stopFaceCapture();
+        videoContainer.classList.add('d-none');
+        step2.classList.add('d-none');
+        step1.classList.remove('d-none');
+    }
+    
+    function confirmFaceIdHandler() {
+        Swal.fire({
+            title: 'Face ID Set Up Successfully!',
+            text: 'You can now use Face ID to log in to your account.',
+            icon: 'success',
+            confirmButtonColor: '#3554D1'
+        });
+    }
+    
+    async function retakePhotoHandler() {
+        // Go back to step 2 and restart camera
+        step3.classList.add('d-none');
+        step2.classList.remove('d-none');
+        videoContainer.classList.remove('d-none');
+        
+        // Start face capture again
+        await startFaceCapture();
+    }
+
+    // Load face recognition models
+    async function loadFaceApiModels() {
+        try {
+            // Define models directory - use CDN instead of local files
+            const modelUrl = 'https://justadudewhohacks.github.io/face-api.js/models';
+            
+            // Load required models from CDN
+            await Promise.all([
+                faceapi.nets.tinyFaceDetector.loadFromUri(modelUrl),
+                faceapi.nets.faceLandmark68Net.loadFromUri(modelUrl),
+                faceapi.nets.faceRecognitionNet.loadFromUri(modelUrl)
+            ]);
+            
+            console.log('Face API models loaded successfully');
+            isFaceApiReady = true;
+            return true;
+        } catch (error) {
+            console.error('Error loading Face API models:', error);
+            isFaceApiReady = false;
+            return false;
+        }
+    }
+    
+    // Start face capture process
+    async function startFaceCapture() {
+        console.log('Starting face capture...');
+        
+        // Check if Face API models are loaded
+        if (!isFaceApiReady) {
+            console.log('Loading Face API models first...');
+            await loadFaceApiModels();
+        }
+        
+        // Double-check that DOM elements are initialized
+        if (!faceCaptureVideo) {
+            console.log('Video element not initialized, finding it...');
+            faceCaptureVideo = document.getElementById('faceCapture');
+            if (!faceCaptureVideo) {
+                console.error('Could not find video element');
+                return false;
+            }
+        }
+        
+        if (!faceOverlayCanvas) {
+            faceOverlayCanvas = document.getElementById('faceOverlay');
+            if (!faceOverlayCanvas) {
+                console.error('Could not find canvas element');
+                return false;
+            }
+        }
+        
+        if (!faceGuideBox) {
+            faceGuideBox = document.getElementById('face-guide-box');
+            if (!faceGuideBox) {
+                console.error('Could not find guide box element');
+                return false;
+            }
+        }
+        
+        try {
+            console.log('Requesting camera access...');
+            faceCaptureStream = await navigator.mediaDevices.getUserMedia({ 
+                video: {
+                    width: { ideal: 640 },
+                    height: { ideal: 480 },
+                    facingMode: 'user'
+                } 
+            });
+            
+            console.log('Camera access granted, setting up video stream...');
+            faceCaptureVideo.srcObject = faceCaptureStream;
+            faceCaptureVideo.style.display = 'block';
+            faceOverlayCanvas.style.display = 'block';
+            faceGuideBox.style.display = 'block';
+            
+            // Wait for video to load
+            await new Promise(resolve => {
+                faceCaptureVideo.onloadedmetadata = () => {
+                    faceCaptureVideo.play()
+                        .then(() => {
+                            console.log('Video playing successfully');
+                            resolve();
+                        })
+                        .catch(err => {
+                            console.error('Error playing video:', err);
+                            resolve(); // Continue anyway
+                        });
+                };
+                
+                // Fallback in case onloadedmetadata doesn't fire
+                setTimeout(resolve, 1000);
+            });
+            
+            // Set canvas dimensions to match video
+            if (faceCaptureVideo.videoWidth && faceCaptureVideo.videoHeight) {
+                faceOverlayCanvas.width = faceCaptureVideo.videoWidth;
+                faceOverlayCanvas.height = faceCaptureVideo.videoHeight;
+                console.log('Canvas dimensions set:', faceCaptureVideo.videoWidth, 'x', faceCaptureVideo.videoHeight);
+            } else {
+                // Fallback dimensions
+                faceOverlayCanvas.width = 640;
+                faceOverlayCanvas.height = 480;
+                console.log('Using fallback canvas dimensions');
+            }
+            
+            // Start face detection
+            console.log('Starting face detection...');
+            startFaceDetection();
+            
+            return true;
+        } catch (error) {
+            console.error('Error accessing camera:', error);
+            Swal.fire({
+                title: 'Camera Access Error',
+                text: 'Could not access your camera. Please check camera permissions and try again.',
+                icon: 'error',
+                confirmButtonColor: '#3554D1'
+            });
+            return false;
+        }
+    }
+    
+    // Stop face capture
+    function stopFaceCapture() {
+        if (faceDetectionInterval) {
+            clearInterval(faceDetectionInterval);
+            faceDetectionInterval = null;
+        }
+        
+        if (faceCaptureStream) {
+            faceCaptureStream.getTracks().forEach(track => track.stop());
+            faceCaptureStream = null;
+        }
+        
+        faceCaptureVideo.style.display = 'none';
+        faceOverlayCanvas.style.display = 'none';
+        faceGuideBox.style.display = 'none';
+        faceDetected = false;
+    }
+    
+    // Start face detection
+    function startFaceDetection() {
+        console.log('Starting face detection...');
+        
+        // Clear any existing interval
+        if (faceDetectionInterval) {
+            clearInterval(faceDetectionInterval);
+            faceDetectionInterval = null;
+        }
+        
+        // Safety check for video element
+        if (!faceCaptureVideo) {
+            console.error('Video element not available for face detection');
+            return;
+        }
+        
+        faceDetectionInterval = setInterval(async () => {
+            // Double check all elements are still available
+            if (!faceCaptureVideo || !faceOverlayCanvas || !captureProgress) {
+                console.error('Required elements missing during detection');
+                clearInterval(faceDetectionInterval);
+                return;
+            }
+            
+            if (!faceCaptureVideo.paused && !faceCaptureVideo.ended) {
+                try {
+                    // Detect faces with landmarks and descriptors
+                    const detections = await faceapi.detectAllFaces(
+                        faceCaptureVideo, 
+                        new faceapi.TinyFaceDetectorOptions()
+                    ).withFaceLandmarks().withFaceDescriptors();
+                    
+                    // Safety check for canvas
+                    if (!faceOverlayCanvas) return;
+                    
+                    // Get canvas context and clear previous drawings
+                    const ctx = faceOverlayCanvas.getContext('2d');
+                    ctx.clearRect(0, 0, faceOverlayCanvas.width, faceOverlayCanvas.height);
+                    
+                    // Draw detections
+                    if (detections && detections.length > 0) {
+                        console.log('Face detected');
+                        // Use only the first detected face
+                        const detection = detections[0];
+                        const box = detection.detection.box;
+                        
+                        // Draw face box
+                        ctx.strokeStyle = '#3554D1';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(box.x, box.y, box.width, box.height);
+                        
+                        // Center of guide circle
+                        const centerX = faceOverlayCanvas.width / 2;
+                        const centerY = faceOverlayCanvas.height / 2;
+                        
+                        // Calculate face center
+                        const faceX = box.x + box.width / 2;
+                        const faceY = box.y + box.height / 2;
+                        
+                        // Face distance from center
+                        const distance = Math.sqrt(
+                            Math.pow(faceX - centerX, 2) + 
+                            Math.pow(faceY - centerY, 2)
+                        );
+                        
+                        // Check if face is centered (within 50px of center)
+                        const isCentered = distance < 50;
+                        
+                        // Check if face is proper size (40-60% of guide circle)
+                        const guideSize = Math.min(faceOverlayCanvas.width, faceOverlayCanvas.height) * 0.4;
+                        const faceSizePercent = Math.max(box.width, box.height) / guideSize;
+                        const isProperSize = faceSizePercent > 0.8 && faceSizePercent < 1.2;
+                        
+                        // Update guide box if available
+                        if (faceGuideBox) {
+                            if (isCentered && isProperSize) {
+                                faceGuideBox.style.borderColor = 'rgba(40, 167, 69, 0.8)';
+                            } else {
+                                faceGuideBox.style.borderColor = 'rgba(255, 255, 255, 0.8)';
+                            }
+                        }
+                        
+                        // Update detection status
+                        faceDetected = isCentered && isProperSize;
+                        
+                        // Update UI elements if available
+                        if (captureFaceBtn) {
+                            captureFaceBtn.disabled = !faceDetected;
+                        }
+                        
+                        if (captureProgress) {
+                            if (faceDetected) {
+                                captureProgress.style.width = '100%';
+                            } else {
+                                // Calculate progress percentage based on centering and size
+                                const centeringPercent = Math.max(0, 1 - distance / 100) * 50;
+                                const sizePercent = (1 - Math.min(1, Math.abs(faceSizePercent - 1))) * 50;
+                                const progressPercent = centeringPercent + sizePercent;
+                                captureProgress.style.width = progressPercent + '%';
+                            }
+                        }
+                        
+                        // Store face descriptor for later use
+                        if (faceDetected) {
+                            faceDescriptor = detection.descriptor;
+                        }
+                    } else {
+                        // Reset UI when no face detected
+                        console.log('No face detected');
+                        if (faceGuideBox) {
+                            faceGuideBox.style.borderColor = 'rgba(255, 255, 255, 0.8)';
+                        }
+                        faceDetected = false;
+                        if (captureFaceBtn) {
+                            captureFaceBtn.disabled = true;
+                        }
+                        if (captureProgress) {
+                            captureProgress.style.width = '0%';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error in face detection:', error);
+                }
+            }
+        }, 200); // Increased interval to reduce CPU load
+    }
+    
+    // Capture face image
+    async function captureFace() {
+        console.log('Capturing face...');
+        
+        // Safety check for face detection
+        if (!faceDetected || !faceDescriptor) {
+            console.error('Cannot capture face: No face detected or no descriptor available');
+            return false;
+        }
+        
+        // Safety checks for required elements
+        if (!faceCaptureVideo || !facePreviewCanvas) {
+            console.error('Cannot capture face: Missing video or preview canvas elements');
+            return false;
+        }
+        
+        try {
+            // Create a temporary canvas to capture the video frame
+            const tempCanvas = document.createElement('canvas');
+            
+            // Set dimensions based on video size
+            const videoWidth = faceCaptureVideo.videoWidth || 640;
+            const videoHeight = faceCaptureVideo.videoHeight || 480;
+            tempCanvas.width = videoWidth;
+            tempCanvas.height = videoHeight;
+            
+            console.log('Drawing video to temporary canvas...');
+            // Draw current video frame to canvas
+            tempCanvas.getContext('2d').drawImage(faceCaptureVideo, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            // Stop video capture
+            stopFaceCapture();
+            
+            // Store the captured face image
+            capturedFaceCanvas = tempCanvas;
+            
+            console.log('Drawing face preview...');
+            // Safety check for preview canvas
+            if (!facePreviewCanvas) {
+                console.error('Cannot display preview: Missing preview canvas element');
+                return true; // Continue anyway, just without preview
+            }
+            
+            // Draw face in the preview canvas
+            const previewCtx = facePreviewCanvas.getContext('2d');
+            previewCtx.clearRect(0, 0, facePreviewCanvas.width, facePreviewCanvas.height);
+            
+            // Draw the face centered in the preview canvas
+            previewCtx.drawImage(
+                tempCanvas, 
+                0, 0, tempCanvas.width, tempCanvas.height,
+                0, 0, facePreviewCanvas.width, facePreviewCanvas.height
+            );
+            
+            // Store face descriptor in hidden input
+            storeFaceData();
+            console.log('Face captured successfully');
+            
+            return true;
+        } catch (error) {
+            console.error('Error capturing face:', error);
+            
+            // Show error to user
+            Swal.fire({
+                title: 'Error Capturing Face',
+                text: 'There was a problem capturing your face. Please try again.',
+                icon: 'error',
+                confirmButtonColor: '#3554D1'
+            });
+            
+            return false;
+        }
+    }
+    
+    // Store face data in hidden input
+    function storeFaceData() {
+        console.log('Storing face data...');
+        
+        // Safety check for descriptor and input element
+        if (!faceDescriptor) {
+            console.error('No face descriptor available to store');
+            return false;
+        }
+        
+        if (!faceIdDataInput) {
+            console.error('Face ID data input element not found');
+            faceIdDataInput = document.getElementById('faceIdData'); // Try to find it again
+            if (!faceIdDataInput) return false;
+        }
+        
+        try {
+            // Convert descriptor to array to make it serializable
+            const descriptorArray = Array.from(faceDescriptor);
+            
+            // Create face data object with descriptor and timestamp
+            const faceData = {
+                descriptor: descriptorArray,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Store in hidden input as JSON string
+            const dataString = JSON.stringify(faceData);
+            faceIdDataInput.value = dataString;
+            
+            console.log('Face data stored successfully');
+            return true;
+        } catch (error) {
+            console.error('Error storing face data:', error);
+            return false;
+        }
+    }
+    
+    // Initialize the Face++ module
+    FacePlusPlusModule.init();
+    console.log('Face++ Module initialized');
 });
 </script>
 {% endblock %}

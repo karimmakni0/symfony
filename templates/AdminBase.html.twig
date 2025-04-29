@@ -239,6 +239,15 @@
         </div>
 
         <div class="sidebar__item">
+          <div class="sidebar__button {% if app.request.attributes.get('_route') starts with 'app_admin_coupons' %}-is-active{% endif %}">
+            <a href="{{ path('app_admin_coupons') }}" class="d-flex items-center text-15 lh-1 fw-500">
+              <img src="{{ asset('assets/img/dashboard/sidebar/ticket.svg') }}" alt="image" class="mr-15">
+              Coupons
+            </a>
+          </div>
+        </div>
+
+        <div class="sidebar__item">
           <div class="sidebar__button">
             <a href="{{ path('app_logout') }}" class="d-flex items-center text-15 lh-1 fw-500">
               <img src="{{ asset('assets/img/dashboard/sidebar/log-out.svg') }}" alt="image" class="mr-15">

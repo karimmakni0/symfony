@@ -19,12 +19,19 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\HttpClient\HttpClient;
 
 /**
  * @Route("/api/faceid", name="api_faceid_")
  */
 class FaceIdController extends AbstractController
 {
+    // Face++ API credentials
+    private const FACE_PLUS_PLUS_API_KEY = 'vC4FuF4xftz31i5_kIxw4BmzYoYK_uTY'; // Replace with your actual API key
+    private const FACE_PLUS_PLUS_API_SECRET = 'RErIeLazJRMclv5dckGj5G6lJWQtdEfQ';
+    private const FACE_PLUS_PLUS_DETECT_URL = 'https://api-us.faceplusplus.com/facepp/v3/detect';
+    private const FACE_PLUS_PLUS_COMPARE_URL = 'https://api-us.faceplusplus.com/facepp/v3/compare';
+    
     private $entityManager;
     private $usersRepository;
     private $passwordEncoder;
@@ -265,144 +272,219 @@ class FaceIdController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-    // Helper function to compare face data
+    // Helper function to compare face data with Face++
     private function compareFaceData($storedData, $providedData): bool
     {
-        // DEVELOPMENT MODE FALLBACK
-        // Uncomment the next line for production
-        // return $this->actualFaceComparison($storedData, $providedData);
-        
-        // During development/testing phase, try actual comparison first
-        // but fall back to allowing the login if there's any issue
         try {
-            $result = $this->actualFaceComparison($storedData, $providedData);
-            if ($result) {
-                error_log("Face recognized successfully with confidence above threshold");
-                return true;
-            } else {
-                error_log("Face not recognized with strict comparison, but allowing for testing");
-                return true; // Allow during dev/testing
+            // Extract face tokens
+            $storedFaceToken = $this->extractFaceToken($storedData);
+            $providedFaceToken = $this->extractFaceToken($providedData);
+            
+            if (!$storedFaceToken || !$providedFaceToken) {
+                error_log("Missing face tokens for comparison");
+                return false;
             }
+            
+            // Make request to Face++ Compare API
+            $client = HttpClient::create();
+            $response = $client->request('POST', self::FACE_PLUS_PLUS_COMPARE_URL, [
+                'body' => [
+                    'api_key' => self::FACE_PLUS_PLUS_API_KEY,
+                    'api_secret' => self::FACE_PLUS_PLUS_API_SECRET,
+                    'face_token1' => $storedFaceToken,
+                    'face_token2' => $providedFaceToken
+                ]
+            ]);
+            
+            $statusCode = $response->getStatusCode();
+            $content = $response->toArray(false);
+            
+            if ($statusCode !== 200 || !isset($content['confidence'])) {
+                error_log("Face++ compare API error: " . ($content['error_message'] ?? 'Unknown error'));
+                return false;
+            }
+            
+            // Get confidence score (0-100) from Face++ API
+            $confidence = $content['confidence'];
+            error_log("Face++ comparison confidence: {$confidence}");
+            
+            // Threshold for face recognition (70+ is typically a good match)
+            // Adjust this threshold based on your application's needs
+            $threshold = 70;
+            
+            return $confidence >= $threshold;
+            
         } catch (\Exception $e) {
-            error_log("Exception during face comparison: " . $e->getMessage());
-            return true; // Allow during dev/testing
-        }
-    }
-    
-    // The actual face comparison logic - separated for easier debugging
-    private function actualFaceComparison($storedData, $providedData): bool 
-    {
-        // Set a very lenient threshold - can be adjusted later
-        $similarityThreshold = 0.3; // 30% similarity for testing
-        
-        // Special development mode case - if this is empty/test data
-        if (empty($storedData) || strpos($storedData, 'test') !== false) {
-            error_log("Empty or test data detected - accepting face");
+            error_log("Error comparing faces with Face++: " . $e->getMessage());
+            // For development only - change to return false in production
             return true;
         }
-        
-        // Decode JSON data
-        $storedFaceData = json_decode($storedData, true);
-        $providedFaceData = json_decode($providedData, true);
-        
-        // Log data sizes
-        error_log("Stored face data size: " . (is_array($storedFaceData) ? count($storedFaceData) : 'not an array'));
-        error_log("Provided face data size: " . (is_array($providedFaceData) ? count($providedFaceData) : 'not an array'));
-        
-        // Try different data structures that might be in the face data
-        $storedDescriptor = $this->extractDescriptor($storedFaceData);
-        $providedDescriptor = $this->extractDescriptor($providedFaceData);
-        
-        if (!$storedDescriptor || !$providedDescriptor) {
-            error_log("Could not extract valid descriptors from face data");
-            return false;
-        }
-        
-        // Calculate similarity
-        $similarity = $this->calculateSimilarity($storedDescriptor, $providedDescriptor);
-        error_log("Face similarity score: {$similarity} (threshold: {$similarityThreshold})");
-        
-        return $similarity >= $similarityThreshold;
     }
     
-    // Try to extract descriptors from various formats the face data might be in
-    private function extractDescriptor($faceData) 
+    /**
+     * Extract face token from stored face data
+     */
+    private function extractFaceToken($faceData)
     {
-        if (!$faceData) return null;
-        
-        // Try direct descriptor
-        if (isset($faceData['descriptor']) && is_array($faceData['descriptor'])) {
-            return $faceData['descriptor'];
-        }
-        
-        // Try first item if it's an array of faces
-        if (isset($faceData[0])) {
-            if (isset($faceData[0]['descriptor']) && is_array($faceData[0]['descriptor'])) {
-                return $faceData[0]['descriptor'];
+        if (is_string($faceData)) {
+            try {
+                $decoded = json_decode($faceData, true);
+                if (isset($decoded['faceToken'])) {
+                    return $decoded['faceToken'];
+                } elseif (isset($decoded['face_token'])) {
+                    return $decoded['face_token'];
+                }
+            } catch (\Exception $e) {
+                error_log("Error decoding face token: " . $e->getMessage());
+                return null;
+            }
+        } elseif (is_array($faceData)) {
+            if (isset($faceData['faceToken'])) {
+                return $faceData['faceToken'];
+            } elseif (isset($faceData['face_token'])) {
+                return $faceData['face_token'];
             }
         }
         
-        // Try descriptor property at different levels
-        foreach (['detection', 'landmarks', 'embedding'] as $prop) {
-            if (isset($faceData[$prop]) && isset($faceData[$prop]['descriptor']) && 
-                is_array($faceData[$prop]['descriptor'])) {
-                return $faceData[$prop]['descriptor'];
-            }
-        }
-        
+        error_log("Could not extract face token from face data");
         return null;
     }
     
-    // Calculate similarity score between face descriptors
-    private function calculateSimilarity($descriptor1, $descriptor2) 
+    /**
+     * Verify face with Face++ API
+     * 
+     * @Route("/verify-face", name="verify_face", methods={"POST"})
+     */
+    public function verifyFace(Request $request): Response
     {
-        if (!is_array($descriptor1) || !is_array($descriptor2)) {
-            return 0;
+        $data = json_decode($request->getContent(), true);
+        
+        if (!isset($data['email']) || !isset($data['faceToken'])) {
+            return new JsonResponse(['success' => false, 'error' => 'Email and face token are required'], Response::HTTP_BAD_REQUEST);
         }
         
-        // Cosine similarity works better than Euclidean distance for face recognition
-        // but we'll use both and take the max for flexibility
+        // Find the user
+        $user = $this->usersRepository->findOneBy(['email' => $data['email']]);
         
-        // Calculate Euclidean distance
-        $euclideanDistance = 0;
-        $dimensions = min(count($descriptor1), count($descriptor2));
-        
-        for ($i = 0; $i < $dimensions; $i++) {
-            $diff = ($descriptor1[$i] ?? 0) - ($descriptor2[$i] ?? 0);
-            $euclideanDistance += $diff * $diff;
+        if (!$user) {
+            return new JsonResponse(['success' => false, 'error' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
-        $euclideanDistance = sqrt($euclideanDistance);
-        $euclideanSimilarity = max(0, 1 - $euclideanDistance);
         
-        // Calculate Cosine similarity
-        $dotProduct = 0;
-        $magnitude1 = 0;
-        $magnitude2 = 0;
+        // Check if Face ID is enabled
+        if (!$user->isFaceidEnabled()) {
+            return new JsonResponse(['success' => false, 'error' => 'Face ID not enabled for this account'], Response::HTTP_BAD_REQUEST);
+        }
         
-        for ($i = 0; $i < $dimensions; $i++) {
-            $val1 = $descriptor1[$i] ?? 0;
-            $val2 = $descriptor2[$i] ?? 0;
+        // Get stored face token
+        $faceIdData = $user->getFaceidData();
+        $storedFaceToken = $this->extractFaceToken($faceIdData);
+        
+        if (!$storedFaceToken) {
+            return new JsonResponse(['success' => false, 'error' => 'No valid face token found for this user'], Response::HTTP_BAD_REQUEST);
+        }
+        
+        // Compare faces using Face++ API
+        $isMatch = $this->compareFaceData($storedFaceToken, $data['faceToken']);
+        
+        if ($isMatch) {
+            return new JsonResponse(['success' => true, 'matched' => true], Response::HTTP_OK);
+        } else {
+            return new JsonResponse(['success' => true, 'matched' => false], Response::HTTP_OK);
+        }
+    }
+    public function getFaceToken(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['email'])) {
+            return new JsonResponse(['success' => false, 'error' => 'Email is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Find the user
+        $user = $this->usersRepository->findOneBy(['email' => $data['email']]);
+
+        if (!$user) {
+            return new JsonResponse(['success' => false, 'error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Check if Face ID is enabled
+        if (!$user->isFaceidEnabled()) {
+            return new JsonResponse(['success' => false, 'error' => 'Face ID not enabled for this account'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Get the face token data
+        $faceIdData = $user->getFaceidData();
+        $faceToken = $this->extractFaceToken($faceIdData);
+
+        if (!$faceToken) {
+            return new JsonResponse(['success' => false, 'error' => 'No valid face token found'], Response::HTTP_BAD_REQUEST);
+        }
+
+        return new JsonResponse([
+            'success' => true, 
+            'faceToken' => $faceToken
+        ], Response::HTTP_OK);
+    }
+    
+    /**
+     * Analyze face with Face++ and get face token
+     * 
+     * @Route("/analyze-face", name="analyze_face", methods={"POST"})
+     */
+    public function analyzeFace(Request $request): Response
+    {
+        // Get image data from request
+        $imageData = $request->request->get('imageData');
+        
+        if (empty($imageData)) {
+            return new JsonResponse(['success' => false, 'error' => 'Image data is required'], Response::HTTP_BAD_REQUEST);
+        }
+        
+        // Remove data URL prefix if present
+        if (strpos($imageData, 'data:image/') === 0) {
+            $imageData = preg_replace('/^data:image\/(\w+);base64,/', '', $imageData);
+        }
+        
+        // Make request to Face++ Detect API
+        try {
+            $client = HttpClient::create();
+            $response = $client->request('POST', self::FACE_PLUS_PLUS_DETECT_URL, [
+                'body' => [
+                    'api_key' => self::FACE_PLUS_PLUS_API_KEY,
+                    'api_secret' => self::FACE_PLUS_PLUS_API_SECRET,
+                    'image_base64' => $imageData,
+                    'return_landmark' => 0,
+                    'return_attributes' => 'gender,age,emotion'
+                ]
+            ]);
             
-            $dotProduct += $val1 * $val2;
-            $magnitude1 += $val1 * $val1;
-            $magnitude2 += $val2 * $val2;
+            $statusCode = $response->getStatusCode();
+            $content = $response->toArray(false);
+            
+            if ($statusCode !== 200 || !isset($content['faces']) || empty($content['faces'])) {
+                return new JsonResponse([
+                    'success' => false, 
+                    'error' => 'Failed to detect face', 
+                    'details' => $content['error_message'] ?? 'Unknown error'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            
+            // Return the face token from the first detected face
+            $faceToken = $content['faces'][0]['face_token'];
+            
+            return new JsonResponse([
+                'success' => true,
+                'faceToken' => $faceToken,
+                'attributes' => $content['faces'][0]['attributes'] ?? null
+            ], Response::HTTP_OK);
+            
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false, 
+                'error' => 'Error analyzing face', 
+                'details' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
-        $magnitude1 = sqrt($magnitude1);
-        $magnitude2 = sqrt($magnitude2);
-        
-        $cosineSimilarity = 0;
-        if ($magnitude1 > 0 && $magnitude2 > 0) {
-            $cosineSimilarity = $dotProduct / ($magnitude1 * $magnitude2);
-        }
-        
-        // Use the best similarity score for more flexibility
-        $similarity = max($euclideanSimilarity, $cosineSimilarity);
-        
-        error_log("Similarity scores - Euclidean: {$euclideanSimilarity}, Cosine: {$cosineSimilarity}, Final: {$similarity}");
-        
-        return $similarity;
-        
     }
     
     /**

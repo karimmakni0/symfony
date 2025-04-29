@@ -1,0 +1,306 @@
+{% extends 'AdminBase.html.twig' %}
+
+{% block title %}Admin - Manage Coupons{% endblock %}
+
+{% block body %}
+<div class="dashboard__content bg-light-2">
+    <div class="row y-gap-20 justify-between items-end pb-20 lg:pb-40 md:pb-32">
+        <div class="col-auto">
+            <h1 class="text-30 lh-14 fw-600">Coupon Management</h1>
+            <div class="text-15 text-light-1">Create and manage discount coupons for activities</div>
+        </div>
+        <div class="col-auto">
+            <div class="d-flex items-center">
+                <button id="createCouponBtn" class="button h-50 px-25 -dark-1 bg-blue-1 text-white">
+                    <i class="icon-plus text-12 mr-10"></i>
+                    <span>Create New Coupon</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Messages will be handled by SweetAlert -->
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="d-none" data-swal-toast="true" data-swal-title="{{ label|capitalize }}" data-swal-text="{{ message }}" data-swal-icon="{{ label == 'success' ? 'success' : (label == 'error' ? 'error' : 'info') }}"></div>
+        {% endfor %}
+    {% endfor %}
+
+    <!-- Coupons Table -->
+    <div class="py-30 px-30 rounded-4 bg-white shadow-3">
+        <div class="tabs -underline-2 js-tabs">
+            <div class="tabs__content pt-30 js-tabs-content">
+                <div class="tabs__pane -tab-item-1 is-tab-el-active">
+                    <div class="overflow-scroll scroll-bar-1">
+                        <table class="table-4 -border-bottom col-12">
+                            <thead class="bg-light-2">
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Discount</th>
+                                    <th>Usage</th>
+                                    <th>Expires</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if coupons is empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-20">
+                                            <div class="empty-state">
+                                                <div class="empty-state-icon">
+                                                    <i class="icon-ticket text-40 text-light-1"></i>
+                                                </div>
+                                                <h4 class="text-18 fw-500 mt-10">No coupons found</h4>
+                                                <div class="text-15 mt-5 text-light-1">Start by creating your first discount coupon</div>
+                                                <button id="emptyCreateBtn" class="button -md -blue-1 bg-blue-1 text-white mt-20">
+                                                    <i class="icon-plus mr-10"></i>
+                                                    Create Coupon
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    {% for coupon in coupons %}
+                                        <tr>
+                                            <td>
+                                                <div class="fw-500">{{ coupon.code }}</div>
+                                            </td>
+                                            <td>
+                                                {% if coupon.isPercentage %}
+                                                    <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-dark-4 text-white">{{ coupon.discount }}%</div>
+                                                {% else %}
+                                                    <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-purple-2 text-white">{{ coupon.discount }} TND</div>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="d-flex items-center">
+                                                    <div class="text-14 mr-10">{{ coupon.usageCount }}/{{ coupon.usageLimit }}</div>
+                                                    {% set percentage = (coupon.usageCount / coupon.usageLimit) * 100 %}
+                                                    <div class="progress-bar" style="width: 70px">
+                                                        <div class="progress-bar__bg bg-light-2"></div>
+                                                        <div class="progress-bar__bar bg-{{ percentage > 80 ? 'red-2' : 'blue-1' }}" style="width: {{ percentage }}%"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% set days_left = date(coupon.expiresAt).diff(date()).days %}
+                                                {% if days_left < 0 %}
+                                                    <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-red-2 text-white">Expired</div>
+                                                {% elseif days_left < 3 %}
+                                                    <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-yellow-2 text-dark-1">{{ days_left }} days left</div>
+                                                {% else %}
+                                                    <div class="text-14">{{ coupon.expiresAt|date('Y-m-d') }}</div>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if coupon.isActive and coupon.isValid %}
+                                                    <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-green-2 text-white">Active</div>
+                                                {% else %}
+                                                    <div class="rounded-100 py-4 px-10 text-center col-12 text-14 fw-500 bg-light-2 text-dark-1">Inactive</div>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="d-flex x-gap-10 items-center justify-center">
+                                                    <div>
+                                                        <button class="editCouponBtn flex-center size-40 rounded-full bg-blue-1-05 text-blue-1" data-id="{{ coupon.id }}" data-code="{{ coupon.code }}" data-discount="{{ coupon.discount }}" data-is-percentage="{{ coupon.isPercentage ? 'true' : 'false' }}" data-usage-limit="{{ coupon.usageLimit }}" data-expires-at="{{ coupon.expiresAt|date('Y-m-d') }}" data-is-active="{{ coupon.isActive ? 'true' : 'false' }}">
+                                                            <i class="icon-edit text-16"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div>
+                                                        <button class="deleteCouponBtn flex-center size-40 rounded-full bg-red-3 text-red-2" data-id="{{ coupon.id }}" data-code="{{ coupon.code }}">
+                                                            <i class="icon-trash text-16"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .empty-state {
+        text-align: center;
+        padding: 2rem 1rem;
+    }
+</style>
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Display flash messages using SweetAlert
+        document.querySelectorAll('[data-swal-toast]').forEach(elem => {
+            Swal.fire({
+                title: elem.dataset.swalTitle,
+                text: elem.dataset.swalText,
+                icon: elem.dataset.swalIcon,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+        });
+        
+        // Create Coupon Button
+        document.getElementById('createCouponBtn')?.addEventListener('click', openCreateCouponModal);
+        document.getElementById('emptyCreateBtn')?.addEventListener('click', openCreateCouponModal);
+        
+        // Edit Coupon Buttons
+        document.querySelectorAll('.editCouponBtn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const code = this.dataset.code;
+                const discount = this.dataset.discount;
+                const isPercentage = this.dataset.isPercentage === 'true';
+                const usageLimit = this.dataset.usageLimit;
+                const expiresAt = this.dataset.expiresAt;
+                const isActive = this.dataset.isActive === 'true';
+                
+                openEditCouponModal(id, code, discount, isPercentage, usageLimit, expiresAt, isActive);
+            });
+        });
+        
+        // Delete Coupon Buttons
+        document.querySelectorAll('.deleteCouponBtn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const code = this.dataset.code;
+                
+                Swal.fire({
+                    title: 'Delete Coupon',
+                    text: `Are you sure you want to delete coupon ${code}?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '{{ path("app_admin_coupons_delete", {"id": "COUPON_ID"}) }}'.replace('COUPON_ID', id);
+                    }
+                });
+            });
+        });
+        
+        function openCreateCouponModal() {
+            Swal.fire({
+                title: 'Create New Coupon',
+                html: `
+                    <form id="createCouponForm" method="post" action="{{ path('app_admin_coupons_new') }}" class="text-left" style="padding: 20px; margin: 0 auto;">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Coupon Code <span class="text-danger">*</span></label>
+                            <input type="text" class="swal2-input" id="code" name="code" required 
+                                   placeholder="e.g. SUMMER20" maxlength="20" pattern="^[A-Za-z0-9_-]{3,20}$">
+                            <small class="form-text text-muted">3-20 characters, letters, numbers, and dashes only</small>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Discount Value <span class="text-danger">*</span></label>
+                            <div class="d-flex">
+                                <input type="number" class="swal2-input" id="discount" name="discount" 
+                                       min="0.01" step="0.01" required placeholder="e.g. 20" style="margin-right: 10px">
+                                <select class="swal2-select" id="discount_type" name="discount_type">
+                                    <option value="percentage" selected>Percentage (%)</option>
+                                    <option value="fixed">Fixed Amount (TND)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Usage Limit <span class="text-danger">*</span></label>
+                            <input type="number" class="swal2-input" id="usage_limit" name="usage_limit" 
+                                   min="1" required placeholder="e.g. 100">
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Expiration Date <span class="text-danger">*</span></label>
+                            <input type="date" class="swal2-input" id="expires_at" name="expires_at" 
+                                   required min="{{ 'now'|date('Y-m-d') }}">
+                        </div>
+                    </form>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Create',
+                cancelButtonText: 'Cancel',
+                focusConfirm: false,
+                width: '800px',
+                preConfirm: () => {
+                    document.getElementById('createCouponForm').submit();
+                }
+            });
+            
+            // Auto uppercase for coupon code
+            document.getElementById('code').addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        }
+        
+        function openEditCouponModal(id, code, discount, isPercentage, usageLimit, expiresAt, isActive) {
+            Swal.fire({
+                title: 'Edit Coupon',
+                html: `
+                    <form id="editCouponForm" method="post" action="{{ path('app_admin_coupons_edit', {"id": "COUPON_ID"}) }}" class="text-left" style="padding: 20px; margin: 0 auto;">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Coupon Code</label>
+                            <input type="text" class="swal2-input" value="${code}" readonly disabled>
+                            <small class="form-text text-muted">Coupon code cannot be changed after creation</small>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Discount Value <span class="text-danger">*</span></label>
+                            <div class="d-flex">
+                                <input type="number" class="swal2-input" id="edit_discount" name="discount" 
+                                       min="0.01" step="0.01" required value="${discount}" style="margin-right: 10px">
+                                <select class="swal2-select" id="edit_discount_type" name="discount_type">
+                                    <option value="percentage" ${isPercentage ? 'selected' : ''}>Percentage (%)</option>
+                                    <option value="fixed" ${!isPercentage ? 'selected' : ''}>Fixed Amount (TND)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Usage Limit <span class="text-danger">*</span></label>
+                            <input type="number" class="swal2-input" id="edit_usage_limit" name="usage_limit" 
+                                   min="1" required value="${usageLimit}">
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Expiration Date <span class="text-danger">*</span></label>
+                            <input type="date" class="swal2-input" id="edit_expires_at" name="expires_at" 
+                                   required value="${expiresAt}">
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="edit_is_active" name="is_active" 
+                                       ${isActive ? 'checked' : ''}>
+                                <label class="form-check-label" for="edit_is_active">Active</label>
+                            </div>
+                            <small class="form-text text-muted">Inactive coupons cannot be used</small>
+                        </div>
+                    </form>
+                `.replace('COUPON_ID', id),
+                showCancelButton: true,
+                confirmButtonText: 'Update',
+                cancelButtonText: 'Cancel',
+                focusConfirm: false,
+                width: '800px',
+                preConfirm: () => {
+                    document.getElementById('editCouponForm').submit();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

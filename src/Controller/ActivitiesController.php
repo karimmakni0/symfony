@@ -635,8 +635,30 @@ class ActivitiesController extends AbstractController
         
         // Calculate unit price from activity (for safety)
         $unitPrice = $activity->getActivityPrice();
-        // Optionally, recalculate totalPrice to prevent tampering
-        $totalPrice = $participants * $unitPrice;
+        // Calculate initial total price
+        $initialTotalPrice = $participants * $unitPrice;
+        
+        // Get coupon from session if exists
+        $session = $request->getSession();
+        $appliedCoupon = $session->get('applied_coupon', null);
+        $appliedDiscount = 0;
+        
+        // Apply coupon discount if available
+        if ($appliedCoupon) {
+            $couponRepository = $this->entityManager->getRepository('App\Entity\Coupon');
+            $coupon = $couponRepository->find($appliedCoupon['id']);
+            
+            if ($coupon && $coupon->isValid()) {
+                $appliedDiscount = $coupon->calculateDiscount($initialTotalPrice);
+                $totalPrice = $initialTotalPrice - $appliedDiscount;
+            } else {
+                // Invalid or expired coupon, remove from session
+                $session->remove('applied_coupon');
+                $appliedCoupon = null;
+            }
+        } else {
+            $totalPrice = $initialTotalPrice;
+        }
         
         // Validate participants count
         $totalBookedTickets = $this->billetRepository->getTotalBookedTicketsForActivity($id);
@@ -645,6 +667,38 @@ class ActivitiesController extends AbstractController
         if ($participants <= 0 || $participants > $remainingTickets) {
             $this->addFlash('error', 'Invalid number of participants');
             return $this->redirectToRoute('app_client_activity_detail', ['id' => $id]);
+        }
+        
+        // Handle coupon application
+        if ($request->isMethod('POST') && $request->request->has('coupon_code')) {
+            $couponCode = $request->request->get('coupon_code');
+            $couponRepository = $this->entityManager->getRepository('App\Entity\Coupon');
+            $coupon = $couponRepository->findValidCoupon($couponCode);
+            
+            if ($coupon) {
+                $discount = $coupon->calculateDiscount($initialTotalPrice);
+                $discountedPrice = $initialTotalPrice - $discount;
+                
+                // Store coupon in session
+                $session->set('applied_coupon', [
+                    'id' => $coupon->getId(),
+                    'code' => $coupon->getCode(),
+                    'discount' => $discount,
+                    'discount_text' => $coupon->isPercentage() ? $coupon->getDiscount() . '%' : $coupon->getDiscount() . ' TND',
+                ]);
+                
+                $this->addFlash('success', 'Coupon applied successfully: ' . $coupon->getCode());
+                return $this->redirectToRoute('app_payment_reservation', ['id' => $id]);
+            } else {
+                $this->addFlash('error', 'Invalid or expired coupon code');
+            }
+        }
+        
+        // Remove coupon if requested
+        if ($request->query->has('remove_coupon')) {
+            $session->remove('applied_coupon');
+            $this->addFlash('success', 'Coupon removed successfully');
+            return $this->redirectToRoute('app_payment_reservation', ['id' => $id]);
         }
         
         // Process form submission for credit card payment
@@ -668,12 +722,24 @@ class ActivitiesController extends AbstractController
                             'activity' => $activity,
                             'participants' => $participants,
                             'totalPrice' => $totalPrice,
+                            'initialTotalPrice' => $initialTotalPrice,
+                            'appliedCoupon' => $appliedCoupon,
                             'user' => $user
                         ]);
                     }
                     try {
                         // Begin transaction
                         $this->entityManager->beginTransaction();
+                        
+                        // Update coupon usage if one was applied
+                        if ($appliedCoupon) {
+                            $couponRepository = $this->entityManager->getRepository('App\Entity\Coupon');
+                            $coupon = $couponRepository->find($appliedCoupon['id']);
+                            if ($coupon) {
+                                $coupon->incrementUsageCount();
+                            }
+                        }
+                        
                         // Always create a new Billet for each reservation
                         $billet = new Billet();
                         $billet->setActiviteId($activity->getId());
@@ -682,6 +748,7 @@ class ActivitiesController extends AbstractController
                         $billet->setNumero('TICKET-' . uniqid());
                         $this->entityManager->persist($billet);
                         $this->entityManager->flush(); // ensures billet gets a unique auto-incremented id
+                        
                         // Always create a new Reservation for each booking
                         $reservation = new Reservation();
                         $reservation->setUser($user); // must be the managed User entity
@@ -691,8 +758,23 @@ class ActivitiesController extends AbstractController
                         $reservation->setPrixTotal($totalPrice);
                         $reservation->setPrixUnite($unitPrice);
                         $reservation->setStatuts('confirmed');
+                        
+                        // Store coupon information, without using a comment field
+                        if ($appliedCoupon) {
+                            // We would need to add a couponCode field to the Reservation entity to properly store this
+                            // For now we'll just log it for debugging purposes
+                            error_log('Coupon applied to reservation: ' . $appliedCoupon['code'] . ' (' . $appliedCoupon['discount_text'] . ')');
+                            
+                            // If you want to store this information, you would need to add a field to your Reservation entity
+                            // Example: $reservation->setCouponCode($appliedCoupon['code']);
+                        }
+                        
                         $this->entityManager->persist($reservation);
                         $this->entityManager->flush(); // ensures reservation gets a unique auto-incremented id
+                        
+                        // Clear applied coupon from session
+                        $session->remove('applied_coupon');
+                        
                         $this->addFlash('success', 'Your reservation was successful! Ticket number: ' . $billet->getNumero());
                         $this->entityManager->commit();
                         return $this->redirectToRoute('app_user_reservation_history');
@@ -706,6 +788,8 @@ class ActivitiesController extends AbstractController
                             'activity' => $activity,
                             'participants' => $participants,
                             'totalPrice' => $totalPrice,
+                            'initialTotalPrice' => $initialTotalPrice,
+                            'appliedCoupon' => $appliedCoupon,
                             'user' => $user
                         ]);
                     }
@@ -720,6 +804,8 @@ class ActivitiesController extends AbstractController
             'activity' => $activity,
             'participants' => $participants,
             'totalPrice' => $totalPrice,
+            'initialTotalPrice' => $initialTotalPrice,
+            'appliedCoupon' => $appliedCoupon,
             'user' => $user
         ]);
     }
