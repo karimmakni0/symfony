@@ -2,14 +2,15 @@
 
 namespace App\Controller;
 
-use App\Entity\Comment;
+use App\Entity\Activities;
 use App\Entity\Post;
+use App\Entity\Comment;
 use App\Entity\BlogRating;
-use App\Form\CommentFormType;
 use App\Form\PostFormType;
+use App\Form\CommentFormType;
 use App\Repository\ActivitiesRepository;
-use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
+use App\Repository\CommentRepository;
 use App\Repository\BlogRatingRepository;
 use App\Repository\UsersRepository;
 use App\Service\GeminiAIService;
@@ -43,19 +44,19 @@ class BlogController extends AbstractController
     public function __construct(
         EntityManagerInterface $entityManager,
         PostRepository $postRepository,
-        ActivitiesRepository $activitiesRepository,
         CommentRepository $commentRepository,
+        ActivitiesRepository $activitiesRepository,
         UsersRepository $usersRepository,
         BlogRatingRepository $blogRatingRepository,
         Security $security,
-        HttpClientInterface $httpClient = null,
-        LoggerInterface $logger = null,
-        GeminiAIService $geminiService = null
+        ?HttpClientInterface $httpClient = null,
+        ?LoggerInterface $logger = null,
+        ?GeminiAIService $geminiService = null
     ) {
         $this->entityManager = $entityManager;
         $this->postRepository = $postRepository;
-        $this->activitiesRepository = $activitiesRepository;
         $this->commentRepository = $commentRepository;
+        $this->activitiesRepository = $activitiesRepository;
         $this->usersRepository = $usersRepository;
         $this->blogRatingRepository = $blogRatingRepository;
         $this->security = $security;
@@ -694,13 +695,17 @@ class BlogController extends AbstractController
         // Get the uploaded image if available
         $image = $request->files->get('image');
         
+        // Get the stripHtml parameter if provided
+        $stripHtml = $request->query->getBoolean('stripHtml', true);
+        
         // Use our GeminiAIService to generate content
         if ($this->geminiService) {
             try {
                 $generatedContent = $this->geminiService->generateBlogContent(
                     $activity->getActivityName(),
                     $activity->getActivityDestination() ?? 'unknown location',
-                    $image
+                    $image,
+                    $stripHtml
                 );
                 
                 if ($generatedContent) {
@@ -714,181 +719,12 @@ class BlogController extends AbstractController
             }
         }
         
-        // If Gemini service fails or doesn't exist, try fallback services
-        $generatedContent = null;
-        $lastError = null;
-        
-        // Define fallback content generation services
-        $fallbackServices = [
-            'openai' => function() use ($activity) {
-                return $this->generateWithOpenAI($activity);
-            },
-            'huggingface' => function() use ($activity) {
-                return $this->generateWithHuggingFace($activity);
-            },
-            'localai' => function() use ($activity) {
-                return $this->generateWithLocalAI($activity);
-            }
-        ];
-        
-        // Try each fallback service until one succeeds
-        if ($this->httpClient) {
-            foreach ($fallbackServices as $serviceName => $serviceFunction) {
-                try {
-                    $generatedContent = $serviceFunction();
-                    if ($generatedContent) {
-                        break;
-                    }
-                } catch (\Exception $e) {
-                    $lastError = $e->getMessage();
-                    $this->logger?->warning("Error with $serviceName service", [
-                        'error' => $lastError,
-                        'activity' => $activity->getActivityName()
-                    ]);
-                }
-            }
-        }
-        
-        if ($generatedContent) {
-            return new JsonResponse(['content' => $generatedContent]);
-        }
-        
-        // If all services failed
+        // If Gemini service fails or doesn't exist
         return new JsonResponse([
             'error' => 'Failed to generate content',
-            'details' => $lastError
+            'details' => 'Gemini AI service is not available'
         ], Response::HTTP_SERVICE_UNAVAILABLE);
     }
     
-    // Helper methods for AI content generation
-    private function generateWithOpenAI($activity)
-    {
-        // ... (rest of the code remains the same)
-                    'Authorization' => 'Bearer ' . $apiKey,
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'model' => 'gpt-3.5-turbo',
-                    'messages' => [
-                        [
-                            'role' => 'system',
-                            'content' => 'You are a travel blogger writing about activities and destinations.'
-                        ],
-                        [
-                            'role' => 'user',
-                            'content' => 'Write a detailed blog post about a ' . $activity->getActivityName() . ' experience. Include what makes this activity special, what to expect, and some tips for travelers. Format the response in HTML with appropriate headings, paragraphs, and occasional emphasis.'
-                        ]
-                    ],
-                    'temperature' => 0.7,
-                    'max_tokens' => 1000
-                ]
-            ]);
-            
-            $statusCode = $response->getStatusCode();
-            if ($statusCode === 200) {
-                $data = $response->toArray();
-                if (isset($data['choices'][0]['message']['content'])) {
-                    return $data['choices'][0]['message']['content'];
-                }
-            } else {
-                $this->logger?->warning('OpenAI returned non-200 status', [
-                    'endpoint' => $endpoint,
-                    'status' => $statusCode,
-                    'response' => $response->getContent(false)
-                ]);
-            }
-        } catch (\Exception $e) {
-            $this->logger?->warning('Exception when calling OpenAI', [
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
-        }
-        
-        return null;
-    }
-    
-    private function generateWithHuggingFace($activity)
-    {
-        if (!$this->httpClient) {
-            return null;
-        }
-        
-        $apiKey = $this->getParameter('huggingface_api_key');
-        if (!$apiKey) {
-            $this->logger?->warning('HuggingFace API key not configured');
-            return null;
-        }
-        
-        $endpoint = 'https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2';
-        
-        try {
-            $response = $this->httpClient->request('POST', $endpoint, [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $apiKey,
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'inputs' => 'Write a detailed blog post about a ' . $activity->getActivityName() . ' experience. Include what makes this activity special, what to expect, and some tips for travelers. Format the response in HTML with appropriate headings, paragraphs, and occasional emphasis.',
-                    'parameters' => [
-                        'max_new_tokens' => 1000,
-                        'temperature' => 0.7
-                    ]
-                ]
-            ]);
-            
-            $statusCode = $response->getStatusCode();
-            if ($statusCode === 200) {
-                $data = $response->toArray();
-                if (isset($data[0]['generated_text'])) {
-                    return $data[0]['generated_text'];
-                }
-            } else {
-                $this->logger?->warning('HuggingFace returned non-200 status', [
-                    'endpoint' => $endpoint,
-                    'status' => $statusCode,
-                    'response' => $response->getContent(false)
-                ]);
-            }
-        } catch (\Exception $e) {
-            $this->logger?->warning('Exception when calling HuggingFace', [
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
-        }
-        
-        
-        try {
-            $response = $this->httpClient->request('POST', $endpoint, [
-                'json' => [
-                    'model' => 'mistral',
-                    'prompt' => 'Write a detailed blog post about a ' . $activity->getActivityName() . ' experience. Include what makes this activity special, what to expect, and some tips for travelers. Format the response in HTML with appropriate headings, paragraphs, and occasional emphasis.',
-                    'max_tokens' => 1000,
-                    'temperature' => 0.7
-                ]
-            ]);
-            
-            $statusCode = $response->getStatusCode();
-            if ($statusCode === 200) {
-                $data = $response->toArray();
-                if (isset($data['choices'][0]['text'])) {
-                    return $data['choices'][0]['text'];
-                }
-            } else {
-                $lastError = "Received status code {$statusCode} from {$endpoint}";
-                $this->logger?->warning('API returned non-200 status', [
-                    'endpoint' => $endpoint,
-                    'status' => $statusCode,
-                    'response' => $response->getContent(false)
-                ]);
-            }
-        } catch (\Exception $e) {
-            $lastError = $e->getMessage();
-            $this->logger?->warning('Exception when calling LocalAI', [
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
-        }
-        
-        return null;
-    }
+    // No additional helper methods needed as we're now using the GeminiAIService
 }

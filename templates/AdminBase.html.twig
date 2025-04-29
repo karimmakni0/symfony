@@ -134,7 +134,11 @@
               <div class="dropdown">
                 <div class="d-flex items-center user-dropdown-toggle" id="userDropdown">
                   {% if app.user and app.user.image %}
-                    <img src="{{ asset(app.user.image) }}" alt="{{ app.user.name }}" class="size-50 rounded-22 object-cover">
+                    {% if app.user.image starts with 'google_profile:' %}
+                      <img src="{{ app.user.image[15:] }}" alt="{{ app.user.name }}" class="size-50 rounded-22 object-cover">
+                    {% else %}
+                      <img src="{{ asset('assets/img/UserPictures/' ~ app.user.image) }}" alt="{{ app.user.name }}" class="size-50 rounded-22 object-cover">
+                    {% endif %}
                   {% else %}
                     <div class="size-50 rounded-22 flex-center bg-blue-1-05 text-blue-1">
                       <i class="icon-user text-24"></i>

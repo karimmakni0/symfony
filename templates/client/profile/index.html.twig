@@ -83,7 +83,11 @@
                       <div class="profile-image-container position-relative">
                         <div class="ratio ratio-1:1 w-200 bg-light-2 rounded-circle overflow-hidden shadow-sm border">
                           {% if user.image %}
-                            <img src="{{ asset('assets/img/UserPictures/' ~ user.image) }}" alt="User profile" class="img-ratio object-fit-cover">
+                            {% if user.image starts with 'google_profile:' %}
+                              <img src="{{ user.image[15:] }}" alt="User profile" class="img-ratio object-fit-cover">
+                            {% else %}
+                              <img src="{{ asset('assets/img/UserPictures/' ~ user.image) }}" alt="User profile" class="img-ratio object-fit-cover">
+                            {% endif %}
                           {% else %}
                             <img src="{{ asset('assets/img/avatars/3.png') }}" alt="Default profile" class="img-ratio object-fit-cover">
                           {% endif %}

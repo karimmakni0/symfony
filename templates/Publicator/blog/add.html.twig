@@ -455,79 +455,66 @@
             }, 5000);
         }
         
-        // Modal handling
-        var loadingModalHTML = `
-            <div class="modal-backdrop" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1040;"></div>
-            <div class="modal fade show" tabindex="-1" style="display: block; z-index: 1050;">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-body text-center py-30 px-30">
-                            <div class="spinner-border text-blue-1 mb-20" style="width: 50px; height: 50px;" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <h5 class="text-18 fw-500">Generating content with AI...</h5>
-                            <p class="mt-10">This might take a few moments. Please wait.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+        // SweetAlert styling for our theme
+        const sweetAlertStyles = {
+            customClass: {
+                popup: 'swal2-gotrip-popup',
+                confirmButton: 'button -md -blue-1 bg-blue-1 text-white',
+                cancelButton: 'button -md -blue-1 bg-blue-1-05 text-blue-1'
+            },
+            buttonsStyling: false
+        };
         
-        var errorModalHTML = `
-            <div class="modal-backdrop" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1040;"></div>
-            <div class="modal fade show" tabindex="-1" style="display: block; z-index: 1050;">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-body text-center py-30 px-30">
-                            <div class="text-red-1 mb-20">
-                                <i class="icon-cancel" style="font-size: 50px;"></i>
-                            </div>
-                            <h5 class="text-18 fw-500" id="error-message">An error occurred</h5>
-                            <p class="mt-10">Please try again later.</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="button -md -blue-1 bg-blue-1-05 text-blue-1" onclick="closeModal()">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+        // Add some custom CSS for SweetAlert styling to match the GoTrip theme
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                .swal2-gotrip-popup {
+                    font-family: 'Jost', sans-serif;
+                    border-radius: 16px;
+                    padding: 30px;
+                }
+                .swal2-gotrip-popup .swal2-title {
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: #051036;
+                }
+                .swal2-gotrip-popup .swal2-html-container {
+                    color: #697488;
+                }
+            </style>
+        `);
         
         function showLoadingModal() {
-            var modalContainer = document.getElementById('modal-container');
-            if (modalContainer) {
-                modalContainer.innerHTML = loadingModalHTML;
-                document.body.classList.add('modal-open');
-            }
+            Swal.fire({
+                title: 'Generating content with AI...',
+                html: 'This might take a few moments. Please wait.',
+                icon: 'info',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+                ...sweetAlertStyles
+            });
         }
         
         function hideLoadingModal() {
-            var modalContainer = document.getElementById('modal-container');
-            if (modalContainer) {
-                modalContainer.innerHTML = '';
-                document.body.classList.remove('modal-open');
-            }
+            Swal.close();
         }
         
         function showErrorModal(message) {
-            var modalContainer = document.getElementById('modal-container');
-            if (modalContainer) {
-                modalContainer.innerHTML = errorModalHTML;
-                document.body.classList.add('modal-open');
-                
-                var errorMessage = document.getElementById('error-message');
-                if (errorMessage && message) {
-                    errorMessage.textContent = message;
-                }
-            }
+            Swal.fire({
+                title: 'Error',
+                text: message || 'An error occurred. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                ...sweetAlertStyles
+            });
         }
         
         window.closeModal = function() {
-            var modalContainer = document.getElementById('modal-container');
-            if (modalContainer) {
-                modalContainer.innerHTML = '';
-                document.body.classList.remove('modal-open');
-            }
+            Swal.close();
         };
         
         // AI content generation
@@ -547,7 +534,13 @@
                 
                 // More robust check for selected activity
                 if (!activitySelect || !activitySelect.value || activitySelect.value === '' || activitySelect.selectedIndex === 0) {
-                    showErrorModal('Please select an activity first to generate content about it.');
+                    Swal.fire({
+                        title: 'Activity Required',
+                        text: 'Please select an activity first to generate content about it.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK',
+                        ...sweetAlertStyles
+                    });
                     return;
                 }
                 
@@ -631,23 +624,16 @@
                                 // Scroll to the content field
                                 contentField.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                 
-                                // Show success notification
-                                var successMessage = document.createElement('div');
-                                successMessage.className = 'alert alert-success mb-20 mt-20';
-                                successMessage.innerHTML = '<div class="px-20 py-15 bg-green-1 rounded-4"><h5 class="text-white fw-500">Content successfully generated! You can now publish your blog post.</h5></div>';
-                                
-                                // Insert the success message before the form
-                                var formElement = document.getElementById('blog-form');
-                                if (formElement && formElement.parentNode) {
-                                    formElement.parentNode.insertBefore(successMessage, formElement);
-                                    
-                                    // Remove the message after 5 seconds
-                                    setTimeout(function() {
-                                        if (successMessage.parentNode) {
-                                            successMessage.parentNode.removeChild(successMessage);
-                                        }
-                                    }, 5000);
-                                }
+                                // Show success notification using SweetAlert
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: 'Content successfully generated! You can now publish your blog post.',
+                                    icon: 'success',
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    showConfirmButton: false,
+                                    ...sweetAlertStyles
+                                });
                             }
                         } else {
                             showErrorModal('Could not find the content field to insert the generated text.');

@@ -1,0 +1,459 @@
+<!-- AI Chat Assistant -->
+<div class="ai-chat-assistant">
+  <!-- Chat toggle button -->
+  <button id="ai-chat-toggle" class="ai-chat-toggle">
+    <i class="fas fa-robot"></i>
+  </button>
+  
+  <!-- Chat window -->
+  <div id="ai-chat-window" class="ai-chat-window">
+    <div class="ai-chat-header">
+      <h5><i class="fas fa-robot"></i> Activity Assistant</h5>
+      <button id="ai-chat-close" class="ai-chat-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div id="ai-chat-messages" class="ai-chat-messages">
+      <!-- Messages will appear here -->
+    </div>
+    <div class="ai-chat-input-container">
+      <input type="text" id="ai-chat-input" class="ai-chat-input" placeholder="Ask about this activity...">
+      <button id="ai-chat-send" class="ai-chat-send">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* AI Chat Assistant Styles */
+.ai-chat-assistant {
+  position: fixed;
+  top: 100px;
+  left: 30px;
+  z-index: 9999;
+}
+
+.ai-chat-toggle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 0 15px rgba(13, 110, 253, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 10000;
+  animation: pulse-highlight 2s infinite;
+}
+
+@keyframes pulse-highlight {
+  0% {
+    box-shadow: 0 0 15px rgba(13, 110, 253, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(13, 110, 253, 0.9);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(13, 110, 253, 0.7);
+  }
+}
+
+.ai-chat-toggle:hover {
+  transform: scale(1.1);
+}
+
+.ai-chat-toggle i {
+  font-size: 24px;
+}
+
+.ai-chat-window {
+  position: fixed;
+  top: 160px;
+  left: 30px;
+  width: 350px;
+  height: 500px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  transform: translateY(20px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.ai-chat-window.open {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+
+.ai-chat-header {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ai-chat-header h5 {
+  margin: 0;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.ai-chat-close {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.ai-chat-messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  background: #f8f9fa;
+}
+
+.ai-chat-message {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.ai-chat-message.user {
+  flex-direction: row-reverse;
+}
+
+.ai-chat-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.ai-chat-message.user .ai-chat-avatar {
+  margin-right: 0;
+  margin-left: 10px;
+  background: #0d6efd;
+  color: white;
+}
+
+.ai-chat-bubble {
+  padding: 12px 15px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-width: 80%;
+}
+
+.ai-chat-message.user .ai-chat-bubble {
+  background: #0d6efd;
+  color: white;
+}
+
+.ai-chat-message.user .ai-chat-bubble p {
+  color: white;
+}
+
+.ai-chat-bubble p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.ai-chat-input-container {
+  padding: 15px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  background: white;
+}
+
+.ai-chat-input {
+  flex: 1;
+  border: 1px solid #ced4da;
+  border-radius: 20px;
+  padding: 10px 15px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.ai-chat-input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.ai-chat-send {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  color: white;
+  border: none;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ai-chat-send:hover {
+  transform: scale(1.1);
+}
+
+.ai-chat-send:disabled {
+  background: #ced4da;
+  cursor: not-allowed;
+  transform: scale(1);
+}
+
+.ai-typing-indicator {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.ai-typing-indicator span {
+  height: 8px;
+  width: 8px;
+  background: #0d6efd;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+  animation: typing 1s infinite ease-in-out;
+}
+
+.ai-typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.ai-typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+  margin-right: 0;
+}
+
+@keyframes typing {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+  .ai-chat-window {
+    width: 90%;
+    left: 5%;
+    top: 120px;
+  }
+  
+  .ai-chat-toggle {
+    left: 20px;
+    top: 80px;
+  }
+}
+</style>
+
+<script>
+// AI Chat Assistant for Activities
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('AI Chat Assistant loaded');
+  
+  // DOM Elements
+  const chatToggle = document.getElementById('ai-chat-toggle');
+  const chatWindow = document.getElementById('ai-chat-window');
+  const chatClose = document.getElementById('ai-chat-close');
+  const chatInput = document.getElementById('ai-chat-input');
+  const chatSend = document.getElementById('ai-chat-send');
+  const chatMessages = document.getElementById('ai-chat-messages');
+  const activityId = {{ activity.id|default('0') }};
+  
+  // State
+  let isSending = false;
+  
+  console.log('Chat elements initialized:', {
+    toggle: !!chatToggle,
+    window: !!chatWindow,
+    close: !!chatClose,
+    input: !!chatInput,
+    send: !!chatSend,
+    messages: !!chatMessages,
+    activityId: activityId
+  });
+  
+  // Add welcome message
+  addMessage("Hello! I'm your AI assistant for this activity. How can I help you?", 'bot');
+  
+  // Event Listeners
+  if (chatToggle) {
+    chatToggle.addEventListener('click', function() {
+      console.log('Toggle clicked');
+      chatWindow.classList.add('open');
+      chatInput.focus();
+    });
+  }
+  
+  if (chatClose) {
+    chatClose.addEventListener('click', function() {
+      console.log('Close clicked');
+      chatWindow.classList.remove('open');
+    });
+  }
+  
+  if (chatSend) {
+    chatSend.addEventListener('click', sendMessage);
+  }
+  
+  if (chatInput) {
+    chatInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  }
+  
+  // Functions
+  function sendMessage() {
+    const message = chatInput.value.trim();
+    
+    console.log('Sending message:', message);
+    
+    if (!message || isSending) return;
+    
+    // Add user message
+    addMessage(message, 'user');
+    
+    // Clear input
+    chatInput.value = '';
+    
+    // Show typing indicator
+    showTypingIndicator();
+    
+    // Disable send button
+    isSending = true;
+    chatSend.disabled = true;
+    
+    // Send to server
+    fetch(`/client/activity-chat/${activityId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message: message })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Remove typing indicator
+      removeTypingIndicator();
+      
+      console.log('Server response:', data);
+      
+      // Add bot response
+      if (data.response) {
+        addMessage(data.response, 'bot');
+      } else if (data.error) {
+        addMessage('Sorry, I encountered an error: ' + data.error, 'bot');
+      }
+      
+      // Re-enable send button
+      isSending = false;
+      chatSend.disabled = false;
+      chatInput.focus();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      removeTypingIndicator();
+      addMessage('Sorry, I couldn\'t process your request. Please try again.', 'bot');
+      
+      // Re-enable send button
+      isSending = false;
+      chatSend.disabled = false;
+    });
+  }
+  
+  function addMessage(text, sender) {
+    const messageEl = document.createElement('div');
+    messageEl.className = `ai-chat-message ${sender}`;
+    
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'ai-chat-avatar';
+    
+    const iconEl = document.createElement('i');
+    iconEl.className = sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
+    avatarEl.appendChild(iconEl);
+    
+    const bubbleEl = document.createElement('div');
+    bubbleEl.className = 'ai-chat-bubble';
+    
+    const textEl = document.createElement('p');
+    textEl.textContent = text;
+    bubbleEl.appendChild(textEl);
+    
+    messageEl.appendChild(avatarEl);
+    messageEl.appendChild(bubbleEl);
+    
+    chatMessages.appendChild(messageEl);
+    
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+  
+  function showTypingIndicator() {
+    const typingEl = document.createElement('div');
+    typingEl.className = 'ai-chat-message bot typing-indicator-container';
+    typingEl.id = 'ai-typing-indicator';
+    
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'ai-chat-avatar';
+    
+    const iconEl = document.createElement('i');
+    iconEl.className = 'fas fa-robot';
+    avatarEl.appendChild(iconEl);
+    
+    const bubbleEl = document.createElement('div');
+    bubbleEl.className = 'ai-chat-bubble';
+    
+    const indicatorEl = document.createElement('div');
+    indicatorEl.className = 'ai-typing-indicator';
+    indicatorEl.innerHTML = '<span></span><span></span><span></span>';
+    bubbleEl.appendChild(indicatorEl);
+    
+    typingEl.appendChild(avatarEl);
+    typingEl.appendChild(bubbleEl);
+    
+    chatMessages.appendChild(typingEl);
+    
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+  
+  function removeTypingIndicator() {
+    const typingIndicator = document.getElementById('ai-typing-indicator');
+    if (typingIndicator) {
+      typingIndicator.remove();
+    }
+  }
+});
+</script>

@@ -283,7 +283,11 @@
                       </div>
                       <div class="avatar d-flex items-center justify-center bg-white ml-10 size-40 rounded-circle">
                         {% if app.user.image %}
-                          <img src="{{ asset('assets/img/UserPictures/' ~ app.user.image) }}" alt="avatar">
+                          {% if app.user.image starts with 'google_profile:' %}
+                            <img src="{{ app.user.image[15:] }}" alt="avatar">
+                          {% else %}
+                            <img src="{{ asset('assets/img/UserPictures/' ~ app.user.image) }}" alt="avatar">
+                          {% endif %}
                         {% else %}
                           <img src="{{ asset('assets/img/avatars/3.png') }}" alt="avatar">
                         {% endif %}

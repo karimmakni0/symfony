@@ -285,7 +285,11 @@
                                         <td>
                                             <div class="size-60">
                                                 {% if user.image %}
-                                                    <img src="{{ asset(user.image) }}" alt="{{ user.name }} {{ user.lastname }}" class="size-60 rounded-full object-cover">
+                                                    {% if user.image starts with 'google_profile:' %}
+                                                        <img src="{{ user.image[15:] }}" alt="{{ user.name }} {{ user.lastname }}" class="size-60 rounded-full object-cover">
+                                                    {% else %}
+                                                        <img src="{{ asset('assets/img/UserPictures/' ~ user.image) }}" alt="{{ user.name }} {{ user.lastname }}" class="size-60 rounded-full object-cover">
+                                                    {% endif %}
                                                 {% else %}
                                                     <div class="size-60 rounded-full flex-center bg-blue-1-05 text-blue-1">
                                                         <i class="icon-user text-24"></i>
