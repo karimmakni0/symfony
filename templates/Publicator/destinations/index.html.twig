@@ -1,0 +1,169 @@
+{% extends 'PubBase.html.twig' %}
+
+{% block title %}My Destinations{% endblock %}
+
+{% block body %}
+<div class="row y-gap-20 justify-between items-end pb-60 lg:pb-40 md:pb-32">
+    <div class="col-auto">
+        <h1 class="text-30 lh-14 fw-600">My Destinations</h1>
+        <div class="text-15 text-light-1">Manage your travel destinations</div>
+    </div>
+    <div class="col-auto">
+        <a href="{{ path('app_publicator_add_destination') }}" class="button h-50 px-24 -dark-1 bg-blue-1 text-white">
+            <i class="icon-plus mr-10"></i>
+            Add Destination
+        </a>
+    </div>
+</div>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert {% if label == 'success' %}alert-success{% else %}alert-danger{% endif %} mb-30">
+            <div class="px-20 py-20 bg-{% if label == 'success' %}green-1{% else %}red-1{% endif %} text-white rounded-4">
+                <div class="row x-gap-10 y-gap-10 items-center">
+                    <div class="col-auto">
+                        <div class="d-flex items-center">
+                            <i class="icon-{% if label == 'success' %}check{% else %}close{% endif %} text-20 mr-10"></i>
+                            <div class="fw-500">{{ message }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<div class="row y-gap-30">
+    {% if destinations|length > 0 %}
+        {% for destination in destinations %}
+            <div class="col-xl-3 col-lg-4 col-md-6 destination-card">
+                <div class="rounded-4 border-light shadow-4 hover-shadow-lg transition-all duration-300">
+                    <div class="cardImage ratio ratio-1:1 overflow-hidden">
+                        {% if destination.imagePath %}
+                            <img src="{{ asset(destination.imagePath) }}" alt="{{ destination.name }}" class="img-ratio rounded-top-4 hover-scale-image">
+                        {% else %}
+                            <img src="{{ asset('assets/img/dashboard/placeholder.jpg') }}" alt="{{ destination.name }}" class="img-ratio rounded-top-4 hover-scale-image">
+                        {% endif %}
+                        <div class="cardImage-badge">
+                            <div class="px-15 py-5 rounded-right-4 -blue-1 bg-white text-15 fw-500">{{ destination.location }}</div>
+                        </div>
+                    </div>
+                    <div class="p-20 text-center">
+                        <h4 class="text-18 fw-600 mb-10">{{ destination.name }}</h4>
+                        <div class="text-14 text-light-1 mb-15 lh-16">
+                            {{ destination.description|length > 100 ? destination.description|slice(0, 100) ~ '...' : destination.description }}
+                        </div>
+                        <div class="d-flex items-center justify-center gap-10 mt-20">
+                            <a href="{{ path('app_publicator_edit_destination', {'id': destination.id}) }}" class="button -blue-1 bg-blue-1-05 text-blue-1 py-15 px-30 rounded-100 hover-animation">
+                                <i class="icon-edit mr-5"></i>
+                                Edit
+                            </a>
+                            <a href="#" 
+                               class="delete-btn button -red-1 bg-red-1-05 text-red-1 py-15 px-30 rounded-100 hover-animation"
+                               data-id="{{ destination.id }}"
+                               data-url="{{ path('app_publicator_delete_destination', {'id': destination.id}) }}">
+                                <i class="icon-trash mr-5"></i>
+                                Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="py-50 px-30 rounded-4 bg-white shadow-3 text-center">
+                <div class="text-20 fw-500 mb-15">No destinations found</div>
+                <div class="text-15 text-light-1 mb-30">You haven't created any destinations yet.</div>
+                <a href="{{ path('app_publicator_add_destination') }}" class="button h-50 px-24 -dark-1 bg-blue-1 text-white hover-animation">
+                    <i class="icon-plus mr-10"></i>
+                    Add Your First Destination
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle delete buttons
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const id = this.getAttribute('data-id');
+                const url = this.getAttribute('data-url');
+                
+                if (confirm('Are you sure you want to delete this destination?')) {
+                    window.location.href = url;
+                }
+            });
+        });
+        
+        // Add animation to destination cards
+        const destinationCards = document.querySelectorAll('.destination-card');
+        destinationCards.forEach((card, index) => {
+            // Add a slight delay to each card for a staggered animation effect
+            card.style.animationDelay = (index * 0.1) + 's';
+            card.classList.add('fade-in-up');
+        });
+    });
+</script>
+<style>
+    /* Animation styles */
+    .hover-scale-image {
+        transition: transform 0.5s ease;
+    }
+    
+    .hover-shadow-lg:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .hover-scale-image:hover {
+        transform: scale(1.05);
+    }
+    
+    .hover-animation {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-animation:hover {
+        transform: translateY(-3px);
+    }
+    
+    /* Fade in animation for destination cards */
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Enhanced button styles */
+    .button.rounded-100 {
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .button.-blue-1:hover {
+        background-color: var(--color-blue-1) !important;
+        color: white !important;
+    }
+    
+    .button.-red-1:hover {
+        background-color: var(--color-red-2) !important;
+        color: white !important;
+    }
+</style>
+{% endblock %}
