@@ -1,0 +1,237 @@
+/* Premium Language Modal - GoTrip Style */
+
+.language-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(5, 16, 54, 0.75);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
+}
+
+.language-modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  max-width: 480px;
+  border-radius: 8px;
+  box-shadow: 0 20px 40px rgba(5, 16, 54, 0.2);
+  animation: slideIn 0.4s ease;
+  overflow: hidden;
+}
+
+.language-modal-header {
+  position: relative;
+  padding: 25px 30px;
+  border-bottom: 1px solid rgba(53, 84, 209, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #0d2857, #1e3c72);
+}
+
+.language-modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  color: #ffffff;
+  font-family: 'Jost', sans-serif;
+  position: relative;
+  z-index: 1;
+}
+
+.language-close {
+  position: relative;
+  z-index: 1;
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.language-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+.language-modal-body {
+  padding: 25px;
+}
+
+.language-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.language-option a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 25px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #051036;
+  transition: all 0.3s;
+  background-color: #f5f7fa;
+  border: 1px solid #EEF1F7;
+  height: 160px;
+}
+
+.language-option a:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(5, 16, 54, 0.08);
+  border-color: rgba(53, 84, 209, 0.3);
+  background-color: rgba(53, 84, 209, 0.02);
+}
+
+.language-flag {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+  background-size: cover;
+  background-position: center;
+  border: 3px solid #fff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.language-option a:hover .language-flag {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(5, 16, 54, 0.15);
+}
+
+.language-name {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.language-code {
+  font-size: 12px;
+  color: #697488;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+.en-flag {
+  background-image: url('https://flagcdn.com/w160/gb.png');
+}
+
+.fr-flag {
+  background-image: url('https://flagcdn.com/w160/fr.png');
+}
+
+.ar-flag {
+  background-image: url('https://flagcdn.com/w160/sa.png');
+}
+
+.de-flag {
+  background-image: url('https://flagcdn.com/w160/de.png');
+}
+
+/* Current language indicator */
+.language-option a.current {
+  background-color: rgba(53, 84, 209, 0.05);
+  border-color: rgba(53, 84, 209, 0.25);
+  position: relative;
+}
+
+.language-option a.current::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  background-color: #3554D1;
+  border-radius: 50%;
+}
+
+.language-option a.current::after {
+  content: '✓';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+}
+
+.language-option a.current .language-name {
+  color: #3554D1;
+  font-weight: 600;
+}
+
+/* RTL Support for Arabic */
+html[dir="rtl"] .language-option a.current::before,
+html[dir="rtl"] .language-option a.current::after {
+  right: auto;
+  left: 10px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 576px) {
+  .language-modal-content {
+    margin: 20% auto;
+    max-width: 90%;
+  }
+  
+  .language-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .language-option a {
+    height: auto;
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+    padding: 15px;
+  }
+  
+  .language-flag {
+    margin-bottom: 0;
+    margin-right: 15px;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .language-text {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  html[dir="rtl"] .language-flag {
+    margin-right: 0;
+    margin-left: 15px;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

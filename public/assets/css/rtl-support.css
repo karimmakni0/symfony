@@ -1,0 +1,72 @@
+/* RTL Support Styles */
+
+html[dir="rtl"] {
+    /* Basic text direction */
+    text-align: right;
+}
+
+html[dir="rtl"] .ml-10 {
+    margin-left: 0;
+    margin-right: 10px;
+}
+
+html[dir="rtl"] .ml-20 {
+    margin-left: 0;
+    margin-right: 20px;
+}
+
+html[dir="rtl"] .mr-10 {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+html[dir="rtl"] .mr-20 {
+    margin-right: 0;
+    margin-left: 20px;
+}
+
+/* Menu items direction */
+html[dir="rtl"] .menu__nav {
+    padding-right: 0;
+}
+
+/* Dropdown alignment */
+html[dir="rtl"] .dropdown__button {
+    text-align: right;
+}
+
+html[dir="rtl"] .toggle-element.-dropdown-2 {
+    left: auto;
+    right: 0;
+}
+
+/* Icon direction flipping */
+html[dir="rtl"] .icon-chevron-sm-down {
+    transform: rotate(180deg);
+}
+
+/* Form elements */
+html[dir="rtl"] input,
+html[dir="rtl"] textarea {
+    text-align: right;
+}
+
+/* Header elements */
+html[dir="rtl"] .header-logo {
+    margin-right: 0;
+    margin-left: 20px;
+}
+
+/* Any elements that need to be flipped */
+html[dir="rtl"] .icon-map-marker {
+    margin-right: 0;
+    margin-left: 5px;
+}
+
+/* Mobile menu */
+@media (max-width: 991px) {
+    html[dir="rtl"] .menu__nav .subnav {
+        padding-right: 15px !important;
+        padding-left: 0 !important;
+    }
+}

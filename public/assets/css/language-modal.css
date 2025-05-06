@@ -1,0 +1,156 @@
+/* Language Modal Styles - Theme Matched */
+
+.language-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(5, 16, 54, 0.7);
+  animation: fadeIn 0.3s ease;
+}
+
+.language-modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  max-width: 450px;
+  border-radius: 4px;
+  box-shadow: 0 15px 40px rgba(5, 16, 54, 0.15);
+  animation: slideIn 0.3s ease;
+  border: none;
+}
+
+.language-modal-header {
+  padding: 25px 30px;
+  border-bottom: 1px solid #EEF1F7;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0d2857;
+  border-radius: 4px 4px 0 0;
+}
+
+.language-modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  color: #ffffff;
+  font-family: 'Jost', sans-serif;
+}
+
+.language-close {
+  color: #ffffff;
+  float: right;
+  font-size: 24px;
+  font-weight: 300;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.language-close:hover {
+  opacity: 1;
+}
+
+.language-modal-body {
+  padding: 30px;
+}
+
+.language-option {
+  margin-bottom: 20px;
+}
+
+.language-option:last-child {
+  margin-bottom: 0;
+}
+
+.language-option a {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #051036;
+  transition: all 0.2s;
+  font-family: 'Jost', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  width: 100%;
+}
+
+.language-option a:hover {
+  background-color: rgba(53, 84, 209, 0.05);
+  color: #3554D1;
+}
+
+.language-flag {
+  width: 30px;
+  height: 30px;
+  margin-right: 15px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.en-flag {
+  background-image: url('https://flagsapi.com/GB/flat/64.png');
+}
+
+.fr-flag {
+  background-image: url('https://flagsapi.com/FR/flat/64.png');
+}
+
+.ar-flag {
+  background-image: url('https://flagsapi.com/SA/flat/64.png');
+}
+
+.de-flag {
+  background-image: url('https://flagsapi.com/DE/flat/64.png');
+}
+
+/* Current language indicator */
+.language-option a.current {
+  background-color: rgba(53, 84, 209, 0.05);
+  color: #3554D1;
+  position: relative;
+}
+
+.language-option a.current:after {
+  content: '✓';
+  position: absolute;
+  right: 20px;
+  color: #3554D1;
+}
+
+/* RTL Support for Arabic */
+html[dir="rtl"] .language-flag {
+  margin-right: 0;
+  margin-left: 15px;
+}
+
+html[dir="rtl"] .language-option a.current:after {
+  right: auto;
+  left: 20px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 576px) {
+  .language-modal-content {
+    margin: 30% auto 0;
+    max-width: 90%;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

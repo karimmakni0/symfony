@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Hôte : 127.0.0.1
--- Généré le : lun. 28 avr. 2025 à 21:07
--- Version du serveur : 10.4.32-MariaDB
--- Version de PHP : 8.2.12
+-- Host: localhost
+-- Generation Time: Apr 29, 2025 at 09:28 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `applicationpi`
+-- Database: `applicationpi`
 --
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `activities`
+-- Table structure for table `activities`
 --
 
 CREATE TABLE `activities` (
@@ -44,7 +44,7 @@ CREATE TABLE `activities` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `activities`
+-- Dumping data for table `activities`
 --
 
 INSERT INTO `activities` (`id`, `activity_name`, `activity_description`, `activity_destination`, `activity_duration`, `activity_price`, `activity_genre`, `user_id`, `activity_date`, `created_at`, `max_number`, `latitude`, `longitude`) VALUES
@@ -67,33 +67,31 @@ INSERT INTO `activities` (`id`, `activity_name`, `activity_description`, `activi
 (116, 'Pyramids Camel Ride', 'Ride camels around the majestic pyramids of Giza.', 'Cairo', '2 Hours', 90.00, 'Adventure', 4, '2025-06-26', '2025-04-25 10:53:22', 30, 30.04440000, 31.23570000),
 (117, 'Egyptian Museum Tour', 'See ancient artifacts including Tutankhamun’s treasures.', 'Cairo', 'Half Day', 110.00, 'Cultural', 4, '2025-06-27', '2025-04-25 10:53:22', 30, 30.04440000, 31.23570000),
 (118, 'Old Town Walking Tour', 'Explore Prague’s historic Old Town and Charles Bridge.', 'Prague', 'Half Day', 85.00, 'Cultural', 4, '2025-06-28', '2025-04-25 10:53:22', 40, 50.07550000, 14.43780000),
-(119, 'Prague Castle Visit', 'Tour the largest ancient castle complex in the world.', 'Prague', 'Half Day', 95.00, 'Cultural', 4, '2025-06-29', '2025-04-25 10:53:22', 30, 50.07550000, 14.43780000),
-(120, 'Sugarloaf Mountain Cable Car', 'Ride to the top for the best view of Rio de Janeiro.', 'Rio de Janeiro', '2 Hours', 75.00, 'Adventure', 4, '2025-06-30', '2025-04-25 10:53:22', 60, -22.90680000, -43.17290000),
-(121, 'Samba Dance Show', 'Experience the lively rhythms of Brazil with a samba show.', 'Rio de Janeiro', 'Evening', 120.00, 'Cultural', 4, '2025-07-01', '2025-04-25 10:53:22', 80, -22.90680000, -43.17290000),
 (122, 'Lisbon Tram 28 Ride', 'Take a scenic historic tram ride through Lisbon’s neighborhoods.', 'Lisbon', '2 Hours', 40.00, 'Cultural', 4, '2025-07-02', '2025-04-25 10:53:22', 70, 38.71690000, -9.13990000),
 (123, 'Fado Music Dinner', 'Enjoy a traditional Portuguese dinner with live Fado music.', 'Lisbon', 'Evening', 100.00, 'Cultural', 4, '2025-07-03', '2025-04-25 10:53:22', 50, 38.71690000, -9.13990000),
 (124, 'Bangkok Floating Market Tour', 'Shop at lively markets floating along Bangkok\'s canals.', 'Bangkok', 'Half Day', 60.00, 'Cultural', 4, '2025-07-04', '2025-04-25 10:53:22', 50, 13.75630000, 100.50180000),
-(125, 'Thai Cooking Class', 'Learn to prepare authentic Thai dishes with a local chef.', 'Bangkok', 'Half Day', 90.00, 'Food', 28, '2025-07-05', '2025-04-25 10:53:22', 20, 13.75630000, 100.50180000),
-(126, 'Hollywood Sign Hike', 'Get up close to LA’s iconic Hollywood sign.', 'Los Angeles', 'Half Day', 70.00, 'Adventure', 28, '2025-07-06', '2025-04-25 10:53:22', 50, 34.05220000, -118.24370000),
-(127, 'Venice Beach Bike Ride', 'Cycle along the colorful Venice Beach boardwalk.', 'Los Angeles', 'Half Day', 65.00, 'Beach', 28, '2025-07-07', '2025-04-25 10:53:22', 40, 34.05220000, -118.24370000),
-(128, 'Northern Lights Hunt', 'Go chasing the Aurora Borealis outside Reykjavik.', 'Reykjavik', 'Night', 300.00, 'Nature', 28, '2025-07-08', '2025-04-25 10:53:22', 25, 64.13550000, -21.89540000),
-(129, 'Blue Lagoon Spa Day', 'Relax in Iceland’s famous geothermal spa.', 'Reykjavik', 'Half Day', 250.00, 'Relaxation', 28, '2025-07-09', '2025-04-25 10:53:22', 30, 64.13550000, -21.89540000),
-(130, 'Edinburgh Castle Tour', 'Explore the royal history of Edinburgh Castle.', 'Edinburgh', 'Half Day', 80.00, 'Cultural', 28, '2025-07-10', '2025-04-25 10:53:22', 40, 55.95330000, -3.18830000),
-(131, 'Scottish Highlands Day Trip', 'Visit the stunning Highlands scenery from Edinburgh.', 'Edinburgh', '1 Day', 220.00, 'Nature', 28, '2025-07-11', '2025-04-25 10:53:22', 20, 55.95330000, -3.18830000),
-(132, 'Petra Night Experience', 'See the ancient Petra lit by thousands of candles.', 'Petra', 'Evening', 110.00, 'Cultural', 28, '2025-07-12', '2025-04-25 10:53:22', 60, 30.32850000, 35.44440000),
-(133, 'Treasury Guided Tour', 'Discover the mysteries behind Petra’s famous Treasury.', 'Petra', 'Half Day', 140.00, 'Cultural', 28, '2025-07-13', '2025-04-25 10:53:22', 30, 30.32850000, 35.44440000),
-(134, 'Seoul Palace Tour', 'Visit the grand palaces of the Joseon Dynasty.', 'Seoul', 'Half Day', 80.00, 'Cultural', 28, '2025-07-14', '2025-04-25 10:53:22', 50, 37.56650000, 126.97800000),
-(135, 'K-Pop Experience', 'Dive into the exciting world of K-pop in Seoul.', 'Seoul', 'Half Day', 150.00, 'Cultural', 28, '2025-07-15', '2025-04-25 10:53:22', 30, 37.56650000, 126.97800000),
-(136, 'Gondola Ride', 'Romantic gondola ride through Venice’s canals.', 'Venice', '1 Hour', 100.00, 'Relaxation', 28, '2025-07-16', '2025-04-25 10:53:22', 30, 45.44080000, 12.31550000),
-(137, 'Venetian Mask Workshop', 'Learn the craft of traditional Venetian masks.', 'Venice', 'Half Day', 120.00, 'Cultural', 28, '2025-07-17', '2025-04-25 10:53:22', 20, 45.44080000, 12.31550000),
-(138, 'Classic Car Tour Havana', 'Cruise through Havana in a vintage car.', 'Havana', '2 Hours', 80.00, 'Cultural', 28, '2025-07-18', '2025-04-25 10:53:22', 50, 23.11360000, -82.36660000),
-(139, 'Cuban Salsa Lessons', 'Learn salsa from the best in Havana.', 'Havana', 'Half Day', 90.00, 'Cultural', 28, '2025-07-19', '2025-04-25 10:53:22', 30, 23.11360000, -82.36660000),
-(145, 'Ubusd Jungle Swing & Rice Terrace Toura', 'asdcdsadasd', 'Baliafii', '5 hours', 409.00, 'Family', 40, '2025-04-29', '2025-04-26 12:46:36', 34, 36.80110000, 115.27986900);
+(125, 'Thai Cooking Class', 'Learn to prepare authentic Thai dishes with a local chef.', 'Bangkok', 'Half Day', 90.00, 'Food', 4, '2025-07-05', '2025-04-25 10:53:22', 20, 13.75630000, 100.50180000),
+(126, 'Hollywood Sign Hike', 'Get up close to LA’s iconic Hollywood sign.', 'Los Angeles', 'Half Day', 70.00, 'Adventure', 4, '2025-07-06', '2025-04-25 10:53:22', 50, 34.05220000, -118.24370000),
+(127, 'Venice Beach Bike Ride', 'Cycle along the colorful Venice Beach boardwalk.', 'Los Angeles', 'Half Day', 65.00, 'Beach', 4, '2025-07-07', '2025-04-25 10:53:22', 40, 34.05220000, -118.24370000),
+(128, 'Northern Lights Hunt', 'Go chasing the Aurora Borealis outside Reykjavik.', 'Reykjavik', 'Night', 300.00, 'Nature', 4, '2025-07-08', '2025-04-25 10:53:22', 25, 64.13550000, -21.89540000),
+(129, 'Blue Lagoon Spa Day', 'Relax in Iceland’s famous geothermal spa.', 'Reykjavik', 'Half Day', 250.00, '', 4, '2025-07-09', '2025-04-25 10:53:22', 30, 64.13550000, -21.89540000),
+(130, 'Edinburgh Castle Tour', 'Explore the royal history of Edinburgh Castle.', 'Edinburgh', 'Half Day', 80.00, 'Cultural', 4, '2025-07-10', '2025-04-25 10:53:22', 40, 55.95330000, -3.18830000),
+(131, 'Scottish Highlands Day Trip', 'Visit the stunning Highlands scenery from Edinburgh.', 'Edinburgh', '1 Day', 220.00, 'Nature', 4, '2025-07-11', '2025-04-25 10:53:22', 20, 55.95330000, -3.18830000),
+(132, 'Petra Night Experience', 'See the ancient Petra lit by thousands of candles.', 'Petra', 'Evening', 110.00, 'Cultural', 4, '2025-07-12', '2025-04-25 10:53:22', 60, 30.32850000, 35.44440000),
+(133, 'Treasury Guided Tour', 'Discover the mysteries behind Petra’s famous Treasury.', 'Petra', 'Half Day', 140.00, 'Cultural', 4, '2025-07-13', '2025-04-25 10:53:22', 30, 30.32850000, 35.44440000),
+(134, 'Seoul Palace Tour', 'Visit the grand palaces of the Joseon Dynasty.', 'Seoul', 'Half Day', 80.00, 'Cultural', 4, '2025-07-14', '2025-04-25 10:53:22', 50, 37.56650000, 126.97800000),
+(135, 'K-Pop Experience', 'Dive into the exciting world of K-pop in Seoul.', 'Seoul', 'Half Day', 150.00, 'Cultural', 4, '2025-07-15', '2025-04-25 10:53:22', 30, 37.56650000, 126.97800000),
+(136, 'Gondola Ride', 'Romantic gondola ride through Venice’s canals.', 'Venice', '1 Hour', 100.00, '', 4, '2025-07-16', '2025-04-25 10:53:22', 30, 45.44080000, 12.31550000),
+(137, 'Venetian Mask Workshop', 'Learn the craft of traditional Venetian masks.', 'Venice', 'Half Day', 120.00, 'Cultural', 4, '2025-07-17', '2025-04-25 10:53:22', 20, 45.44080000, 12.31550000),
+(138, 'Classic Car Tour Havana', 'Cruise through Havana in a vintage car.', 'Havana', '2 Hours', 80.00, 'Cultural', 4, '2025-07-18', '2025-04-25 10:53:22', 50, 23.11360000, -82.36660000),
+(139, 'Cuban Salsa Lessons', 'Learn salsa from the best in Havana.', 'Havana', 'Half Day', 90.00, 'Cultural', 4, '2025-07-19', '2025-04-25 10:53:22', 30, 23.11360000, -82.36660000),
+(156, 'Ubud Jungle Swing & Rice Terrace Tour', 'amazing trippp is waitng for u', 'Bali', '5 hours', 409.00, 'Family', 47, '2025-04-30', '2025-04-29 12:35:44', 11, 36.80110000, 115.27986900),
+(157, 'Ubud Jungle Swing & Rice Terrace Tour', 'amazing trippp is waitng for u', 'Bali', '5 hours', 409.00, 'Family', 47, '2025-04-30', '2025-04-29 12:36:19', 11, 36.80110000, 115.27986900);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `billet`
+-- Table structure for table `billet`
 --
 
 CREATE TABLE `billet` (
@@ -105,7 +103,7 @@ CREATE TABLE `billet` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `billet`
+-- Dumping data for table `billet`
 --
 
 INSERT INTO `billet` (`id`, `prix`, `numero`, `activiteId`, `nb`) VALUES
@@ -149,12 +147,18 @@ INSERT INTO `billet` (`id`, `prix`, `numero`, `activiteId`, `nb`) VALUES
 (166, 90, 'TICKET-680c019907f29', 139, 3),
 (167, 90, 'TICKET-680c01a79b746', 139, 3),
 (168, 409, 'TICKET-680e088496e9a', 145, 2),
-(169, 409, 'TICKET-680f5fc3a4eed', 145, 1);
+(169, 409, 'TICKET-680f5fc3a4eed', 145, 1),
+(170, 120, 'TICKET-681043f428fb0', 137, 1),
+(173, 80, 'TICKET-6810c2e29fe41', 138, 1),
+(174, 150, 'TICKET-6810c4690985c', 135, 1),
+(175, 409, 'TICKET-6810c9be6df9f', 155, 1),
+(176, 120, 'TICKET-6810cfca89f92', 137, 1),
+(177, 150, 'TICKET-6810d36228698', 100, 1);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `blogs_rating`
+-- Table structure for table `blogs_rating`
 --
 
 CREATE TABLE `blogs_rating` (
@@ -167,48 +171,19 @@ CREATE TABLE `blogs_rating` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `blogs_rating`
+-- Dumping data for table `blogs_rating`
 --
 
 INSERT INTO `blogs_rating` (`id`, `user_id`, `post_id`, `is_like`, `created_at`, `updated_at`) VALUES
-(7, 28, 8, 1, '2025-04-25 11:00:00', NULL),
-(8, 28, 13, 0, '2025-04-25 11:01:00', NULL),
-(9, 28, 12, 1, '2025-04-25 11:02:00', NULL),
-(10, 28, 27, 0, '2025-04-25 11:03:00', NULL),
-(11, 28, 33, 0, '2025-04-25 11:04:00', NULL),
-(12, 28, 17, 1, '2025-04-25 11:05:00', NULL),
-(13, 28, 19, 1, '2025-04-25 11:06:00', NULL),
-(14, 28, 35, 1, '2025-04-25 11:07:00', NULL),
-(15, 28, 11, 0, '2025-04-25 11:08:00', NULL),
-(16, 28, 15, 0, '2025-04-25 11:09:00', NULL),
-(17, 28, 34, 0, '2025-04-25 11:10:00', NULL),
-(18, 28, 36, 0, '2025-04-25 11:11:00', NULL),
-(19, 28, 25, 0, '2025-04-25 11:12:00', NULL),
-(20, 28, 26, 1, '2025-04-25 11:13:00', NULL),
-(21, 28, 30, 1, '2025-04-25 11:14:00', NULL),
-(22, 28, 9, 0, '2025-04-25 11:15:00', NULL),
-(23, 28, 21, 1, '2025-04-25 11:16:00', NULL),
-(24, 28, 32, 1, '2025-04-25 11:17:00', NULL),
-(25, 28, 23, 1, '2025-04-25 11:18:00', NULL),
-(26, 28, 28, 1, '2025-04-25 11:19:00', NULL),
-(27, 28, 16, 1, '2025-04-25 11:20:00', NULL),
-(28, 28, 14, 0, '2025-04-25 11:21:00', NULL),
-(29, 28, 37, 0, '2025-04-25 11:22:00', NULL),
-(30, 28, 24, 1, '2025-04-25 11:23:00', NULL),
-(31, 28, 10, 0, '2025-04-25 11:24:00', NULL),
-(32, 28, 29, 1, '2025-04-25 11:25:00', NULL),
-(33, 28, 18, 0, '2025-04-25 11:26:00', NULL),
-(34, 28, 31, 1, '2025-04-25 11:27:00', NULL),
-(35, 28, 22, 1, '2025-04-25 11:28:00', NULL),
-(36, 28, 20, 0, '2025-04-25 11:29:00', NULL),
-(39, 40, 36, 0, '2025-04-25 13:29:20', NULL),
-(40, 40, 8, 1, '2025-04-25 21:28:52', NULL),
-(42, 40, 38, 1, '2025-04-26 00:07:18', NULL);
+(44, 47, 30, 1, '2025-04-29 11:53:50', NULL),
+(45, 47, 27, 0, '2025-04-29 12:24:47', '2025-04-29 12:24:50'),
+(46, 47, 37, 1, '2025-04-29 12:26:47', NULL),
+(47, 45, 37, 1, '2025-04-29 13:15:31', NULL);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `comments`
+-- Table structure for table `comments`
 --
 
 CREATE TABLE `comments` (
@@ -220,7 +195,7 @@ CREATE TABLE `comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `comments`
+-- Dumping data for table `comments`
 --
 
 INSERT INTO `comments` (`id`, `post_id`, `user_id`, `date`, `comment`) VALUES
@@ -261,7 +236,34 @@ INSERT INTO `comments` (`id`, `post_id`, `user_id`, `date`, `comment`) VALUES
 -- --------------------------------------------------------
 
 --
--- Structure de la table `destinations`
+-- Table structure for table `coupon`
+--
+
+CREATE TABLE `coupon` (
+  `id` int(11) NOT NULL,
+  `code` varchar(20) NOT NULL,
+  `discount` double NOT NULL,
+  `is_percentage` tinyint(1) NOT NULL DEFAULT 1,
+  `usage_limit` int(11) NOT NULL,
+  `usage_count` int(11) NOT NULL DEFAULT 0,
+  `expires_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `coupon`
+--
+
+INSERT INTO `coupon` (`id`, `code`, `discount`, `is_percentage`, `usage_limit`, `usage_count`, `expires_at`, `is_active`, `created_at`) VALUES
+(1, 'SUMMER2025', 50, 1, 1, 1, '2025-05-01 00:00:00', 1, '2025-04-29 12:14:09'),
+(3, 'SUMMER303', 50, 1, 1, 1, '2025-05-01 00:00:00', 1, '2025-04-29 12:17:50'),
+(4, 'SUMMER2021', 1, 1, 1, 1, '2025-04-30 00:00:00', 1, '2025-04-29 12:21:18');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `destinations`
 --
 
 CREATE TABLE `destinations` (
@@ -275,7 +277,7 @@ CREATE TABLE `destinations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `destinations`
+-- Dumping data for table `destinations`
 --
 
 INSERT INTO `destinations` (`id`, `name`, `location`, `description`, `image_path`, `user_id`, `created_at`) VALUES
@@ -304,27 +306,26 @@ INSERT INTO `destinations` (`id`, `name`, `location`, `description`, `image_path
 (48, 'Auckland', 'New Zealand', 'Adventures in nature, Maori culture, and spectacular coastlines.', 'uploads/destinations/destination-680fcc0d54e68-1745865741.jpg', 4, '2025-04-24 17:00:00'),
 (49, 'Budapest', 'Hungary', 'Relax in thermal baths and admire grand architecture by the Danube River.', 'uploads/destinations/destination-680fcbc677234-1745865670.jpg', 4, '2025-04-24 18:00:00'),
 (50, 'Vienna', 'Austria', 'City of music, art, imperial palaces, and delightful coffee houses.', 'uploads/destinations/destination-680fcb8107ff7-1745865601.jpg', 4, '2025-04-24 19:00:00'),
-(51, 'Buenos Aires', 'Argentina', 'Tango, vibrant neighborhoods, and grand European-style architecture.', 'uploads/destinations/destination-26.jpg', 28, '2025-04-24 20:00:00'),
-(52, 'Quebec City', 'Canada', 'Charming cobbled streets and the magic of French culture in North America.', 'uploads/destinations/destination-27.jpg', 28, '2025-04-24 21:00:00'),
-(53, 'Moscow', 'Russia', 'Explore Red Square, the Kremlin, and onion-domed cathedrals.', 'uploads/destinations/destination-28.jpg', 28, '2025-04-24 22:00:00'),
-(54, 'Athens', 'Greece', 'Discover the ancient wonders of the Acropolis and Greek mythology.', 'uploads/destinations/destination-29.jpg', 28, '2025-04-25 09:00:00'),
-(55, 'Hoi An', 'Vietnam', 'Charming lantern-lit streets, ancient temples, and riverside cafes.', 'uploads/destinations/destination-30.jpg', 28, '2025-04-25 10:00:00'),
-(56, 'Vancouver', 'Canada', 'Nature meets city life: mountains, beaches, and a vibrant downtown.', 'uploads/destinations/destination-31.jpg', 28, '2025-04-25 11:00:00'),
-(57, 'Florence', 'Italy', 'Birthplace of the Renaissance — art, architecture, and Tuscan charm.', 'uploads/destinations/destination-32.jpg', 28, '2025-04-25 12:00:00'),
-(58, 'Amman', 'Jordan', 'Modern city blended with historic ruins and Middle Eastern culture.', 'uploads/destinations/destination-33.jpg', 28, '2025-04-25 13:00:00'),
-(59, 'Lima', 'Peru', 'A vibrant coastal city known for its colonial architecture and cuisine.', 'uploads/destinations/destination-34.jpg', 28, '2025-04-25 14:00:00'),
-(60, 'Madrid', 'Spain', 'Lively plazas, royal palaces, world-famous museums and tapas.', 'uploads/destinations/destination-35.jpg', 28, '2025-04-25 15:00:00'),
-(61, 'Phuket', 'Thailand', 'Tropical beaches, luxury resorts, and lively night markets.', 'uploads/destinations/destination-36.jpg', 28, '2025-04-25 16:00:00'),
-(62, 'Luxor', 'Egypt', 'The world’s greatest open-air museum of ancient temples and tombs.', 'uploads/destinations/destination-37.jpg', 28, '2025-04-25 17:00:00'),
-(63, 'Montreal', 'Canada', 'Blend of European charm and vibrant festivals in every season.', 'uploads/destinations/destination-38.jpg', 28, '2025-04-25 18:00:00'),
-(64, 'Jerusalem', 'Israel', 'A holy city rich in spiritual significance and historic landmarks.', 'uploads/destinations/destination-39.jpg', 28, '2025-04-25 19:00:00'),
-(65, 'Siem Reap', 'Cambodia', 'Gateway to the incredible Angkor Wat temple complex.', 'uploads/destinations/destination-40.jpg', 28, '2025-04-25 20:00:00'),
-(67, 'Baliafii', 'Armenia', 'Destination deleted successfully!', 'uploads/destinations/destination-680c33a7862c3-1745630119.png', 40, '2025-04-26 00:15:19');
+(53, 'Moscow', 'Russia', 'Explore Red Square, the Kremlin, and onion-domed cathedrals.', 'uploads/destinations/destination-680fe5ead2680-1745872362.jpg', 4, '2025-04-24 22:00:00'),
+(54, 'Athens', 'Greece', 'Discover the ancient wonders of the Acropolis and Greek mythology.', 'uploads/destinations/destination-680fe408ae28f-1745871880.jpg', 4, '2025-04-25 09:00:00'),
+(55, 'Hoi An', 'Vietnam', 'Charming lantern-lit streets, ancient temples, and riverside cafes.', 'uploads/destinations/destination-680fe5cd7edf3-1745872333.jpg', 4, '2025-04-25 10:00:00'),
+(56, 'Vancouver', 'Canada', 'Nature meets city life: mountains, beaches, and a vibrant downtown.', 'uploads/destinations/destination-680fe5adcbd0c-1745872301.jpg', 4, '2025-04-25 11:00:00'),
+(57, 'Florence', 'Italy', 'Birthplace of the Renaissance — art, architecture, and Tuscan charm.', 'uploads/destinations/destination-680fe5822542a-1745872258.jpg', 4, '2025-04-25 12:00:00'),
+(58, 'Amman', 'Jordan', 'Modern city blended with historic ruins and Middle Eastern culture.', 'uploads/destinations/destination-680fe564ad1a5-1745872228.jpg', 4, '2025-04-25 13:00:00'),
+(59, 'Lima', 'Peru', 'A vibrant coastal city known for its colonial architecture and cuisine.', 'uploads/destinations/destination-680fe545aeead-1745872197.jpg', 4, '2025-04-25 14:00:00'),
+(60, 'Madrid', 'Spain', 'Lively plazas, royal palaces, world-famous museums and tapas.', 'uploads/destinations/destination-680fe52449c42-1745872164.jpg', 4, '2025-04-25 15:00:00'),
+(61, 'Phuket', 'Thailand', 'Tropical beaches, luxury resorts, and lively night markets.', 'uploads/destinations/destination-680fe5062aa11-1745872134.jpg', 4, '2025-04-25 16:00:00'),
+(62, 'Luxor', 'Egypt', 'The world’s greatest open-air museum of ancient temples and tombs.', 'uploads/destinations/destination-680fe4db57cbd-1745872091.png', 4, '2025-04-25 17:00:00'),
+(63, 'Montreal', 'Canada', 'Blend of European charm and vibrant festivals in every season.', 'uploads/destinations/destination-680fe4b07eb98-1745872048.jpg', 4, '2025-04-25 18:00:00'),
+(64, 'Jerusalem', 'Palestine', 'A holy city rich in spiritual significance and historic landmarks.', 'uploads/destinations/destination-680fe47aa7c2d-1745871994.jpg', 4, '2025-04-25 19:00:00'),
+(65, 'Siem Reap', 'Cambodia', 'Gateway to the incredible Angkor Wat temple complex.', 'uploads/destinations/destination-680fe454a3158-1745871956.jpg', 4, '2025-04-25 20:00:00'),
+(67, 'Baliafii', 'Armenia', 'Destination deleted successfully!', 'uploads/destinations/destination-680fe42edcc17-1745871918.jpg', 4, '2025-04-26 00:15:19'),
+(69, 'Bali', 'Angola', 'enjoyyyyy our trippp', 'uploads/destinations/destination-6810d48fdd660-1745933455.png', 47, '2025-04-29 12:30:55');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `doctrine_migration_versions`
+-- Table structure for table `doctrine_migration_versions`
 --
 
 CREATE TABLE `doctrine_migration_versions` (
@@ -334,7 +335,7 @@ CREATE TABLE `doctrine_migration_versions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Déchargement des données de la table `doctrine_migration_versions`
+-- Dumping data for table `doctrine_migration_versions`
 --
 
 INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
@@ -343,7 +344,7 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 -- --------------------------------------------------------
 
 --
--- Structure de la table `faceid_sessions`
+-- Table structure for table `faceid_sessions`
 --
 
 CREATE TABLE `faceid_sessions` (
@@ -356,16 +357,18 @@ CREATE TABLE `faceid_sessions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `faceid_sessions`
+-- Dumping data for table `faceid_sessions`
 --
 
 INSERT INTO `faceid_sessions` (`id`, `user_id`, `token`, `created_at`, `expires_at`, `device_info`) VALUES
-(33, 40, '191d723a472c40f0f6d8e0f1cfe8b18bea96cca5abd4a3d888902458f961ae10', '2025-04-28 10:46:01', '2025-04-29 10:46:01', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36');
+(33, 40, '191d723a472c40f0f6d8e0f1cfe8b18bea96cca5abd4a3d888902458f961ae10', '2025-04-28 10:46:01', '2025-04-29 10:46:01', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'),
+(34, 40, '0f6bedc225b9315e30f08ab4e6146b2d92d6aa2024e6961bc250805b1b0d40f1', '2025-04-29 02:39:48', '2025-04-30 02:39:48', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'),
+(35, 40, '1cf776b5c86374d06410cf228689ba4508b97372b81761db8b2be5b8cbbe607e', '2025-04-29 09:35:46', '2025-04-30 09:35:46', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `messenger_messages`
+-- Table structure for table `messenger_messages`
 --
 
 CREATE TABLE `messenger_messages` (
@@ -381,7 +384,7 @@ CREATE TABLE `messenger_messages` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `posts`
+-- Table structure for table `posts`
 --
 
 CREATE TABLE `posts` (
@@ -395,46 +398,42 @@ CREATE TABLE `posts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `posts`
+-- Dumping data for table `posts`
 --
 
 INSERT INTO `posts` (`id`, `user_id`, `activity_id`, `title`, `description`, `picture`, `date`) VALUES
-(8, 28, 100, 'Sunsets and Sand', 'An unforgettable experience that combined history, beauty, and a whole lot of walking. Highly recommended!', 'IMG-8684-68068422d11a2.jpg', '2025-04-20 10:00:00'),
-(9, 28, 101, 'Cultural Immersion in the City', 'Nothing beats the thrill of exploring new places and cultures. This one hit all the right notes.', 'IMG-8684-68068422d11a2.jpg', '2025-04-20 11:00:00'),
-(10, 28, 102, 'Unexpected Adventures', 'Whether you\'re chasing waterfalls or chasing your breath on a hike, this activity has it all.', 'IMG-8684-68068422d11a2.jpg', '2025-04-20 12:00:00'),
-(11, 28, 103, 'From Peak to Paradise', 'Views that took our breath away and memories that will last a lifetime.', 'IMG-8684-68068422d11a2.jpg', '2025-04-20 13:00:00'),
-(12, 28, 104, 'Walking Through History', 'Felt like stepping back in time while discovering the secrets of this place.', 'IMG-8684-68068422d11a2.jpg', '2025-04-20 14:00:00'),
-(13, 28, 105, 'Sky High and Smiling', 'Adrenaline, awe, and a bit of altitude! What an epic day out.', 'IMG-8684-68068422d11a2.jpg', '2025-04-20 15:00:00'),
-(14, 28, 106, 'Tastes of Tradition', 'We laughed, we learned, and we feasted. A perfect cultural dive.', 'IMG-8684-68068422d11a2.jpg', '2025-04-20 16:00:00'),
-(15, 28, 107, 'Dancing With Locals', 'Music, movement, and magic – a celebration of local life and energy.', 'IMG-8684-68068422d11a2.jpg', '2025-04-20 17:00:00'),
-(16, 28, 108, 'Nature’s Symphony', 'Surrounded by nature’s finest melodies and colors, I found peace.', 'IMG-8684-68068422d11a2.jpg', '2025-04-20 18:00:00'),
-(17, 28, 109, 'Calm Before the Climb', 'Challenging yet rewarding. Every step brought us closer to the sky.', 'IMG-8684-68068422d11a2.jpg', '2025-04-20 19:00:00'),
-(18, 28, 137, 'Lost in the Moment', 'Every moment felt like a dream frozen in time. Pure magic.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 10:00:00'),
-(19, 28, 102, 'Views Worth the Climb', 'The higher we climbed, the more stunning the view became.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 11:00:00'),
-(20, 28, 113, 'Colors of the City', 'Bright colors, friendly faces, and stories at every turn.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 12:00:00'),
-(21, 28, 133, 'Under the Stars', 'That night under the stars will live forever in my memory.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 13:00:00'),
-(22, 28, 118, 'Seashell Stories', 'Collected stories like seashells – one for every smile.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 14:00:00'),
-(23, 28, 124, 'A Day to Remember', 'Perfect day. Perfect people. Perfect memories.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 15:00:00'),
-(24, 28, 136, 'Flavors of the Market', 'Tasted, touched, and treasured every second of it.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 16:00:00'),
-(25, 28, 111, 'Steps Through Time', 'History whispered through the walls as we wandered.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 17:00:00'),
-(26, 28, 104, 'Chasing Sunsets', 'Golden hour cast everything in soft wonder.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 18:00:00'),
-(27, 28, 100, 'Between Sky and Sea', 'We found peace where the sky met the sea.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 19:00:00'),
-(28, 28, 117, 'Sands and Stories', 'Warm sand, cool breeze, and laughter in the air.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 20:00:00'),
-(29, 28, 119, 'Echoes of History', 'Ancient ruins with timeless tales.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 21:00:00'),
-(30, 28, 122, 'Into the Wild', 'We followed the wild path and found ourselves.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 22:00:00'),
-(31, 28, 101, 'Calm Currents', 'Water so calm it mirrored our joy.', 'IMG-8684-68068422d11a2.jpg', '2025-04-21 23:00:00'),
-(32, 28, 106, 'Rooftop Rhythms', 'Music and movement under the open sky.', 'IMG-8684-68068422d11a2.jpg', '2025-04-22 00:00:00'),
-(33, 28, 115, 'Beneath Ancient Walls', 'Stone walls and soul-stirring silence.', 'IMG-8684-68068422d11a2.jpg', '2025-04-22 01:00:00'),
-(34, 28, 123, 'Desert Dreams', 'Endless dunes and endless dreams.', 'IMG-8684-68068422d11a2.jpg', '2025-04-22 02:00:00'),
-(35, 28, 110, 'Lantern Light Adventures', 'Paper lanterns guiding our journey.', 'IMG-8684-68068422d11a2.jpg', '2025-04-22 03:00:00'),
-(36, 28, 135, 'Market Maze', 'Winding alleys full of scents and sounds.', 'IMG-8684-68068422d11a2.jpg', '2025-04-22 04:00:00'),
-(37, 28, 126, 'Cityscape Serenity', 'City views that take your breath away.', 'IMG-8684-68068422d11a2.jpg', '2025-04-22 05:00:00'),
-(38, 40, 106, 'jawwwww', 'asascoiashjjkadghakhsdakdasascoiashjjkadghakhs', '3-removebg-preview-680c248514f8a.png', '2025-04-25 22:11:48');
+(9, 4, 101, 'Cultural Immersion in the City', 'Nothing beats the thrill of exploring new places and cultures. This one hit all the right notes.', 'images-10-6810b96a3b84c.jpg', '2025-04-20 11:00:00'),
+(11, 4, 103, 'From Peak to Paradise', 'Views that took our breath away and memories that will last a lifetime.', '501453311-6810b98d301d4.jpg', '2025-04-20 13:00:00'),
+(13, 4, 105, 'Sky High and Smiling', 'Adrenaline, awe, and a bit of altitude! What an epic day out.', 'hq720-6810b91ed5d18.jpg', '2025-04-20 15:00:00'),
+(14, 4, 106, 'Tastes of Tradition', 'We laughed, we learned, and we feasted. A perfect cultural dive.', 'images-9-6810b8e29b844.jpg', '2025-04-20 16:00:00'),
+(15, 4, 107, 'Dancing With Locals', 'Music, movement, and magic – a celebration of local life and energy.', '46f17b9ef62f42ee9a96e050b36dc20f-6810b8c648484.jpg', '2025-04-20 17:00:00'),
+(16, 4, 108, 'Nature’s Symphony', 'Surrounded by nature’s finest melodies and colors, I found peace.', 'images-8-6810b87fd3740.jpg', '2025-04-20 18:00:00'),
+(17, 4, 109, 'Calm Before the Climb', 'Challenging yet rewarding. Every step brought us closer to the sky.', 'images-7-6810b860c4d71.jpg', '2025-04-20 19:00:00'),
+(18, 4, 137, 'Lost in the Moment', 'Every moment felt like a dream frozen in time. Pure magic.', 'ab67616d0000b273c1df1a17390d131c354ff85f-6810b8339bcf8.jpg', '2025-04-21 10:00:00'),
+(19, 4, 102, 'Views Worth the Climb', 'The higher we climbed, the more stunning the view became.', 'The-View-Is-Worth-the-Climb-6810b8145d8ea.jpg', '2025-04-21 11:00:00'),
+(20, 4, 113, 'Colors of the City', 'Bright colors, friendly faces, and stories at every turn.', 'City-Lights-Color-image-PowerPoint-6810b7f5dabff.jpg', '2025-04-21 12:00:00'),
+(21, 4, 133, 'Under the Stars', 'That night under the stars will live forever in my memory.', 'stars-feature-6810b7cf65cad.jpg', '2025-04-21 13:00:00'),
+(22, 4, 118, 'Seashell Stories', 'Collected stories like seashells – one for every smile.', 'images-6-6810b7ab56c01.jpg', '2025-04-21 14:00:00'),
+(23, 4, 124, 'A Day to Remember', 'Perfect day. Perfect people. Perfect memories.', 'images-5-6810b78a9759e.jpg', '2025-04-21 15:00:00'),
+(24, 4, 136, 'Flavors of the Market', 'Tasted, touched, and treasured every second of it.', 'natural-food-flavors-market-2023-2032-6810b75cbbeb3.jpg', '2025-04-21 16:00:00'),
+(25, 4, 111, 'Steps Through Time', 'History whispered through the walls as we wandered.', '082512-0029-1-6810b73454d7e.png', '2025-04-21 17:00:00'),
+(26, 4, 104, 'Chasing Sunsets', 'Golden hour cast everything in soft wonder.', '1587128557290-6810b6d77650f.jpg', '2025-04-21 18:00:00'),
+(27, 4, 100, 'Between Sky and Sea', 'We found peace where the sky met the sea.', 'Between-Sea-And-Sky-34335644-6810b6b5e844a.jpg', '2025-04-21 19:00:00'),
+(28, 4, 117, 'Sands and Stories', 'Warm sand, cool breeze, and laughter in the air.', 'images-4-6810b4761dc6a.jpg', '2025-04-21 20:00:00'),
+(29, 4, 104, 'Echoes of History', 'Ancient ruins with timeless tales.', '1715601123546-436f709a81a446bccaae37a60e471645-6810b44f1beb2.jpg', '2025-04-21 21:00:00'),
+(30, 4, 122, 'Into the Wild', 'We followed the wild path and found ourselves.', 'intothewildcouv1-1030x689-6810b42c65abb.jpg', '2025-04-21 22:00:00'),
+(31, 4, 101, 'Calm Currents', 'Water so calm it mirrored our joy.', 'Screenshot-2023-04-23-at-2-06-36-AM-6810b3dde1f5a.jpg', '2025-04-21 23:00:00'),
+(32, 4, 106, 'Rooftop Rhythms', 'Music and movement under the open sky.', 'images-3-6810b3a963863.jpg', '2025-04-22 00:00:00'),
+(33, 4, 115, 'Beneath Ancient Walls', 'Stone walls and soul-stirring silence.', 'excavation-under-temple-mount-6810b38c64fce.jpg', '2025-04-22 01:00:00'),
+(34, 4, 123, 'Desert Dreams', 'Endless dunes and endless dreams.', 'desert-dreams-6810b3632e9e0.jpg', '2025-04-22 02:00:00'),
+(35, 4, 110, 'Lantern Light Adventures', 'Paper lanterns guiding our journey.', 'images-2-6810b3403921a.jpg', '2025-04-22 03:00:00'),
+(36, 4, 135, 'Market Maze', 'Winding alleys full of scents and sounds.', 'Corn-Maze-Pingles-Farm-Market-6810b30f48e38.jpg', '2025-04-22 04:00:00'),
+(37, 4, 126, 'Cityscape Serenity', 'City views that take your breath away.', '630355376-6810b2ef8479a.jpg', '2025-04-22 05:00:00');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `reservation`
+-- Table structure for table `reservation`
 --
 
 CREATE TABLE `reservation` (
@@ -449,7 +448,7 @@ CREATE TABLE `reservation` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `reservation`
+-- Dumping data for table `reservation`
 --
 
 INSERT INTO `reservation` (`id`, `dateAchat`, `userId`, `billetId`, `nombre`, `prixTotal`, `prixUnite`, `statuts`) VALUES
@@ -493,12 +492,15 @@ INSERT INTO `reservation` (`id`, `dateAchat`, `userId`, `billetId`, `nombre`, `p
 (47, '2025-04-25 21:41:45', 40, 166, 3, 270, 90, 'confirmed'),
 (48, '2025-04-25 21:41:59', 40, 167, 3, 270, 90, 'confirmed'),
 (49, '2025-04-27 10:35:48', 40, 168, 2, 818, 409, 'confirmed'),
-(50, '2025-04-28 11:00:19', 42, 169, 1, 409, 409, 'confirmed');
+(50, '2025-04-28 11:00:19', 42, 169, 1, 409, 409, 'confirmed'),
+(51, '2025-04-29 03:13:56', 45, 170, 1, 120, 120, 'confirmed'),
+(55, '2025-04-29 13:10:34', 42, 176, 1, 120, 120, 'confirmed'),
+(56, '2025-04-29 13:25:54', 45, 177, 1, 75, 150, 'confirmed');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `resources`
+-- Table structure for table `resources`
 --
 
 CREATE TABLE `resources` (
@@ -508,11 +510,10 @@ CREATE TABLE `resources` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `resources`
+-- Dumping data for table `resources`
 --
 
 INSERT INTO `resources` (`id`, `path`, `activity_id`) VALUES
-(80, '/uploads/activities/activity-680e03cc620a8-1745748940.png', 145),
 (101, '/uploads/activities/activity-680f992447724-1745852708.jpg', 100),
 (102, '/uploads/activities/activity-680f9947326b1-1745852743.jpg', 101),
 (103, '/uploads/activities/activity-680f998659da6-1745852806.jpg', 102),
@@ -534,12 +535,30 @@ INSERT INTO `resources` (`id`, `path`, `activity_id`) VALUES
 (119, '/uploads/activities/activity-680f9f2362c59-1745854243.jpg', 118),
 (120, '/uploads/activities/activity-680f9f67bf1bf-1745854311.jpg', 122),
 (121, '/uploads/activities/activity-680f9fa41b78c-1745854372.jpg', 123),
-(122, '/uploads/activities/activity-680f9fd99c37c-1745854425.jpg', 124);
+(122, '/uploads/activities/activity-680f9fd99c37c-1745854425.jpg', 124),
+(124, '/uploads/activities/activity-680fe09bd3a93-1745871003.jpg', 139),
+(125, '/uploads/activities/activity-680fe0c91e439-1745871049.jpg', 138),
+(126, '/uploads/activities/activity-680fe0fa1281b-1745871098.jpg', 137),
+(127, '/uploads/activities/activity-680fe1736bc3c-1745871219.jpg', 136),
+(128, '/uploads/activities/activity-680fe1ab8b83d-1745871275.jpg', 135),
+(129, '/uploads/activities/activity-680fe1cb38ae1-1745871307.jpg', 134),
+(130, '/uploads/activities/activity-680fe1f75b188-1745871351.jpg', 133),
+(131, '/uploads/activities/activity-680fe226b2090-1745871398.jpg', 132),
+(132, '/uploads/activities/activity-680fe24821382-1745871432.jpg', 131),
+(133, '/uploads/activities/activity-680fe266e530d-1745871462.jpg', 130),
+(134, '/uploads/activities/activity-680fe2853547a-1745871493.jpg', 129),
+(135, '/uploads/activities/activity-680fe2a8d4ebc-1745871528.jpg', 128),
+(136, '/uploads/activities/activity-680fe2ccec19d-1745871564.jpg', 127),
+(137, '/uploads/activities/activity-680fe2f1826da-1745871601.jpg', 126),
+(138, '/uploads/activities/activity-680fe3374b30b-1745871671.jpg', 125),
+(139, '/uploads/activities/activity-680fe362e51c9-1745871714.jpg', 124),
+(148, '/uploads/activities/activity-6810d5b02e0b6-1745933744.png', 156),
+(149, '/uploads/activities/activity-6810d5d34a1f6-1745933779.png', 157);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `roles`
+-- Table structure for table `roles`
 --
 
 CREATE TABLE `roles` (
@@ -548,7 +567,7 @@ CREATE TABLE `roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `roles`
+-- Dumping data for table `roles`
 --
 
 INSERT INTO `roles` (`id`, `nom`) VALUES
@@ -559,7 +578,7 @@ INSERT INTO `roles` (`id`, `nom`) VALUES
 -- --------------------------------------------------------
 
 --
--- Structure de la table `upgrade_requests`
+-- Table structure for table `upgrade_requests`
 --
 
 CREATE TABLE `upgrade_requests` (
@@ -572,17 +591,18 @@ CREATE TABLE `upgrade_requests` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `upgrade_requests`
+-- Dumping data for table `upgrade_requests`
 --
 
 INSERT INTO `upgrade_requests` (`id`, `user_id`, `request_date`, `status`, `processed_date`, `message`) VALUES
 (12, 28, '2025-04-07 09:29:09', 'approved', '2025-04-15 13:19:20', 'i wanna be hahaha'),
-(13, 40, '2025-04-22 10:24:26', 'approved', '2025-04-24 11:16:34', 'i would like to be a Publicator');
+(13, 40, '2025-04-22 10:24:26', 'approved', '2025-04-24 11:16:34', 'i would like to be a Publicator'),
+(14, 47, '2025-04-29 11:22:34', 'approved', '2025-04-29 11:28:51', 'i wannt to be an admin');
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -607,31 +627,22 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `name`, `lastname`, `email`, `password`, `gender`, `role`, `phone`, `birthday`, `verification_code`, `enabled`, `created_at`, `image`, `is_banned`, `totp_secret`, `totp_enabled`, `faceid_enabled`, `faceid_data`) VALUES
-(1, 'SiAiimir', 'Othman', 'tayebgod@gmail.com', 'qqqqqqx', 'Male', 'Publicitaire', '048294234', '2000-02-16', '5443', 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0, 0, NULL),
-(4, 'amir', 'jabeur', 'amirjabeur0@gmail.com', '$2y$13$CGQ0nL6MUntFbzqcz1itn.S6d5eKvvDh83Yl9BjDNGC5EB///xzWy', NULL, 'Publicitaire', NULL, NULL, NULL, 1, '2025-04-28 14:55:21', NULL, 0, NULL, 1, 0, NULL),
-(15, 'mihan', 'iihcsa', 'ahmsm3eed@gmail.com', 'qqqqqqx', 'Male', 'user', '06324234234', '1998-02-12', NULL, 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0, 0, NULL),
-(16, 'aaaamir', 'othman', 'amir.othman@esprit.tn', 'Amyr2001@', 'Female', 'Publicitaire', '0648324423', '2002-02-14', '1973', 0, '2025-02-23 17:18:28', NULL, 0, NULL, 0, 0, NULL),
-(18, 'si amir', 'safadas', 'amir.othaman@esprit.tn', 'aaaaaa', 'Female', 'user', 'Amyr2001@', '2001-02-02', NULL, 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0, 0, NULL),
-(19, 'amiro', 'oothmsan', 'therealamirothman@gmail.com', 'qqqqqq', 'Male', 'Publicitaire', '0642834234', '1998-02-05', '8064', 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0, 0, NULL),
-(20, 'amir', 'thmsn', 'amyyr.othman@gmail.com', 'aaaaaa', 'Female', 'user', '04723942', '1998-02-05', '1465', 1, '2025-02-23 17:18:28', NULL, 0, NULL, 0, 0, NULL),
-(25, 'amid', 'sdfsf', 'aundrea6263@edny.net', 'qwertyu', 'Male', 'user', '075832534', '1997-02-06', NULL, 1, '2025-02-24 18:40:52', NULL, 0, NULL, 0, 0, NULL),
-(27, 'aami', 'zzzzz', 'amaltr21@gmail.com', 'Amyr2001@', 'Male', 'user', '0575835345', '1998-02-05', NULL, 1, '2025-02-25 14:17:08', NULL, 0, NULL, 0, 0, NULL),
-(28, 'Amir', 'Othman', 'amirothmaneee@gmail.com', '$2y$13$fasEV95xWkDMUknjeKKYPeO3gyV76Y2yM5689p3HFUggd/SGSjm3m', 'Male', 'Publicitaire', '27856958', '2025-03-30', NULL, 1, '2025-03-30 18:03:46', 'WhatsApp-Image-2025-03-02-at-12-27-03-AM-67e987716365c.jpg', 0, NULL, 0, 0, NULL),
-(37, 'l 3araf', 'karim', 'nihedabdworks@gmail.com', '$2y$13$rGhg7gTOcj5mddXTAk9EVeCseAlGyJDXt6CDW2iiXCjGHJHddN2kO', 'Male', 'Publicitaire', 'nihedabdworks@gmail.', '2002-02-11', '33dcb5346c7c117661cbe7dfe98fc35b', 1, '2025-04-19 12:25:07', NULL, 0, '45YKIDMOHGXOENT5WVMXTABBJXCLJ52A3JNZKZ46ZMXDLFWY4KYQ====', 1, 0, NULL),
-(38, 'l 3araf', 'karim', 'crackxtn07@gmail.com', '$2y$13$tb/nc4sH7GzDkeStdlFHx.V07ld2q4a2Zan2dqBvIENCw95U3gpO2', 'Male', 'user', '27582038', '2002-01-11', '9952a39bc1f72a8d5ed4e2d07bf48f5c', 1, '2025-04-19 14:05:23', NULL, 0, 'YO7EA4E6HQLFHWUV4RPV4NMEBA4V2XSG62WLGNJ6CJPOKHRYUD5Q====', 1, 0, NULL),
-(39, 'l 3araf', 'karim', 'hello@gmail.com', '$2y$13$F5DGL9D5ojvVVL9uJC94E.t0hloejBccI10pav8GjQnOQ1yJQ7v2i', 'Male', 'user', '27582038', '2002-01-11', 'fff5347f92b1601d01e1cba5590d62c8', 1, '2025-04-19 15:31:49', NULL, 0, 'MTRAJB72FJFCOFVZKT3LSP5BIUMSE5PABH755N4ZTVRHUPLWXYRQ====', 1, 0, NULL),
-(40, 'amirboo', 'othman', 'aronxothman@gmail.com', '$2y$13$SgH.DPj1F3HOZkKEgijeCe.QgykSRH/D39NIhZEnDXsU6X30elfcu', 'Male', 'Publicitaire', '+21655590348', '2025-04-18', '6054e431c235d58711b589baf9f3f183', 1, '2025-04-22 10:20:58', NULL, 0, 'X6G5YMJRMM4T7VZUMWT6MXP46KAHLEHBDWLMKSTPZFOMTUYMLCAA====', 1, 1, '[-0.09101969003677368,0.05621180310845375,0.06823620945215225,-0.00796710979193449,0.029068470001220703,-0.0671747624874115,0.0380515530705452,-0.03139021620154381,0.19187438488006592,-0.014750045724213123,0.21530748903751373,-0.04585587605834007,-0.2251916080713272,-0.013716773129999638,-0.012400914914906025,0.09665724635124207,-0.16648182272911072,-0.0466231033205986,-0.16958202421665192,-0.13869428634643555,0.039498016238212585,0.004601642023772001,0.027451537549495697,0.06841817498207092,-0.11838299036026001,-0.3278138041496277,-0.03149542585015297,-0.18195486068725586,0.08959534764289856,-0.1428821086883545,0.009174403734505177,-0.02022998221218586,-0.17064210772514343,-0.05691646412014961,-0.044760555028915405,-0.0347156822681427,0.009606297127902508,-0.02870282344520092,0.17581139504909515,0.04638194292783737,-0.1428762823343277,0.07047270238399506,0.014346876181662083,0.2928623855113983,0.13948601484298706,0.13543131947517395,0.01581786572933197,-0.03318842872977257,0.10836894810199738,-0.2521018981933594,0.09867920726537704,0.08591792732477188,0.09168725460767746,0.022156883031129837,0.12599150836467743,-0.18979491293430328,-0.03903734311461449,0.03492341190576553,-0.24141258001327515,0.15042153000831604,0.07395657151937485,0.03471061587333679,-0.08909610658884048,-0.05665525048971176,0.2305142879486084,0.12612025439739227,-0.18356572091579437,-0.05951378121972084,0.0800490602850914,-0.1618833839893341,0.027553923428058624,0.06812775135040283,-0.08558066934347153,-0.15613290667533875,-0.25899645686149597,0.11747337877750397,0.4662856161594391,0.10993050038814545,-0.16597433388233185,-0.01224405039101839,-0.1165815070271492,-0.015079188160598278,0.07426777482032776,0.07675547152757645,-0.11098774522542953,0.02029147744178772,-0.03919195756316185,0.03041800670325756,0.06206792965531349,0.05173986032605171,-0.07462269812822342,0.20900622010231018,-0.04798086732625961,-0.005631290841847658,-0.07565127313137054,0.025548599660396576,-0.1902490258216858,-0.030694512650370598,-0.06222335621714592,-0.045650627464056015,0.06211089715361595,0.005202838685363531,0.016680415719747543,0.03738303482532501,-0.15919694304466248,0.14513981342315674,0.002218682551756501,-0.022758523002266884,0.031797174364328384,0.12384363263845444,-0.1062551736831665,-0.04078623279929161,0.1025049239397049,-0.2976419925689697,0.1784587800502777,0.17565661668777466,0.05979923903942108,0.09383762627840042,0.014327965676784515,0.020642409101128578,0.03400006517767906,0.10321594029664993,-0.15449252724647522,-0.05228870362043381,0.0334889255464077,-0.04254143685102463,0.06097587198019028,0.004967527464032173]'),
-(41, 'usual', 'muire', 'usualmuire@indigobook.com', '$2y$13$nIZzjsmGwdgZtxK3C964B.PhPKOPTrQFXUf5wdKjEhpr1OUENikXe', 'Male', 'user', '+21650034045', '1999-06-11', 'd755b87a0bd8e261bc663445c33b4bb8', 1, '2025-04-25 18:07:47', NULL, 0, 'WRGTGCEHPTSED4ZQPNYK4CZ3N4N35SHHEZO42PFRMBEJIYXCV3UA====', 1, 0, NULL),
-(42, 'joni', 'srose', 'jonisrose@chefalicious.com', '$2y$13$2nY2UWS.a9tAQM8CkFP2XuPI0BfB/teUsNXDmPLwceQDoSwq4nqkK', 'Male', 'user', '+21650034045', '1994-04-17', '984aeb7001a792d8b8ac4e70f0cd094d', 1, '2025-04-28 09:06:15', NULL, 0, 'L36P46AXY4DYW6ZSZY3YABQ244DIC5UOTRDODMOAXLMO7XPB5ILQ====', 1, 0, NULL);
+(4, 'Karim', 'Makni', 'usualmuire@indigobook.com', '$2y$13$nIZzjsmGwdgZtxK3C964B.PhPKOPTrQFXUf5wdKjEhpr1OUENikXe', 'Male', 'Publicitaire', '+21650034045', '1999-06-11', 'd755b87a0bd8e261bc663445c33b4bb8', 1, '2025-04-25 18:07:47', NULL, 0, 'WRGTGCEHPTSED4ZQPNYK4CZ3N4N35SHHEZO42PFRMBEJIYXCV3UA====', 1, 0, NULL),
+(28, 'Amir', 'Othman', 'amirothmaneee@gmail.com', '$2y$13$fasEV95xWkDMUknjeKKYPeO3gyV76Y2yM5689p3HFUggd/SGSjm3m', 'Male', 'Publicitaire', '+21656080708', '2025-03-30', NULL, 1, '2025-03-30 18:03:46', 'WhatsApp-Image-2025-03-02-at-12-27-03-AM-67e987716365c.jpg', 0, NULL, 0, 0, NULL),
+(40, 'Amir', 'Jabeur', 'aronxothman@gmail.com', '$2y$13$SgH.DPj1F3HOZkKEgijeCe.QgykSRH/D39NIhZEnDXsU6X30elfcu', 'Male', 'Publicitaire', '+21699091975', '2025-04-18', '6054e431c235d58711b589baf9f3f183', 1, '2025-04-22 10:20:58', NULL, 0, 'X6G5YMJRMM4T7VZUMWT6MXP46KAHLEHBDWLMKSTPZFOMTUYMLCAA====', 1, 1, '[-0.09101969003677368,0.05621180310845375,0.06823620945215225,-0.00796710979193449,0.029068470001220703,-0.0671747624874115,0.0380515530705452,-0.03139021620154381,0.19187438488006592,-0.014750045724213123,0.21530748903751373,-0.04585587605834007,-0.2251916080713272,-0.013716773129999638,-0.012400914914906025,0.09665724635124207,-0.16648182272911072,-0.0466231033205986,-0.16958202421665192,-0.13869428634643555,0.039498016238212585,0.004601642023772001,0.027451537549495697,0.06841817498207092,-0.11838299036026001,-0.3278138041496277,-0.03149542585015297,-0.18195486068725586,0.08959534764289856,-0.1428821086883545,0.009174403734505177,-0.02022998221218586,-0.17064210772514343,-0.05691646412014961,-0.044760555028915405,-0.0347156822681427,0.009606297127902508,-0.02870282344520092,0.17581139504909515,0.04638194292783737,-0.1428762823343277,0.07047270238399506,0.014346876181662083,0.2928623855113983,0.13948601484298706,0.13543131947517395,0.01581786572933197,-0.03318842872977257,0.10836894810199738,-0.2521018981933594,0.09867920726537704,0.08591792732477188,0.09168725460767746,0.022156883031129837,0.12599150836467743,-0.18979491293430328,-0.03903734311461449,0.03492341190576553,-0.24141258001327515,0.15042153000831604,0.07395657151937485,0.03471061587333679,-0.08909610658884048,-0.05665525048971176,0.2305142879486084,0.12612025439739227,-0.18356572091579437,-0.05951378121972084,0.0800490602850914,-0.1618833839893341,0.027553923428058624,0.06812775135040283,-0.08558066934347153,-0.15613290667533875,-0.25899645686149597,0.11747337877750397,0.4662856161594391,0.10993050038814545,-0.16597433388233185,-0.01224405039101839,-0.1165815070271492,-0.015079188160598278,0.07426777482032776,0.07675547152757645,-0.11098774522542953,0.02029147744178772,-0.03919195756316185,0.03041800670325756,0.06206792965531349,0.05173986032605171,-0.07462269812822342,0.20900622010231018,-0.04798086732625961,-0.005631290841847658,-0.07565127313137054,0.025548599660396576,-0.1902490258216858,-0.030694512650370598,-0.06222335621714592,-0.045650627464056015,0.06211089715361595,0.005202838685363531,0.016680415719747543,0.03738303482532501,-0.15919694304466248,0.14513981342315674,0.002218682551756501,-0.022758523002266884,0.031797174364328384,0.12384363263845444,-0.1062551736831665,-0.04078623279929161,0.1025049239397049,-0.2976419925689697,0.1784587800502777,0.17565661668777466,0.05979923903942108,0.09383762627840042,0.014327965676784515,0.020642409101128578,0.03400006517767906,0.10321594029664993,-0.15449252724647522,-0.05228870362043381,0.0334889255464077,-0.04254143685102463,0.06097587198019028,0.004967527464032173]'),
+(42, 'Amine', 'afat', 'jonisrose@chefalicious.com', '$2y$13$2nY2UWS.a9tAQM8CkFP2XuPI0BfB/teUsNXDmPLwceQDoSwq4nqkK', 'Male', 'user', '+21650034045', '1994-04-17', '984aeb7001a792d8b8ac4e70f0cd094d', 1, '2025-04-28 09:06:15', NULL, 0, 'L36P46AXY4DYW6ZSZY3YABQ244DIC5UOTRDODMOAXLMO7XPB5ILQ====', 1, 0, NULL),
+(45, 'JUST', 'FOR LOCALHOST', 'justforlocalhost@gmail.com', '$argon2id$v=19$m=65536,t=4,p=1$sYXRYb8croL47vHV5T4mmA$2indGibyRORIxL6TFbzvD9/K6ZoqePI+4c5DfUtNKPg', NULL, 'admin', NULL, NULL, NULL, 1, '2025-04-29 00:54:37', 'google_profile:https://lh3.googleusercontent.com/a/ACg8ocKe2Z-adCjrenA-qUVyYZDFbgtxVi-_DML_g_N4doKypgsDaQ=s96-c', 0, NULL, 0, 0, NULL),
+(46, 'Amir', 'Othmasn', 'cindyaqua@chefalicious.com', '$2y$13$4zf1YWoHAJKfjlUTcmAmpOQxUqACxEt.4EO3qROhhHtpG7/MfpmVG', 'Male', 'user', '+21650034045', '1998-07-30', '541daa80c5643268430d62fe3d2bd1a8', 0, '2025-04-29 09:12:04', NULL, 0, 'RWL6FR3D2VNCXCGERCCLZVDV7PJ3SCO374SJVZW5SYIKBLIERQBQ====', 0, 0, NULL),
+(47, 'circulars', 'apphire', 'circularsapphire@chefalicious.com', '$2y$13$tO.O3cZTUEHABxcEAUXXBODkV0Q5dX3dofw9scJFS4yuIzG9sn/FO', 'Male', 'Publicitaire', '037875823', '2025-04-30', '0d41ab6ed7a1159a3dc6678de7e8c3e9', 1, '2025-04-29 10:16:16', NULL, 0, '4QDZJ6M4KJRBKLP7TIXDZFJGVNWE3SFWKH44S4GSINBQNVQ27EZA====', 1, 0, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `user_login_history`
+-- Table structure for table `user_login_history`
 --
 
 CREATE TABLE `user_login_history` (
@@ -646,24 +657,24 @@ CREATE TABLE `user_login_history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Index pour les tables déchargées
+-- Indexes for dumped tables
 --
 
 --
--- Index pour la table `activities`
+-- Indexes for table `activities`
 --
 ALTER TABLE `activities`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
 
 --
--- Index pour la table `billet`
+-- Indexes for table `billet`
 --
 ALTER TABLE `billet`
   ADD PRIMARY KEY (`id`);
 
 --
--- Index pour la table `blogs_rating`
+-- Indexes for table `blogs_rating`
 --
 ALTER TABLE `blogs_rating`
   ADD PRIMARY KEY (`id`),
@@ -672,7 +683,7 @@ ALTER TABLE `blogs_rating`
   ADD KEY `idx_post` (`post_id`);
 
 --
--- Index pour la table `comments`
+-- Indexes for table `comments`
 --
 ALTER TABLE `comments`
   ADD PRIMARY KEY (`id`),
@@ -680,27 +691,34 @@ ALTER TABLE `comments`
   ADD KEY `idx_user` (`user_id`);
 
 --
--- Index pour la table `destinations`
+-- Indexes for table `coupon`
+--
+ALTER TABLE `coupon`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UNIQ_64BF3F0277153098` (`code`);
+
+--
+-- Indexes for table `destinations`
 --
 ALTER TABLE `destinations`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
 
 --
--- Index pour la table `doctrine_migration_versions`
+-- Indexes for table `doctrine_migration_versions`
 --
 ALTER TABLE `doctrine_migration_versions`
   ADD PRIMARY KEY (`version`);
 
 --
--- Index pour la table `faceid_sessions`
+-- Indexes for table `faceid_sessions`
 --
 ALTER TABLE `faceid_sessions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id_idx` (`user_id`);
 
 --
--- Index pour la table `messenger_messages`
+-- Indexes for table `messenger_messages`
 --
 ALTER TABLE `messenger_messages`
   ADD PRIMARY KEY (`id`),
@@ -709,15 +727,15 @@ ALTER TABLE `messenger_messages`
   ADD KEY `IDX_75EA56E016BA31DB` (`delivered_at`);
 
 --
--- Index pour la table `posts`
+-- Indexes for table `posts`
 --
 ALTER TABLE `posts`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_user` (`user_id`),
-  ADD KEY `idx_activity` (`activity_id`);
+  ADD KEY `fk_user` (`user_id`),
+  ADD KEY `fk_activity` (`activity_id`);
 
 --
--- Index pour la table `reservation`
+-- Indexes for table `reservation`
 --
 ALTER TABLE `reservation`
   ADD PRIMARY KEY (`id`),
@@ -725,171 +743,184 @@ ALTER TABLE `reservation`
   ADD KEY `reservation_ibfk_2` (`billetId`);
 
 --
--- Index pour la table `resources`
+-- Indexes for table `resources`
 --
 ALTER TABLE `resources`
   ADD PRIMARY KEY (`id`),
   ADD KEY `activity_id` (`activity_id`);
 
 --
--- Index pour la table `roles`
+-- Indexes for table `roles`
 --
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `nom` (`nom`);
 
 --
--- Index pour la table `upgrade_requests`
+-- Indexes for table `upgrade_requests`
 --
 ALTER TABLE `upgrade_requests`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
 
 --
--- Index pour la table `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- Index pour la table `user_login_history`
+-- Indexes for table `user_login_history`
 --
 ALTER TABLE `user_login_history`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_LOGIN_USER` (`user_id`);
 
 --
--- AUTO_INCREMENT pour les tables déchargées
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT pour la table `activities`
+-- AUTO_INCREMENT for table `activities`
 --
 ALTER TABLE `activities`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=158;
 
 --
--- AUTO_INCREMENT pour la table `billet`
+-- AUTO_INCREMENT for table `billet`
 --
 ALTER TABLE `billet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=170;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=178;
 
 --
--- AUTO_INCREMENT pour la table `blogs_rating`
+-- AUTO_INCREMENT for table `blogs_rating`
 --
 ALTER TABLE `blogs_rating`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
--- AUTO_INCREMENT pour la table `comments`
+-- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
--- AUTO_INCREMENT pour la table `destinations`
+-- AUTO_INCREMENT for table `coupon`
+--
+ALTER TABLE `coupon`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `destinations`
 --
 ALTER TABLE `destinations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
--- AUTO_INCREMENT pour la table `faceid_sessions`
+-- AUTO_INCREMENT for table `faceid_sessions`
 --
 ALTER TABLE `faceid_sessions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
--- AUTO_INCREMENT pour la table `messenger_messages`
+-- AUTO_INCREMENT for table `messenger_messages`
 --
 ALTER TABLE `messenger_messages`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT pour la table `posts`
+-- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
--- AUTO_INCREMENT pour la table `reservation`
+-- AUTO_INCREMENT for table `reservation`
 --
 ALTER TABLE `reservation`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
--- AUTO_INCREMENT pour la table `resources`
+-- AUTO_INCREMENT for table `resources`
 --
 ALTER TABLE `resources`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=150;
 
 --
--- AUTO_INCREMENT pour la table `roles`
+-- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT pour la table `upgrade_requests`
+-- AUTO_INCREMENT for table `upgrade_requests`
 --
 ALTER TABLE `upgrade_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
--- AUTO_INCREMENT pour la table `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
--- AUTO_INCREMENT pour la table `user_login_history`
+-- AUTO_INCREMENT for table `user_login_history`
 --
 ALTER TABLE `user_login_history`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- Contraintes pour les tables déchargées
+-- Constraints for dumped tables
 --
 
 --
--- Contraintes pour la table `activities`
+-- Constraints for table `activities`
 --
 ALTER TABLE `activities`
   ADD CONSTRAINT `activities_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
--- Contraintes pour la table `blogs_rating`
+-- Constraints for table `blogs_rating`
 --
 ALTER TABLE `blogs_rating`
   ADD CONSTRAINT `fk_blogs_rating_post` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_blogs_rating_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `destinations`
+-- Constraints for table `destinations`
 --
 ALTER TABLE `destinations`
   ADD CONSTRAINT `destinations_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
--- Contraintes pour la table `faceid_sessions`
+-- Constraints for table `faceid_sessions`
 --
 ALTER TABLE `faceid_sessions`
   ADD CONSTRAINT `fk_faceid_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `resources`
+-- Constraints for table `posts`
+--
+ALTER TABLE `posts`
+  ADD CONSTRAINT `fk_activity` FOREIGN KEY (`activity_id`) REFERENCES `activities` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `resources`
 --
 ALTER TABLE `resources`
   ADD CONSTRAINT `resources_ibfk_1` FOREIGN KEY (`activity_id`) REFERENCES `activities` (`id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `upgrade_requests`
+-- Constraints for table `upgrade_requests`
 --
 ALTER TABLE `upgrade_requests`
   ADD CONSTRAINT `upgrade_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
--- Contraintes pour la table `user_login_history`
+-- Constraints for table `user_login_history`
 --
 ALTER TABLE `user_login_history`
   ADD CONSTRAINT `FK_LOGIN_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;

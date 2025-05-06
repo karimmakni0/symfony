@@ -190,7 +190,7 @@
                         </td>
                         <td>
                           <div class="d-flex items-center">
-                            {% if item.activity.resources is defined and item.activity.resources|length > 0 %}
+                            {% if item.activity is not null and item.activity.resources is defined and item.activity.resources|length > 0 %}
                               <div class="activity-image-container">
                                 <img src="{{ asset(item.activity.resources|first.path) }}" alt="{{ item.activity.activityName }}" class="size-60 rounded-4 object-cover mr-15">
                               </div>
@@ -200,18 +200,26 @@
                               </div>
                             {% endif %}
                             <div>
-                              <div class="text-15 lh-15 fw-500 mb-5">{{ item.activity.activityName }}</div>
-                              <div class="d-flex items-center text-13 lh-15 text-light-1">
-                                <i class="icon-location text-12 mr-5"></i>
-                                {{ item.activity.activityDestination }}
-                              </div>
+                              {% if item.activity is not null %}
+                                <div class="text-15 lh-15 fw-500 mb-5">{{ item.activity.activityName }}</div>
+                                <div class="d-flex items-center text-13 lh-15 text-light-1">
+                                  <i class="icon-location text-12 me-8"></i>
+                                  <span>{{ item.activity.activityDestination }}</span>
+                                </div>
+                              {% else %}
+                                <div class="text-15 lh-15 fw-500 mb-5">Activity no longer available</div>
+                                <div class="d-flex items-center text-13 lh-15 text-light-1">
+                                  <i class="icon-info-circle text-12 me-8"></i>
+                                  <span>Activity details unavailable</span>
+                                </div>
+                              {% endif %}
                             </div>
                           </div>
                         </td>
                         <td>
                           <div class="d-flex items-center">
                             <div class="size-35 flex-center bg-blue-1-05 rounded-4 mr-10">
-                              <i class="icon-calendar-2 text-16 text-blue-1"></i>
+                              <i class="icon-calendar text-16 text-blue-1"></i>
                             </div>
                             <div class="text-14">{{ item.reservation.dateAchat|date('d M, Y') }}</div>
                           </div>
@@ -267,9 +275,15 @@
                                 <i class="icon-trash"></i> Cancel
                               </a>
                             {% endif %}
-                            <a href="{{ path('app_client_activity_detail', {'id': item.activity.id}) }}" class="action-btn action-btn-green" title="View Activity">
-                              <i class="icon-eye"></i> View
-                            </a>
+                            {% if item.activity is not null %}
+                              <a href="{{ path('app_client_activity_detail', {'id': item.activity.id}) }}" class="action-btn action-btn-green" title="View Activity">
+                                <i class="icon-eye"></i> View
+                              </a>
+                            {% else %}
+                              <span class="action-btn action-btn-disabled" title="Activity Unavailable">
+                                <i class="icon-eye-slash"></i> Unavailable
+                              </span>
+                            {% endif %}
                           </div>
                         </td>
                       </tr>
@@ -291,7 +305,7 @@
                 <div class="col-12 col-md-6 col-xl-4 mb-30">
                   <div class="rounded-4 border-light shadow-4 reservation-card h-100 bg-white">
                     <div class="position-relative">
-                      {% if item.activity.resources is defined and item.activity.resources|length > 0 %}
+                      {% if item.activity is not null and item.activity.resources is defined and item.activity.resources|length > 0 %}
                         <div style="height: 200px; overflow: hidden;">
                           <img src="{{ asset(item.activity.resources|first.path) }}" alt="{{ item.activity.activityName }}" class="w-100 h-100 rounded-top-4 object-cover">
                         </div>  
@@ -317,35 +331,41 @@
                     </div>
                     
                     <div class="p-20">
-                      <h3 class="text-18 lh-15 fw-500 mb-15">{{ item.activity.activityName }}</h3>
-                      
-                      <div class="d-flex items-center mb-10">
-                        <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
-                          <i class="icon-location text-14 text-blue-1"></i>
+                      {% if item.activity is not null %}
+                        <h3 class="text-18 lh-15 fw-500 mb-15">{{ item.activity.activityName }}</h3>
+                        <div class="d-flex items-center mb-10">
+                          <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
+                            <i class="icon-location text-14 text-blue-1"></i>
+                          </div>
+                          <div class="text-14">{{ item.activity.activityDestination }}</div>
                         </div>
-                        <div class="text-14">{{ item.activity.activityDestination }}</div>
-                      </div>
-                      
-                      <div class="d-flex items-center mb-10">
-                        <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
-                          <i class="icon-calendar-2 text-14 text-blue-1"></i>
+                        <div class="d-flex items-center mb-10">
+                          <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
+                            <i class="icon-calendar-2 text-14 text-blue-1"></i>
+                          </div>
+                          <div class="text-14">{{ item.reservation.dateAchat|date('d M, Y') }}</div>
                         </div>
-                        <div class="text-14">{{ item.reservation.dateAchat|date('d M, Y') }}</div>
-                      </div>
-                      
-                      <div class="d-flex items-center mb-10">
-                        <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
-                          <i class="icon-user text-14 text-blue-1"></i>
+                        <div class="d-flex items-center mb-10">
+                          <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
+                            <i class="icon-user text-14 text-blue-1"></i>
+                          </div>
+                          <div class="text-14">{{ item.reservation.nombre }} participants</div>
                         </div>
-                        <div class="text-14">{{ item.reservation.nombre }} participants</div>
-                      </div>
-                      
-                      <div class="d-flex items-center mb-20">
-                        <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
-                          <i class="icon-tag text-14 text-blue-1"></i>
+                        <div class="d-flex items-center mb-20">
+                          <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
+                            <i class="icon-tag text-14 text-blue-1"></i>
+                          </div>
+                          <div class="text-14">{{ item.reservation.prixTotal }} € <span class="text-12 text-light-1">({{ item.reservation.prixUnite }} € / person)</span></div>
                         </div>
-                        <div class="text-14">{{ item.reservation.prixTotal }} € <span class="text-12 text-light-1">({{ item.reservation.prixUnite }} € / person)</span></div>
-                      </div>
+                      {% else %}
+                        <h3 class="text-18 lh-15 fw-500 mb-15">Activity no longer available</h3>
+                        <div class="d-flex items-center mb-10">
+                          <div class="size-30 flex-center bg-blue-1-05 rounded-full mr-10">
+                            <i class="icon-info-circle text-14 text-blue-1"></i>
+                          </div>
+                          <div class="text-14">Activity details unavailable</div>
+                        </div>
+                      {% endif %}
                       
                       <div class="d-flex border-top-light pt-20">
                         <div class="text-14 fw-500 text-blue-1 mr-auto">Booking #{{ item.billet.numero }}</div>
@@ -355,9 +375,15 @@
                         <a href="{{ path('app_client_reservation_ticket', {'id': item.billet.id}) }}" class="action-btn action-btn-blue">
                           <i class="icon-ticket"></i> Ticket
                         </a>
-                        <a href="{{ path('app_client_activity_detail', {'id': item.activity.id}) }}" class="action-btn action-btn-green">
-                          <i class="icon-eye"></i> View
-                        </a>
+                        {% if item.activity is not null %}
+                          <a href="{{ path('app_client_activity_detail', {'id': item.activity.id}) }}" class="action-btn action-btn-green">
+                            <i class="icon-eye"></i> View Activity
+                          </a>
+                        {% else %}
+                          <span class="action-btn action-btn-disabled">
+                            <i class="icon-eye-slash"></i> Activity Unavailable
+                          </span>
+                        {% endif %}
                         <a href="{{ path('app_reservation_cancel', {'id': item.reservation.id}) }}" 
                            onclick="return confirm('Are you sure you want to cancel this reservation?')"
                            class="action-btn action-btn-red">
@@ -397,7 +423,7 @@
                 <div class="col-12 col-md-6 col-xl-4 mb-30">
                   <div class="rounded-4 border-light shadow-4 reservation-card h-100 bg-white">
                     <div class="position-relative">
-                      {% if item.activity.resources is defined and item.activity.resources|length > 0 %}
+                      {% if item.activity is not null and item.activity.resources is defined and item.activity.resources|length > 0 %}
                         <div style="height: 200px; overflow: hidden;" class="desaturate-img">
                           <img src="{{ asset(item.activity.resources|first.path) }}" alt="{{ item.activity.activityName }}" class="w-100 h-100 rounded-top-4 object-cover">
                         </div>
@@ -413,44 +439,56 @@
                     </div>
                     
                     <div class="p-20">
-                      <h3 class="text-18 lh-15 fw-500 mb-15">{{ item.activity.activityName }}</h3>
-                      
-                      <div class="d-flex items-center mb-10">
-                        <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
-                          <i class="icon-location text-14 text-light-1"></i>
+                      {% if item.activity is not null %}
+                        <h3 class="text-18 lh-15 fw-500 mb-15">{{ item.activity.activityName }}</h3>
+                        <div class="d-flex items-center mb-10">
+                          <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
+                            <i class="icon-location text-14 text-light-1"></i>
+                          </div>
+                          <div class="text-14 text-light-1">{{ item.activity.activityDestination }}</div>
                         </div>
-                        <div class="text-14 text-light-1">{{ item.activity.activityDestination }}</div>
-                      </div>
-                      
-                      <div class="d-flex items-center mb-10">
-                        <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
-                          <i class="icon-calendar-2 text-14 text-light-1"></i>
+                        <div class="d-flex items-center mb-10">
+                          <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
+                            <i class="icon-calendar-2 text-14 text-light-1"></i>
+                          </div>
+                          <div class="text-14 text-light-1">{{ item.reservation.dateAchat|date('d M, Y') }}</div>
                         </div>
-                        <div class="text-14 text-light-1">{{ item.reservation.dateAchat|date('d M, Y') }}</div>
-                      </div>
-                      
-                      <div class="d-flex items-center mb-10">
-                        <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
-                          <i class="icon-user text-14 text-light-1"></i>
+                        <div class="d-flex items-center mb-10">
+                          <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
+                            <i class="icon-user text-14 text-light-1"></i>
+                          </div>
+                          <div class="text-14 text-light-1">{{ item.reservation.nombre }} participants</div>
                         </div>
-                        <div class="text-14 text-light-1">{{ item.reservation.nombre }} participants</div>
-                      </div>
-                      
-                      <div class="d-flex items-center mb-20">
-                        <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
-                          <i class="icon-tag text-14 text-light-1"></i>
+                        <div class="d-flex items-center mb-20">
+                          <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
+                            <i class="icon-tag text-14 text-light-1"></i>
+                          </div>
+                          <div class="text-14 text-light-1">{{ item.reservation.prixTotal }} € <span class="text-12 text-light-1">({{ item.reservation.prixUnite }} € / person)</span></div>
                         </div>
-                        <div class="text-14 text-light-1">{{ item.reservation.prixTotal }} € <span class="text-12 text-light-1">({{ item.reservation.prixUnite }} € / person)</span></div>
-                      </div>
+                      {% else %}
+                        <h3 class="text-18 lh-15 fw-500 mb-15">Activity no longer available</h3>
+                        <div class="d-flex items-center mb-10">
+                          <div class="size-30 flex-center bg-light-2 rounded-full mr-10">
+                            <i class="icon-info-circle text-14 text-light-1"></i>
+                          </div>
+                          <div class="text-14 text-light-1">Activity details unavailable</div>
+                        </div>
+                      {% endif %}
                       
                       <div class="d-flex border-top-light pt-20">
                         <div class="text-14 fw-500 text-light-1 mr-auto">Booking #{{ item.billet.numero }}</div>
                       </div>
                       
                       <div class="d-flex justify-center pt-15">
-                        <a href="{{ path('app_client_activity_detail', {'id': item.activity.id}) }}" class="action-btn action-btn-outline-blue">
-                          <i class="icon-eye"></i> View Activity
-                        </a>
+                        {% if item.activity is not null %}
+                          <a href="{{ path('app_client_activity_detail', {'id': item.activity.id}) }}" class="action-btn action-btn-outline-blue">
+                            <i class="icon-eye"></i> View Activity
+                          </a>
+                        {% else %}
+                          <span class="action-btn action-btn-disabled">
+                            <i class="icon-eye-slash"></i> Activity Unavailable
+                          </span>
+                        {% endif %}
                       </div>
                     </div>
                   </div>
