@@ -58,12 +58,12 @@ class ResetPasswordController extends AbstractController
                 
                 // Create a direct SMTP transport with detailed configuration
                 $transport = new EsmtpTransport(
-                    'smtp.hostinger.com',    // SMTP host
-                    465,                     // Port
-                    true                     // Use SSL
+                    $_ENV['SMTP_HOST'],    // SMTP host
+                    $_ENV['SMTP_PORT'],    // Port
+                    true                   // Use SSL
                 );
-                $transport->setUsername('hala.omran@jameiconseil.org');
-                $transport->setPassword('Oussama1981@');
+                $transport->setUsername($_ENV['SMTP_USERNAME']);
+                $transport->setPassword($_ENV['EMAIL_PASSWORD']);
                 
                 // Create the mailer with our transport
                 $directMailer = new Mailer($transport);

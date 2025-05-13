@@ -26,9 +26,16 @@ use Symfony\Component\HttpClient\HttpClient;
  */
 class FaceIdController extends AbstractController
 {
-    // Face++ API credentials
-    private const FACE_PLUS_PLUS_API_KEY = 'vC4FuF4xftz31i5_kIxw4BmzYoYK_uTY'; // Replace with your actual API key
-    private const FACE_PLUS_PLUS_API_SECRET = 'RErIeLazJRMclv5dckGj5G6lJWQtdEfQ';
+    // Face++ API credentials from environment variables
+    private function getFacePlusPlusApiKey(): string
+    {
+        return $_ENV['FACE_PLUS_PLUS_API_KEY'];
+    }
+    
+    private function getFacePlusPlusApiSecret(): string
+    {
+        return $_ENV['FACE_PLUS_PLUS_API_SECRET'];
+    }
     private const FACE_PLUS_PLUS_DETECT_URL = 'https://api-us.faceplusplus.com/facepp/v3/detect';
     private const FACE_PLUS_PLUS_COMPARE_URL = 'https://api-us.faceplusplus.com/facepp/v3/compare';
     

@@ -6,24 +6,13 @@
 {{ parent() }}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Debug info for posts and activities
-    console.log('Posts:', {{ posts|json_encode|raw }});
-    console.log('Activities by ID:', {{ activitiesById|json_encode|raw }});
-    
-    // Test lookup for each post
-    {% for post in posts %}
-      console.log('Post #{{ post.id }} ({{ post.title }}) has activityId={{ post.activityId }}');
-      {% if post.activityId is not null and post.activityId > 0 %}
-        console.log('Looking for activity {{ post.activityId }} in activitiesById');
-        {% if activitiesById[post.activityId] is defined %}
-          console.log('FOUND: {{ activitiesById[post.activityId].activityName }} at {{ activitiesById[post.activityId].activityDestination }}');
-        {% else %}
-          console.log('NOT FOUND: Activity #{{ post.activityId }} is not in activitiesById');
-        {% endif %}
-      {% else %}
-        console.log('Post has no activity ID (null or 0)');
-      {% endif %}
-    {% endfor %}
+    // Setup automatic form submission on select change
+    const activityFilterSelect = document.getElementById('activityFilter');
+    if (activityFilterSelect) {
+      activityFilterSelect.addEventListener('change', function() {
+        this.closest('form').submit();
+      });
+    }
   });
 </script>
 {% endblock %}
@@ -50,38 +39,39 @@
           {% endfor %}
         {% endfor %}
         
-        <div class="row justify-center mb-30">
-          <div class="col-xl-10">
-            <div class="px-20 py-20 rounded-4 bg-white shadow-3">
-              <div class="d-flex justify-between items-center">
-                <h5 class="text-18 fw-500 mb-0">Filter Articles By Activity</h5>
-                {% if selectedActivityId %}
-                  <a href="{{ path('app_blog_index') }}" class="text-14 fw-500 text-blue-1 d-flex items-center">
-                    <i class="icon-close mr-5"></i> Clear filter
-                  </a>
-                {% endif %}
-              </div>
-              
-              <div class="row y-gap-10 x-gap-10 pt-20">
-                <div class="col-auto">
-                  <a href="{{ path('app_blog_index') }}" 
-                     class="py-10 px-15 rounded-100 fw-500 {% if not selectedActivityId %}bg-blue-1 text-white{% else %}bg-light-2 text-15{% endif %}">
-                    All Posts
-                  </a>
+        <div class="row justify-center mb-20">
+          <div class="col-xl-8">
+            <form action="{{ path('app_blog_index') }}" method="get" class="px-20 py-20 rounded-4 bg-white shadow-2">
+              <div class="row y-gap-20">
+                <!-- Simple select dropdown for activities -->
+                <div class="col-12 col-md-9">
+                  <div class="form-group mb-0">
+                    <label for="activityFilter" class="form-label text-16 fw-500">{{ 'filter_by_activity'|trans }}</label>
+                    <select id="activityFilter" name="activityId" class="form-select" aria-label="{{ 'filter_activities'|trans }}">
+                      <option value="">{{ 'all_posts'|trans }}</option>
+                      {% if activities is defined and activities|length > 0 %}
+                        {% for activity in activities %}
+                          <option value="{{ activity.id }}" {% if selectedActivityId == activity.id %}selected{% endif %}>{{ activity.activityName }}</option>
+                        {% endfor %}
+                      {% endif %}
+                    </select>
+                  </div>
                 </div>
                 
-                {% if activities is defined and activities|length > 0 %}
-                  {% for activity in activities %}
-                    <div class="col-auto">
-                      <a href="{{ path('app_blog_index') }}?activityId={{ activity.id }}" 
-                         class="py-10 px-15 rounded-100 fw-500 {% if selectedActivityId == activity.id %}bg-blue-1 text-white{% else %}bg-light-2 text-15{% endif %}">
-                        {{ activity.activityName }}
-                      </a>
-                    </div>
-                  {% endfor %}
-                {% endif %}
+                <!-- Filter button & Clear button when a filter is applied -->
+                <div class="col-12 col-md-3 d-flex align-items-end">
+                  {% if selectedActivityId %}
+                    <a href="{{ path('app_blog_index') }}" class="button -md -outline-blue-1 text-blue-1 w-100">
+                      <i class="icon-close mr-5"></i> {{ 'clear'|trans }}
+                    </a>
+                  {% else %}
+                    <button type="submit" class="button -md -dark-1 w-100">
+                      <i class="icon-search mr-5"></i> {{ 'filter'|trans }}
+                    </button>
+                  {% endif %}
+                </div>
               </div>
-            </div>
+            </form>
           </div>
         </div>
 

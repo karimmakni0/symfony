@@ -1,0 +1,474 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'donate_us'|trans }} - GoTrip{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+  /* Custom styling for Stripe elements */
+  .StripeElement {
+    box-sizing: border-box;
+    height: 40px;
+    padding: 10px 12px;
+    border: 1px solid #e4e8f0;
+    border-radius: 4px;
+    background-color: white;
+    transition: box-shadow 150ms ease;
+  }
+
+  .StripeElement--focus {
+    box-shadow: 0 1px 3px 0 #cfd7df;
+  }
+
+  .StripeElement--invalid {
+    border-color: #fa755a;
+  }
+
+  .StripeElement--webkit-autofill {
+    background-color: #fefde5 !important;
+  }
+  
+  /* Custom styling for donation amount cards */
+  .donation-amount-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .donation-amount-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .donation-amount-label {
+    display: block;
+    padding: 15px 10px;
+    border: 2px solid #e4e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+  
+  .donation-amount-card input[type="radio"]:checked + .donation-amount-label {
+    border-color: #3554D1;
+    background-color: rgba(53, 84, 209, 0.05);
+    box-shadow: 0 4px 10px rgba(53, 84, 209, 0.15);
+  }
+  
+  .amount-icon {
+    font-size: 24px;
+  }
+  
+  .amount-value {
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 5px;
+  }
+  
+  .amount-description {
+    font-size: 12px;
+    color: #697488;
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<section class="layout-pt-md layout-pb-md bg-light-2">
+  <div class="container">
+    <div class="row justify-center text-center">
+      <div class="col-xl-6 col-lg-8 col-md-10">
+        <h1 class="text-30 fw-600 mb-15">🕊️ {{ 'donate_support_palestine'|trans }} 🕊️</h1>
+        <div class="d-flex justify-center mb-20">
+          <div class="px-20 py-10 bg-blue-1 rounded-100">
+            <span class="text-white">❤️ {{ 'make_a_difference'|trans }} ❤️</span>
+          </div>
+        </div>
+        <p class="text-15 text-dark-1">{{ 'donation_description'|trans }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="layout-pt-md layout-pb-lg">
+  <div class="container">
+    <div class="row y-gap-30 justify-center">
+      <div class="col-xl-7 col-lg-8">
+        <div class="px-40 py-40 md:px-30 md:py-30 bg-white rounded-4 shadow-3">
+          <h2 class="text-22 fw-500 mb-10 d-flex align-items-center">
+            <span class="mr-10">💸</span>
+            {{ 'make_donation'|trans }}
+          </h2>
+          <div class="d-flex justify-between border-top-light border-bottom-light py-15 mb-20">
+            <div class="d-flex align-items-center">
+              <span class="size-40 flex-center bg-blue-1 rounded-full text-white">🇵🇸</span>
+              <span class="ml-10">{{ 'palestine_support'|trans }}</span>
+            </div>
+            <div>
+              <span class="bg-blue-1 text-white px-15 py-5 rounded-100 text-14">100% {{ 'to_humanitarian_aid'|trans }}</span>
+            </div>
+          </div>
+          
+          <form id="payment-form" action="{{ path('app_donate_checkout') }}" method="POST">
+            <div class="row y-gap-20">
+              <div class="col-12">
+                <div class="form-input">
+                  <input type="text" name="name" required>
+                  <label class="lh-1 text-16 text-light-1">{{ 'your_name'|trans }}</label>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="form-input">
+                  <input type="email" name="email" required>
+                  <label class="lh-1 text-16 text-light-1">{{ 'your_email'|trans }}</label>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <h4 class="text-16 fw-500 mb-15 d-flex align-items-center">
+                  <span class="mr-10">💵</span> {{ 'select_amount'|trans }}
+                </h4>
+                <div class="row y-gap-15">
+                  <div class="col-sm-6 col-lg-3">
+                    <div class="donation-amount-card">
+                      <input type="radio" name="amount" value="10" id="amount10" checked>
+                      <label for="amount10" class="donation-amount-label">
+                        <div class="d-flex flex-column align-items-center">
+                          <div class="amount-icon mb-10">🍔</div>
+                          <div class="amount-value">$10</div>
+                          <div class="amount-description">{{ 'food_support'|trans }}</div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div class="col-sm-6 col-lg-3">
+                    <div class="donation-amount-card">
+                      <input type="radio" name="amount" value="25" id="amount25">
+                      <label for="amount25" class="donation-amount-label">
+                        <div class="d-flex flex-column align-items-center">
+                          <div class="amount-icon mb-10">📦</div>
+                          <div class="amount-value">$25</div>
+                          <div class="amount-description">{{ 'supply_kit'|trans }}</div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div class="col-sm-6 col-lg-3">
+                    <div class="donation-amount-card">
+                      <input type="radio" name="amount" value="50" id="amount50">
+                      <label for="amount50" class="donation-amount-label">
+                        <div class="d-flex flex-column align-items-center">
+                          <div class="amount-icon mb-10">💉</div>
+                          <div class="amount-value">$50</div>
+                          <div class="amount-description">{{ 'medical_aid'|trans }}</div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div class="col-sm-6 col-lg-3">
+                    <div class="donation-amount-card">
+                      <input type="radio" name="amount" value="100" id="amount100">
+                      <label for="amount100" class="donation-amount-label">
+                        <div class="d-flex flex-column align-items-center">
+                          <div class="amount-icon mb-10">🏡</div>
+                          <div class="amount-value">$100</div>
+                          <div class="amount-description">{{ 'shelter_support'|trans }}</div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div class="col-sm-6">
+                    <div class="donation-amount-card">
+                      <input type="radio" name="amount" value="custom" id="customAmount">
+                      <label for="customAmount" class="donation-amount-label">
+                        <div class="d-flex flex-column align-items-center">
+                          <div class="amount-icon mb-10">❤️</div>
+                          <div class="amount-value">{{ 'custom_amount'|trans }}</div>
+                          <div class="amount-description">{{ 'your_choice'|trans }}</div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12" id="customAmountField" style="display: none;">
+                <div class="bg-light-2 p-20 rounded-4 mt-10 mb-10">
+                  <div class="d-flex align-items-center mb-10">
+                    <span class="size-40 flex-center bg-blue-1 rounded-full text-white mr-10">💲</span>
+                    <h4 class="text-16 fw-500">{{ 'enter_custom_amount'|trans }}</h4>
+                  </div>
+                  <div class="form-input">
+                    <input type="number" name="custom_amount" min="1">
+                    <label class="lh-1 text-16 text-light-1">{{ 'enter_amount_in_usd'|trans }}</label>
+                  </div>
+                  <div class="text-14 text-light-1 mt-10">
+                    <span class="fw-500 text-dark-1">{{ 'tip'|trans }}:</span> {{ 'custom_amount_tip'|trans }}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="form-input">
+                  <textarea name="message" rows="4"></textarea>
+                  <label class="lh-1 text-16 text-light-1">{{ 'message_optional'|trans }}</label>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <h4 class="text-18 fw-500 mb-10">{{ 'payment_details'|trans }}</h4>
+                
+                <div class="border-dashed rounded-8 p-20 bg-white mb-20">
+                  <!-- Card input with clean design -->
+                    <div class="form-group mb-15">
+                      <label class="d-block text-14 fw-500 mb-10">{{ 'card_information'|trans }}</label>
+                      <div id="card-element" class="form-control p-15 border-light rounded-4 bg-light-2"></div>
+                      <div id="card-errors" class="text-14 text-red-1 mt-10 fw-500" role="alert"></div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mt-15 mb-5">
+                      <div class="size-30 flex-center bg-green-1 rounded-full text-white mr-10">
+                        <i class="icon-check text-12"></i>
+                      </div>
+                      <span class="text-13 text-light-1">{{ 'card_not_charged'|trans }}</span>
+                    </div>
+                    
+                    <div class="mt-10 text-center">
+                      <div class="d-inline-flex align-items-center bg-light-2 px-15 py-5 rounded-100">
+                        <i class="icon-shield text-green-1 mr-5"></i>
+                        <span class="text-12">{{ 'ssl_encrypted'|trans }}</span>
+                      </div>
+                    </div>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <button id="submit-button" type="submit" class="button -md -dark-1 bg-blue-1 text-white w-100">
+                  <span class="d-flex align-items-center justify-center">
+                    <span class="mr-10">💙</span>
+                    {{ 'donate_now'|trans }}
+                    <i class="icon-arrow-top-right ml-10"></i>
+                  </span>
+                </button>
+                <div id="payment-processing" class="d-none">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <div class="spinner-border text-blue-1 mr-10" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                    <span>{{ 'processing_payment'|trans }}...</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Submit button area -->
+              <div class="col-12 mt-15">
+                <!-- Button area is left empty to keep spacing in layout -->
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <div class="col-xl-5 col-lg-8">
+        <div class="px-40 py-40 md:px-30 md:py-30 bg-white rounded-4 shadow-3">
+          <h3 class="text-22 fw-500 mb-20">{{ 'why_donate'|trans }}</h3>
+          <p class="text-15 text-dark-1 mb-20">{{ 'donation_impact_description'|trans }}</p>
+          
+          <div class="row y-gap-30 pt-10">
+            <div class="col-12">
+              <div class="d-flex">
+                <div class="size-40 flex-center bg-blue-2 rounded-full">
+                  <div class="text-14 fw-600 text-blue-1">1</div>
+                </div>
+                <div class="ml-10">
+                  <h4 class="text-16 fw-500">{{ 'humanitarian_aid'|trans }}</h4>
+                  <p class="text-14 text-light-1 mt-5">{{ 'humanitarian_aid_description'|trans }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-12">
+              <div class="d-flex">
+                <div class="size-40 flex-center bg-blue-2 rounded-full">
+                  <div class="text-14 fw-600 text-blue-1">2</div>
+                </div>
+                <div class="ml-10">
+                  <h4 class="text-16 fw-500">{{ 'medical_support'|trans }}</h4>
+                  <p class="text-14 text-light-1 mt-5">{{ 'medical_support_description'|trans }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-12">
+              <div class="d-flex">
+                <div class="size-40 flex-center bg-blue-2 rounded-full">
+                  <div class="text-14 fw-600 text-blue-1">3</div>
+                </div>
+                <div class="ml-10">
+                  <h4 class="text-16 fw-500">{{ 'education_programs'|trans }}</h4>
+                  <p class="text-14 text-light-1 mt-5">{{ 'education_programs_description'|trans }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Stripe with your publishable key
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const elements = stripe.elements();
+    
+    // Custom styling for the card element
+    const style = {
+      base: {
+        color: '#32325d',
+        fontFamily: '"Jost", sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': {
+          color: '#aab7c4'
+        }
+      },
+      invalid: {
+        color: '#fa755a',
+        iconColor: '#fa755a'
+      }
+    };
+    
+    // Create and mount the card element
+    const cardElement = elements.create('card', {style: style});
+    cardElement.mount('#card-element');
+    
+    // Handle real-time validation errors from the card element
+    cardElement.on('change', function(event) {
+      const displayError = document.getElementById('card-errors');
+      if (event.error) {
+        displayError.textContent = event.error.message;
+      } else {
+        displayError.textContent = '';
+      }
+    });
+    
+    // Show/hide custom amount field based on radio selection
+    const customRadio = document.getElementById('customAmount');
+    const customField = document.getElementById('customAmountField');
+    
+    document.querySelectorAll('input[name="amount"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'custom') {
+          customField.style.display = 'block';
+        } else {
+          customField.style.display = 'none';
+        }
+      });
+    });
+    
+    // Handle form submission
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+    const processingIndicator = document.getElementById('payment-processing');
+    const errorElement = document.getElementById('card-errors');
+    
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      // Clear any previous errors
+      errorElement.textContent = '';
+      
+      // Validate the form first
+      const name = document.querySelector('input[name="name"]').value.trim();
+      const email = document.querySelector('input[name="email"]').value.trim();
+      
+      if (!name) {
+        errorElement.textContent = '{{ "name_required"|trans }}';
+        return;
+      }
+      
+      if (!email) {
+        errorElement.textContent = '{{ "email_required"|trans }}';
+        return;
+      }
+      
+      // Check amount validation
+      let amount;
+      const selectedAmountOption = document.querySelector('input[name="amount"]:checked').value;
+      if (selectedAmountOption === 'custom') {
+        amount = document.querySelector('input[name="custom_amount"]').value.trim();
+        if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+          errorElement.textContent = '{{ "valid_amount_required"|trans }}';
+          return;
+        }
+      } else {
+        amount = selectedAmountOption;
+      }
+      
+      // Disable the submit button to prevent repeated clicks
+      submitButton.disabled = true;
+      submitButton.classList.add('d-none');
+      processingIndicator.classList.remove('d-none');
+      
+      // Create payment intent on the server
+      fetch('{{ path('app_donate_checkout') }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: amount,
+          name: name,
+          email: email,
+          message: document.querySelector('textarea[name="message"]').value
+        })
+      })
+      .then(function(response) {
+        if (!response.ok) {
+          return response.json().then(data => {
+            throw new Error(data.error || '{{ "server_error"|trans }}');
+          });
+        }
+        return response.json();
+      })
+      .then(function(data) {
+        if (data.error) {
+          // Show error message
+          errorElement.textContent = data.error;
+          
+          // Re-enable the submit button
+          submitButton.disabled = false;
+          submitButton.classList.remove('d-none');
+          processingIndicator.classList.add('d-none');
+        } else if (data.url) {
+          // Redirect to Stripe Checkout
+          window.location.href = data.url;
+        } else {
+          throw new Error('{{ "invalid_response"|trans }}');
+        }
+      })
+      .catch(function(error) {
+        console.error('Error:', error);
+        // Show error message
+        errorElement.textContent = error.message || '{{ "connection_error"|trans }}';
+        
+        // Re-enable the submit button
+        submitButton.disabled = false;
+        submitButton.classList.remove('d-none');
+        processingIndicator.classList.add('d-none');
+      });
+    });
+  });
+</script>
+{% endblock %}

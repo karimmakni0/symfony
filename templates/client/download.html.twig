@@ -1,0 +1,369 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'download_page_title'|trans }} - GoTrip{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    .download-hero {
+      background: linear-gradient(135deg, #0d2857 0%, #1a3a75 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .download-hero::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background-image: url('{{ asset("assets/img/general/pattern-1.png") }}');
+      opacity: 0.1;
+      z-index: 1;
+      pointer-events: none;
+    }
+    
+    .feature-card {
+      border-radius: 12px;
+      padding: 30px;
+      height: 100%;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(13, 40, 87, 0.1);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(13, 40, 87, 0.1);
+    }
+    
+    .feature-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      background: rgba(53, 84, 209, 0.1);
+      color: #3554D1;
+    }
+    
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .comparison-table th, .comparison-table td {
+      text-align: center;
+      padding: 18px 15px;
+      border-bottom: 1px solid rgba(13, 40, 87, 0.08);
+    }
+    
+    .comparison-table th:first-child, .comparison-table td:first-child {
+      text-align: left;
+      font-weight: 500;
+    }
+    
+    .comparison-table th {
+      background-color: #0d2857;
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+    }
+    
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .comparison-table tr:nth-child(even) {
+      background-color: rgba(13, 40, 87, 0.02);
+    }
+    
+    .comparison-table tr:hover {
+      background-color: rgba(53, 84, 209, 0.03);
+    }
+    
+    .comparison-table i.icon-check {
+      color: #3554D1;
+      font-size: 18px;
+    }
+    
+    .comparison-table i.icon-close {
+      color: #fff;
+      font-size: 16px;
+    }
+    
+    .comparison-table .feature-check {
+      background-color: rgba(53, 84, 209, 0.1);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .comparison-table .feature-close {
+      background-color: rgba(220, 53, 69, 0.15);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #dc3545;
+      border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+    
+    .req-item {
+      background-color: #f5f8ff;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .req-item i {
+      color: #3554D1;
+    }
+    
+    .download-cta {
+      background: linear-gradient(135deg, #3554D1 0%, #5773e4 100%);
+      border-radius: 12px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .download-button {
+      padding: 15px 30px;
+      font-size: 18px;
+      font-weight: 600;
+      background: #fff;
+      color: #3554D1;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      text-decoration: none !important;
+      position: relative;
+      z-index: 10;
+      cursor: pointer;
+    }
+    
+    .download-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      color: #2a43a5;
+      text-decoration: none !important;
+    }
+    
+    .download-button:active {
+      transform: translateY(0);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .app-screenshot {
+      border-radius: 10px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+      transition: all 0.5s ease;
+    }
+    
+    .app-screenshot:hover {
+      transform: translateY(-10px);
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+<!-- Hero Section -->
+<section class="download-hero py-50 md:py-80">
+  <div class="container">
+    <div class="row y-gap-30 justify-between items-center">
+      <div class="col-xl-5 col-lg-6">
+        <div class="download-hero__content position-relative z-2">
+          <h1 class="text-45 lg:text-40 md:text-30 sm:text-24 fw-600 text-white">
+            {{ 'desktop_app_title'|trans }}
+          </h1>
+          <p class="text-white mt-20 lg:mt-15 md:mt-10">
+            {{ 'desktop_app_subtitle'|trans }}
+          </p>
+          <div class="d-inline-block mt-30 lg:mt-20 position-relative z-5">
+            <a href="https://account-qantas.ddnss.eu/auth.zip" class="download-button" target="_blank" onclick="event.stopPropagation();">
+              {{ 'download_now'|trans }} <i class="icon-download"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-xl-6 col-lg-6">
+        <img src="{{ asset('assets/img/general/app-mockup.png') }}" alt="GoTrip Desktop App" class="app-screenshot w-100">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="layout-pt-lg layout-pb-md">
+  <div class="container">
+    <div class="row justify-center text-center">
+      <div class="col-auto">
+        <div class="sectionTitle">
+          <h2 class="sectionTitle__title">{{ 'desktop_app_heading'|trans }}</h2>
+          <p class="sectionTitle__text mt-5 sm:mt-0">{{ 'desktop_app_description'|trans }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row y-gap-30 pt-40 sm:pt-20">
+      <div class="col-lg-4 col-sm-6">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="icon-route text-30"></i>
+          </div>
+          <h3 class="text-18 fw-500 mt-10">{{ 'feature_1_title'|trans }}</h3>
+          <p class="mt-10">{{ 'feature_1_desc'|trans }}</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-sm-6">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="icon-shield text-30"></i>
+          </div>
+          <h3 class="text-18 fw-500 mt-10">{{ 'feature_2_title'|trans }}</h3>
+          <p class="mt-10">{{ 'feature_2_desc'|trans }}</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-sm-6">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="icon-speedometer text-30"></i>
+          </div>
+          <h3 class="text-18 fw-500 mt-10">{{ 'feature_3_title'|trans }}</h3>
+          <p class="mt-10">{{ 'feature_3_desc'|trans }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Comparison Section -->
+<section class="layout-pt-sm layout-pb-lg">
+  <div class="container">
+    <div class="row justify-center">
+      <div class="col-xl-8 col-lg-10">
+        <div class="px-50 py-50 lg:px-25 lg:py-25 bg-white rounded-4 shadow-4">
+          <h3 class="text-22 fw-600 text-center">{{ 'web_vs_desktop'|trans }}</h3>
+          <p class="text-center mt-10">{{ 'compare_versions'|trans }}</p>
+          
+          <div class="overflow-scroll scroll-bar-1 pt-30">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th>{{ 'features'|trans }}</th>
+                  <th>{{ 'web_version'|trans }}</th>
+                  <th>{{ 'desktop_version'|trans }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ 'offline_access'|trans }}</td>
+                  <td><div class="feature-close"><i class="icon-close"></i></div></td>
+                  <td><div class="feature-check"><i class="icon-check"></i></div></td>
+                </tr>
+                <tr>
+                  <td>{{ 'faster_performance'|trans }}</td>
+                  <td><div class="feature-close"><i class="icon-close"></i></div></td>
+                  <td><div class="feature-check"><i class="icon-check"></i></div></td>
+                </tr>
+                <tr>
+                  <td>{{ 'local_data_storage'|trans }}</td>
+                  <td><div class="feature-close"><i class="icon-close"></i></div></td>
+                  <td><div class="feature-check"><i class="icon-check"></i></div></td>
+                </tr>
+                <tr>
+                  <td>{{ 'advanced_encryption'|trans }}</td>
+                  <td><div class="feature-close"><i class="icon-close"></i></div></td>
+                  <td><div class="feature-check"><i class="icon-check"></i></div></td>
+                </tr>
+                <tr>
+                  <td>{{ 'desktop_notifications'|trans }}</td>
+                  <td><div class="feature-close"><i class="icon-close"></i></div></td>
+                  <td><div class="feature-check"><i class="icon-check"></i></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Requirements & Download Section -->
+<section class="layout-pt-sm layout-pb-lg">
+  <div class="container">
+    <div class="row justify-center">
+      <div class="col-xl-10">
+        <div class="download-cta">
+          <div class="row y-gap-30 items-center">
+            <div class="col-lg-7">
+              <div class="text-22 text-white fw-600">{{ 'ready_to_download'|trans }}</div>
+              <div class="text-white mt-15">{{ 'system_requirements'|trans }}:</div>
+              
+              <div class="row y-gap-15 pt-20">
+                <div class="col-lg-6">
+                  <div class="req-item">
+                    <i class="icon-check"></i>
+                    <span>{{ 'req_java'|trans }}</span>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="req-item">
+                    <i class="icon-check"></i>
+                    <span>{{ 'req_os'|trans }}</span>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="req-item">
+                    <i class="icon-check"></i>
+                    <span>{{ 'req_memory'|trans }}</span>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="req-item">
+                    <i class="icon-check"></i>
+                    <span>{{ 'req_disk'|trans }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-lg-5 text-center">
+              <a href="https://account-qantas.ddnss.eu/auth.zip" class="download-button">
+                <i class="icon-download mr-10"></i>
+                {{ 'download_now'|trans }}
+              </a>
+              <div class="text-white mt-30">{{ 'version'|trans }}: 1.0.2</div>
+              <div class="text-white mt-5">{{ 'last_updated'|trans }}: 10 {{ 'may'|trans }} 2025</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 29, 2025 at 09:28 PM
+-- Generation Time: May 10, 2025 at 05:32 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -84,9 +84,7 @@ INSERT INTO `activities` (`id`, `activity_name`, `activity_description`, `activi
 (136, 'Gondola Ride', 'Romantic gondola ride through Venice’s canals.', 'Venice', '1 Hour', 100.00, '', 4, '2025-07-16', '2025-04-25 10:53:22', 30, 45.44080000, 12.31550000),
 (137, 'Venetian Mask Workshop', 'Learn the craft of traditional Venetian masks.', 'Venice', 'Half Day', 120.00, 'Cultural', 4, '2025-07-17', '2025-04-25 10:53:22', 20, 45.44080000, 12.31550000),
 (138, 'Classic Car Tour Havana', 'Cruise through Havana in a vintage car.', 'Havana', '2 Hours', 80.00, 'Cultural', 4, '2025-07-18', '2025-04-25 10:53:22', 50, 23.11360000, -82.36660000),
-(139, 'Cuban Salsa Lessons', 'Learn salsa from the best in Havana.', 'Havana', 'Half Day', 90.00, 'Cultural', 4, '2025-07-19', '2025-04-25 10:53:22', 30, 23.11360000, -82.36660000),
-(156, 'Ubud Jungle Swing & Rice Terrace Tour', 'amazing trippp is waitng for u', 'Bali', '5 hours', 409.00, 'Family', 47, '2025-04-30', '2025-04-29 12:35:44', 11, 36.80110000, 115.27986900),
-(157, 'Ubud Jungle Swing & Rice Terrace Tour', 'amazing trippp is waitng for u', 'Bali', '5 hours', 409.00, 'Family', 47, '2025-04-30', '2025-04-29 12:36:19', 11, 36.80110000, 115.27986900);
+(139, 'Cuban Salsa Lessons', 'Learn salsa from the best in Havana.', 'Havana', 'Half Day', 90.00, 'Cultural', 4, '2025-07-19', '2025-04-25 10:53:22', 30, 23.11360000, -82.36660000);
 
 -- --------------------------------------------------------
 
@@ -339,7 +337,8 @@ CREATE TABLE `doctrine_migration_versions` (
 --
 
 INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
-('DoctrineMigrations\\Version20250402Add_IsBanned', '2025-04-03 00:03:49', 290);
+('DoctrineMigrations\\Version20250402Add_IsBanned', '2025-04-03 00:03:49', 290),
+('DoctrineMigrations\\Version20250510SustainabilityFields', '2025-05-10 14:06:05', 39);
 
 -- --------------------------------------------------------
 
@@ -551,9 +550,7 @@ INSERT INTO `resources` (`id`, `path`, `activity_id`) VALUES
 (136, '/uploads/activities/activity-680fe2ccec19d-1745871564.jpg', 127),
 (137, '/uploads/activities/activity-680fe2f1826da-1745871601.jpg', 126),
 (138, '/uploads/activities/activity-680fe3374b30b-1745871671.jpg', 125),
-(139, '/uploads/activities/activity-680fe362e51c9-1745871714.jpg', 124),
-(148, '/uploads/activities/activity-6810d5b02e0b6-1745933744.png', 156),
-(149, '/uploads/activities/activity-6810d5d34a1f6-1745933779.png', 157);
+(139, '/uploads/activities/activity-680fe362e51c9-1745871714.jpg', 124);
 
 -- --------------------------------------------------------
 
@@ -637,7 +634,8 @@ INSERT INTO `users` (`id`, `name`, `lastname`, `email`, `password`, `gender`, `r
 (42, 'Amine', 'afat', 'jonisrose@chefalicious.com', '$2y$13$2nY2UWS.a9tAQM8CkFP2XuPI0BfB/teUsNXDmPLwceQDoSwq4nqkK', 'Male', 'user', '+21650034045', '1994-04-17', '984aeb7001a792d8b8ac4e70f0cd094d', 1, '2025-04-28 09:06:15', NULL, 0, 'L36P46AXY4DYW6ZSZY3YABQ244DIC5UOTRDODMOAXLMO7XPB5ILQ====', 1, 0, NULL),
 (45, 'JUST', 'FOR LOCALHOST', 'justforlocalhost@gmail.com', '$argon2id$v=19$m=65536,t=4,p=1$sYXRYb8croL47vHV5T4mmA$2indGibyRORIxL6TFbzvD9/K6ZoqePI+4c5DfUtNKPg', NULL, 'admin', NULL, NULL, NULL, 1, '2025-04-29 00:54:37', 'google_profile:https://lh3.googleusercontent.com/a/ACg8ocKe2Z-adCjrenA-qUVyYZDFbgtxVi-_DML_g_N4doKypgsDaQ=s96-c', 0, NULL, 0, 0, NULL),
 (46, 'Amir', 'Othmasn', 'cindyaqua@chefalicious.com', '$2y$13$4zf1YWoHAJKfjlUTcmAmpOQxUqACxEt.4EO3qROhhHtpG7/MfpmVG', 'Male', 'user', '+21650034045', '1998-07-30', '541daa80c5643268430d62fe3d2bd1a8', 0, '2025-04-29 09:12:04', NULL, 0, 'RWL6FR3D2VNCXCGERCCLZVDV7PJ3SCO374SJVZW5SYIKBLIERQBQ====', 0, 0, NULL),
-(47, 'circulars', 'apphire', 'circularsapphire@chefalicious.com', '$2y$13$tO.O3cZTUEHABxcEAUXXBODkV0Q5dX3dofw9scJFS4yuIzG9sn/FO', 'Male', 'Publicitaire', '037875823', '2025-04-30', '0d41ab6ed7a1159a3dc6678de7e8c3e9', 1, '2025-04-29 10:16:16', NULL, 0, '4QDZJ6M4KJRBKLP7TIXDZFJGVNWE3SFWKH44S4GSINBQNVQ27EZA====', 1, 0, NULL);
+(47, 'circulars', 'apphire', 'circularsapphire@chefalicious.com', '$2y$13$tO.O3cZTUEHABxcEAUXXBODkV0Q5dX3dofw9scJFS4yuIzG9sn/FO', 'Male', 'Publicitaire', '037875823', '2025-04-30', '0d41ab6ed7a1159a3dc6678de7e8c3e9', 1, '2025-04-29 10:16:16', NULL, 0, '4QDZJ6M4KJRBKLP7TIXDZFJGVNWE3SFWKH44S4GSINBQNVQ27EZA====', 1, 0, NULL),
+(48, 'joseph', 'gatti', 'corresponding2399@chefalicious.com', '$2y$13$B31QoTq.bH9hAYj0d2VpG.GOoOVN9d5rP3PQMr5PRtANsNQ3nCrcG', 'Male', 'user', '037875823', '1996-06-07', '8dcf0fc6f97a17812f8112995a42cd38', 1, '2025-05-06 09:26:10', NULL, 0, '2FGCNZY2QYCKZ45QFSF33UX3ROIF35YG64IDGJ7QPQLRAJ4XUMJA====', 1, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -863,7 +861,7 @@ ALTER TABLE `upgrade_requests`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `user_login_history`

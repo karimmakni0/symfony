@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'donation_successful'|trans }} - GoTrip{% endblock %}
+
+{% block body %}
+<section class="layout-pt-lg layout-pb-lg bg-light-2">
+  <div class="container">
+    <div class="row justify-center text-center">
+      <div class="col-auto">
+        <div class="size-100 flex-center rounded-full bg-blue-1 mb-30">
+          <i class="icon-check text-30 text-white"></i>
+        </div>
+      </div>
+      
+      <div class="col-xl-6 col-lg-8 col-md-10">
+        <h1 class="text-30 fw-600 mb-15">{{ 'thank_you_for_your_donation'|trans }}</h1>
+        <p class="text-15 text-dark-1">{{ 'donation_received_message'|trans }}</p>
+        
+        <div class="d-inline-block mt-30">
+          <a href="{{ path('app_home') }}" class="button -md -blue-1 bg-blue-1 text-white">
+            {{ 'return_to_home'|trans }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

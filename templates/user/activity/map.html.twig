@@ -22,6 +22,37 @@
         overflow: hidden;
     }
     
+    .map-3d-controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
+        background: white;
+        border-radius: 4px;
+        padding: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    
+    .map-3d-controls button {
+        display: block;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px 10px;
+        margin: 5px 0;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .map-3d-controls button:hover {
+        background: #f0f0f0;
+    }
+    
+    .map-3d-controls button.active {
+        background-color: var(--color-blue-1);
+        color: white;
+    }
+    
     .map-filter-bar {
         background: white;
         padding: 15px;
@@ -334,8 +365,16 @@
             <div class="col-12 js-map-view-container">
                 <!-- Map Container -->
                 <div class="activities-map-container">
-                    <div class="rounded-4 border-light overflow-hidden">
+                    <div class="rounded-4 border-light overflow-hidden position-relative">
                         <div id="map"></div>
+                        <div class="map-3d-controls">
+                            <button id="toggle3D" class="active">3D View</button>
+                            <button id="rotate-left"><i class="icon-arrow-left"></i> Rotate</button>
+                            <button id="rotate-right">Rotate <i class="icon-arrow-right"></i></button>
+                            <button id="tilt-up"><i class="icon-arrow-up"></i> Tilt</button>
+                            <button id="tilt-down">Tilt <i class="icon-arrow-down"></i></button>
+                            <button id="reset-view">Reset View</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -618,12 +657,15 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
         map = new mapboxgl.Map({
             container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
+            style: 'mapbox://styles/mapbox/satellite-streets-v12', // Satellite imagery with streets
             center: [9.5375, 33.8869], // Center on Tunisia
-            zoom: 7
+            zoom: 7,
+            pitch: 60, // Tilted view for 3D effect
+            bearing: 0, // Initial bearing (rotation)
+            antialias: true // Smoother rendering
         });
         
-        console.log('Map initialized successfully');
+        console.log('3D Map initialized successfully');
     } catch (e) {
         console.error('Error initializing map:', e);
         return;
@@ -935,7 +977,73 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add markers when map loads
     map.on('load', function() {
-        console.log('Map loaded, adding markers...');
+        console.log('Map loaded, adding 3D terrain and markers...');
+        
+        // Add 3D terrain
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+        
+        // Add the DEM source as a terrain layer with sky layer
+        map.addSource('mapbox-dem', {
+            'type': 'raster-dem',
+            'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+            'tileSize': 512,
+            'maxzoom': 14
+        });
+        
+        // Add a sky layer that will show when the map is highly pitched
+        map.addLayer({
+            'id': 'sky',
+            'type': 'sky',
+            'paint': {
+                'sky-type': 'atmosphere',
+                'sky-atmosphere-sun': [0.0, 0.0],
+                'sky-atmosphere-sun-intensity': 15
+            }
+        });
+        
+        // Set up 3D controls
+        document.getElementById('toggle3D').addEventListener('click', function() {
+            const is3D = this.classList.contains('active');
+            if (is3D) {
+                // Switch to 2D
+                map.easeTo({ pitch: 0, bearing: 0 });
+                this.classList.remove('active');
+                this.textContent = '2D View';
+            } else {
+                // Switch to 3D
+                map.easeTo({ pitch: 60, bearing: 0 });
+                this.classList.add('active');
+                this.textContent = '3D View';
+            }
+        });
+        
+        document.getElementById('rotate-left').addEventListener('click', function() {
+            map.easeTo({ bearing: map.getBearing() - 30 });
+        });
+        
+        document.getElementById('rotate-right').addEventListener('click', function() {
+            map.easeTo({ bearing: map.getBearing() + 30 });
+        });
+        
+        document.getElementById('tilt-up').addEventListener('click', function() {
+            const currentPitch = map.getPitch();
+            map.easeTo({ pitch: Math.min(currentPitch + 10, 85) });
+        });
+        
+        document.getElementById('tilt-down').addEventListener('click', function() {
+            const currentPitch = map.getPitch();
+            map.easeTo({ pitch: Math.max(currentPitch - 10, 0) });
+        });
+        
+        document.getElementById('reset-view').addEventListener('click', function() {
+            map.easeTo({ 
+                center: [9.5375, 33.8869],
+                zoom: 7,
+                pitch: 60, 
+                bearing: 0
+            });
+        });
+        
         // Clear markers array to avoid duplicates
         markers = [];
         activities.forEach(function(activity) {

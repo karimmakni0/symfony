@@ -34,4 +34,12 @@ class HomeController extends AbstractController
             'destinations' => $destinations,
         ]);
     }
+    
+    /**
+     * @Route("/download", name="app_download")
+     */
+    public function download(): Response
+    {
+        return $this->render('client/download.html.twig');
+    }
 }

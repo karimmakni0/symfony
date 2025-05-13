@@ -349,8 +349,24 @@
             {% endif %}
             
             <div class="map-container">
+              <div class="map-view-toggle mb-3 d-flex justify-content-center">
+                <div class="view-toggle-buttons">
+                  <button id="mapViewBtn" class="view-toggle-btn view-toggle-map active">
+                    <i class="fas fa-map"></i>
+                    <span>{{ 'map_view'|trans }}</span>
+                  </button>
+                  <button id="streetViewBtn" class="view-toggle-btn view-toggle-street">
+                    <i class="fas fa-street-view"></i>
+                    <span>{{ 'street_view'|trans }}</span>
+                  </button>
+                  <button id="directionsBtn" class="view-toggle-btn view-toggle-directions">
+                    <i class="fas fa-route"></i>
+                    <span>{{ 'get_directions'|trans }}</span>
+                  </button>
+                </div>
+              </div>
               <div class="full-map-wrapper">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25864.76992860789!2d10.17991905!3d36.79177545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd337f5e7ef543%3A0xd671924e714a0275!2z2KrZiNmG2LPYjCDYqtmI2YbYsw!5e0!3m2!1sar!2stn!4v1682169865368!5m2!1sar!2stn" class="full-map" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <iframe id="mapFrame" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3000!2d{{ activity.longitude|default(10.17991905) }}!3d{{ activity.latitude|default(36.79177545) }}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzrCsDQ3JzMwLjQiTiAxMMKwMTAnNDcuNyJF!5e0!3m2!1sen!2stn!4v1684514448720!5m2!1sen!2stn" class="full-map" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
               </div>
             </div>
           </div>
@@ -514,6 +530,9 @@
   {{ parent() }}
   <!-- Add SweetAlert2 for beautiful alerts -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <!-- Add anime.js for car animation in Get Directions -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
   
   <!-- Main functionality script -->
   <script>
@@ -729,8 +748,344 @@
       });
     }
     
-    // Add styles for the SweetAlert weather container
+    // Map and Street View functionality
+    const mapViewBtn = document.getElementById('mapViewBtn');
+    const streetViewBtn = document.getElementById('streetViewBtn');
+    const mapFrame = document.getElementById('mapFrame');
+    
+    if (mapViewBtn && streetViewBtn && mapFrame) {
+      // Get actual coordinates and location name from the activity data
+      const activityLat = {{ activity.latitude|default(36.79177545) }};
+      const activityLng = {{ activity.longitude|default(10.17991905) }};
+      const locationName = "{{ activity.activityDestination|e('js') }}";
+      
+      // Create URL for embedded Google Maps with marker
+      const mapUrlWithLocation = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3000!2d${activityLng}!3d${activityLat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2z${encodeURIComponent(locationName)}!5e0!3m2!1sen!2stn!4v1684514448720!5m2!1sen!2stn`;
+      
+      // Save the original iframe reference and URL for later use
+      const originalMapFrame = mapFrame;
+      const originalMapUrl = mapUrlWithLocation;
+      
+      // Handle map view button click
+      mapViewBtn.addEventListener('click', function() {
+        // If we've replaced the iframe, create a new one with the original map
+        if (mapFrame !== originalMapFrame) {
+          const newMapFrame = document.createElement('iframe');
+          newMapFrame.width = '100%';
+          newMapFrame.height = '570';
+          newMapFrame.frameBorder = '0';
+          newMapFrame.style.border = '0';
+          newMapFrame.src = originalMapUrl;
+          newMapFrame.allowFullscreen = true;
+          
+          // Replace the street view iframe with our new map iframe
+          mapFrame.parentNode.replaceChild(newMapFrame, mapFrame);
+          
+          // Update our reference
+          mapFrame = newMapFrame;
+        } else {
+          // If we still have the original iframe, just update its src
+          mapFrame.src = originalMapUrl;
+        }
+        
+        // Update button states
+        mapViewBtn.classList.add('active');
+        streetViewBtn.classList.remove('active');
+      });
+      
+      // Handle street view button click
+      streetViewBtn.addEventListener('click', function() {
+        // Create a Street View iframe with the proper parameters
+        const streetViewFrame = document.createElement('iframe');
+        streetViewFrame.width = '100%';
+        streetViewFrame.height = '570';
+        streetViewFrame.frameBorder = '0';
+        streetViewFrame.style.border = '0';
+        streetViewFrame.src = `https://www.google.com/maps?layer=c&cbll=${activityLat},${activityLng}&cbp=12,0,0,0,0&output=svembed`;
+        streetViewFrame.allowFullscreen = true;
+        
+        // Replace the current iframe with our street view iframe
+        mapFrame.parentNode.replaceChild(streetViewFrame, mapFrame);
+        
+        // Update our reference
+        mapFrame = streetViewFrame;
+        
+        // Update button states
+        streetViewBtn.classList.add('active');
+        mapViewBtn.classList.remove('active');
+      });
+    }
+
+  // Get Directions functionality
+  if (document.getElementById('directionsBtn')) {
+    const directionsBtn = document.getElementById('directionsBtn');
+    
+    // Store activity coordinates for directions - access the values from the data attributes
+    const activityLatForDirections = {{ activity.latitude|default(36.79177545) }};
+    const activityLngForDirections = {{ activity.longitude|default(10.17991905) }};
+    const activityNameForDirections = "{{ activity.activityName|escape('js') }}";
+    
+    directionsBtn.addEventListener('click', function() {
+      // Set active state for directions button
+      directionsBtn.classList.add('active');
+      mapViewBtn.classList.remove('active');
+      streetViewBtn.classList.remove('active');
+      
+      // Show loading SweetAlert while we get the user's location
+      Swal.fire({
+        title: '{{ "getting_location"|trans }}',
+        text: '{{ "please_wait"|trans }}',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      // Get user's current location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showDirections, locationError);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: '{{ "geolocation_not_supported"|trans }}',
+          text: '{{ "browser_not_support_geolocation"|trans }}'
+        });
+      }
+      
+      // Show directions when we have the user's location
+      function showDirections(position) {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+        
+        // Use the activity coordinates defined in outer scope
+        const activityLat = activityLatForDirections;
+        const activityLng = activityLngForDirections;
+        
+        // Create the directions sweet alert with a simpler animation
+        Swal.fire({
+          title: '{{ "directions_to_activity"|trans }}',
+          html: `
+            <div class="directions-container">
+              <div class="route-animation-container" style="position: relative; height: 300px; margin-bottom: 20px; border-radius: 8px; overflow: hidden;">
+                <!-- We've removed the Google Maps satellite view to just show our CSS World Map -->
+                
+                <!-- CSS World Map Background -->
+                <div class="world-map-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #1e88e5 0%, #0d47a1 100%); z-index: 1; overflow: hidden;">
+                  <!-- CSS World Map Grid -->
+                  <div class="map-grid" style="position: absolute; top: 0; left: 0; width: 200%; height: 200%; background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 20px 20px; transform: rotate(15deg); transform-origin: center center;"></div>
+                  
+                  <!-- CSS Continents (simplified shapes) -->
+                  <div class="continent continent-na" style="position: absolute; width: 120px; height: 80px; background-color: rgba(76, 175, 80, 0.7); border-radius: 40% 60% 60% 40% / 70% 30% 70% 30%; top: 25%; left: 20%;"></div>
+                  
+                  <div class="continent continent-sa" style="position: absolute; width: 70px; height: 100px; background-color: rgba(76, 175, 80, 0.7); border-radius: 70% 30% 40% 60% / 30% 30% 70% 70%; top: 45%; left: 25%;"></div>
+                  
+                  <div class="continent continent-eu" style="position: absolute; width: 60px; height: 70px; background-color: rgba(76, 175, 80, 0.7); border-radius: 50% 50% 30% 70% / 60% 40% 60% 40%; top: 20%; left: 45%;"></div>
+                  
+                  <div class="continent continent-af" style="position: absolute; width: 80px; height: 100px; background-color: rgba(76, 175, 80, 0.7); border-radius: 30% 70% 70% 30% / 50% 40% 60% 50%; top: 35%; left: 45%;"></div>
+                  
+                  <div class="continent continent-as" style="position: absolute; width: 140px; height: 120px; background-color: rgba(76, 175, 80, 0.7); border-radius: 60% 40% 40% 60% / 60% 30% 70% 40%; top: 20%; left: 55%;"></div>
+                  
+                  <div class="continent continent-au" style="position: absolute; width: 70px; height: 50px; background-color: rgba(76, 175, 80, 0.7); border-radius: 60% 40% 60% 40% / 40% 60% 40% 60%; top: 60%; left: 70%;"></div>
+                </div>
+                
+                <!-- The route path with multiple points for a road-like route -->
+                <svg id="routePath" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;" viewBox="0 0 1000 300">
+                  <!-- Path shadow/outline for added visibility -->
+                  <path id="pathShadow" d="M100,150 C200,100 300,180 400,140 S500,80 600,120 S750,170 900,150" stroke="#FFFFFF" stroke-width="12" fill="none" opacity="0.3" stroke-linecap="round" />
+                  
+                  <!-- The visible route path (Google Maps blue) -->
+                  <path id="visiblePath" d="M100,150 C200,100 300,180 400,140 S500,80 600,120 S750,170 900,150" stroke="#FFFFFF" stroke-width="8" fill="none" opacity="0.9" stroke-linecap="round" />
+                  
+                  <!-- The animation path (invisible) -->
+                  <path id="drivingPath" d="M100,150 C200,100 300,180 400,140 S500,80 600,120 S750,170 900,150" stroke="transparent" stroke-width="1" fill="none" />
+                </svg>
+                
+                <!-- Start point with label -->
+                <div class="start-point" style="position: absolute; left: 10%; top: 50%; transform: translate(-50%, -50%); z-index: 3;">
+                  <div style="position: relative; width: 32px; height: 32px;">
+                    <div style="position: absolute; width: 32px; height: 32px; background-color: white; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center;">
+                      <span style="color: #4285F4; font-weight: bold;">A</span>
+                    </div>
+                  </div>
+                  <div style="font-size: 12px; margin-top: 8px; color: #333; font-weight: bold; text-shadow: 1px 1px 2px white; text-align: center;">{{ "your_location"|trans }}</div>
+                </div>
+                
+                <!-- End point with label -->
+                <div class="end-point" style="position: absolute; right: 10%; top: 50%; transform: translate(50%, -50%); z-index: 3;">
+                  <div style="position: relative; width: 32px; height: 32px;">
+                    <div style="position: absolute; width: 32px; height: 32px; background-color: white; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center;">
+                      <span style="color: #EA4335; font-weight: bold;">B</span>
+                    </div>
+                  </div>
+                  <div style="font-size: 12px; margin-top: 8px; color: #333; font-weight: bold; text-shadow: 1px 1px 2px white; text-align: center;">{{ "destination"|trans }}</div>
+                </div>
+                
+                <!-- Animated car with shadow for better visibility -->
+                <div id="carAnimation" style="position: absolute; left: 10%; top: 50%; transform: translate(-50%, -50%) rotate(0deg); z-index: 4; transition: transform 0.5s ease;">
+                  <div style="width: 40px; height: 40px; background-color: white; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center;">
+                    <img src="https://maps.google.com/mapfiles/kml/pal4/icon15.png" width="24" height="24" alt="{{ "your_car"|trans }}">
+                  </div>
+                </div>
+              </div>
+              
+              <div id="streetViewContainer" style="height: 400px; border-radius: 8px; overflow: hidden; display: none;">
+                <iframe 
+                  width="100%" 
+                  height="100%" 
+                  frameborder="0" 
+                  style="border:0" 
+                  src="https://www.google.com/maps?layer=c&cbll=${activityLat},${activityLng}&cbp=12,0,0,0,0&output=svembed" 
+                  allowfullscreen>
+                </iframe>
+              </div>
+              
+              <div class="directions-links" style="margin-top: 15px; text-align: center;">
+                <a href="https://www.google.com/maps/dir/${userLat},${userLng}/${activityLat},${activityLng}" target="_blank" class="btn btn-primary">
+                  <i class="fas fa-directions"></i> {{ "open_in_google_maps"|trans }}
+                </a>
+              </div>
+            </div>
+          `,
+          width: 800,
+          showCloseButton: true,
+          showConfirmButton: false,
+          didOpen: () => {
+            // Get the path elements
+            const svgPath = document.getElementById('drivingPath');
+            const visiblePath = document.getElementById('visiblePath');
+            const car = document.getElementById('carAnimation');
+            const streetView = document.getElementById('streetViewContainer');
+            
+            // Make sure the path is visible with animation effects
+            visiblePath.style.strokeDasharray = visiblePath.getTotalLength();
+            visiblePath.style.strokeDashoffset = visiblePath.getTotalLength();
+            visiblePath.style.animation = 'drawPath 2s ease-in-out forwards';
+            
+            // Add the path animation style
+            const style = document.createElement('style');
+            style.textContent = `
+              @keyframes drawPath {
+                0% { stroke-dashoffset: ${visiblePath.getTotalLength()}; }
+                100% { stroke-dashoffset: 0; }
+              }
+            `;
+            document.head.appendChild(style);
+            
+            // Get the total length of the path for animation
+            const pathLength = svgPath.getTotalLength();
+            
+            // Start the car at the beginning of the path
+            const startPoint = svgPath.getPointAtLength(0);
+            car.style.left = startPoint.x + 'px';
+            car.style.top = startPoint.y + 'px';
+            
+            // Animation duration
+            const duration = 4000;
+            const startTime = performance.now();
+            
+            // Animate car along the path
+            function animateCarAlongPath(currentTime) {
+              // Calculate progress (0 to 1)
+              const elapsedTime = currentTime - startTime;
+              const progress = Math.min(elapsedTime / duration, 1);
+              
+              // Get current position on the path
+              const currentDistance = pathLength * progress;
+              const currentPoint = svgPath.getPointAtLength(currentDistance);
+              
+              // Find angle for car rotation (direction of travel)
+              let rotation = 0;
+              if (progress < 1) {
+                const lookAheadDistance = Math.min(currentDistance + 10, pathLength);
+                const lookAheadPoint = svgPath.getPointAtLength(lookAheadDistance);
+                rotation = Math.atan2(
+                  lookAheadPoint.y - currentPoint.y,
+                  lookAheadPoint.x - currentPoint.x
+                ) * (180 / Math.PI);
+              }
+              
+              // Position the car
+              car.style.left = (currentPoint.x / 10) + '%';
+              car.style.top = (currentPoint.y / 3) + '%';
+              car.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+              
+              // Continue animation or finish
+              if (progress < 1) {
+                window.requestAnimationFrame(animateCarAlongPath);
+              } else {
+                // Animation complete - hide the route path and show street view after a short delay
+                setTimeout(() => {
+                  // Hide the entire route animation container
+                  document.querySelector('.route-animation-container').style.display = 'none';
+                  
+                  // Show the Street View
+                  streetView.style.display = 'block';
+                }, 500);
+              }
+            }
+            
+            // Start animation
+            window.requestAnimationFrame(animateCarAlongPath);
+          }
+        });
+      }
+      
+      // Handle location errors
+      function locationError(error) {
+        let errorMessage = '';
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = '{{ "location_permission_denied"|trans }}';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = '{{ "location_unavailable"|trans }}';
+            break;
+          case error.TIMEOUT:
+            errorMessage = '{{ "location_request_timeout"|trans }}';
+            break;
+          default:
+            errorMessage = '{{ "unknown_location_error"|trans }}';
+            break;
+        }
+        
+        Swal.fire({
+          icon: 'error',
+          title: '{{ "location_error"|trans }}',
+          text: errorMessage
+        });
+      }
+    });
+  }
+
+  // Add styles for the SweetAlert weather container and view toggle buttons
     document.head.insertAdjacentHTML('beforeend', `
+      <style>
+        /* Get Directions button styles */
+        .view-toggle-directions {
+          background-color: #3498db;
+          color: white;
+          border: none;
+          padding: 8px 15px;
+          border-radius: 20px;
+          margin-left: 10px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        
+        .view-toggle-directions:hover {
+          background-color: #2980b9;
+          transform: translateY(-2px);
+        }
+        
+        .view-toggle-directions.active {
+          background-color: #2980b9;
+          box-shadow: 0 0 10px rgba(41, 128, 185, 0.5);
+        }
+        
+        .view-toggle-directions i {
+          margin-right: 5px;
+        }
+      </style>
       <style>
         .swal-weather-container {
           display: flex;
@@ -1169,6 +1524,57 @@
   
   {% block stylesheets %}
   {{ parent() }}
+  <style>
+  /* Map View Toggle Button Styling */
+  .view-toggle-buttons {
+    display: flex;
+    background-color: #f0f3f6;
+    padding: 5px;
+    border-radius: 30px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  }
+  
+  .view-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    margin: 0 5px;
+    transition: all 0.3s ease;
+    background-color: transparent;
+    color: #555;
+    font-weight: 500;
+  }
+  
+  .view-toggle-btn i {
+    margin-right: 8px;
+    font-size: 18px;
+  }
+  
+  .view-toggle-btn.active {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .view-toggle-map:hover:not(.active) {
+    background-color: rgba(13, 110, 253, 0.1);
+  }
+  
+  .view-toggle-street:hover:not(.active) {
+    background-color: rgba(13, 110, 253, 0.1);
+  }
+  
+  /* Make sure RTL support is included */
+  html[dir="rtl"] .view-toggle-btn i {
+    margin-right: 0;
+    margin-left: 8px;
+  }
+  </style>
   <!-- Add FontAwesome CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>

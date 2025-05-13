@@ -102,14 +102,14 @@ class LoginNotificationService
                 $resetUrl = $this->urlGenerator->generate('app_reset_password_request', [], UrlGeneratorInterface::ABSOLUTE_URL);
             }
             
-            // Create direct SMTP transport
+            // Create mailer transport for direct sending
             $transport = new EsmtpTransport(
-                'smtp.hostinger.com',
-                465,
+                $_ENV['SMTP_HOST'],
+                $_ENV['SMTP_PORT'],
                 true
             );
-            $transport->setUsername('hala.omran@jameiconseil.org');
-            $transport->setPassword('Oussama1981@');
+            $transport->setUsername($_ENV['SMTP_USERNAME']);
+            $transport->setPassword($_ENV['EMAIL_PASSWORD']);
             
             // Create mailer
             $mailer = new Mailer($transport);

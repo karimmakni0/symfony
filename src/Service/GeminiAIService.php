@@ -8,7 +8,12 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class GeminiAIService
 {
-    private const GEMINI_API_KEY = 'AIzaSyBm7SJfnl5UEqMusZ4lu6sWetpBD-sCeQU';
+    // Using environment variable for API key
+    private function getApiKey(): string
+    {
+        // First try to use the key from .env file, otherwise fall back to the alternative key
+        return $_ENV['GEMINI_API_KEY'] ?? $_ENV['GEMINI_ALT_API_KEY'];
+    }
     private const TEXT_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
     private const VISION_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 

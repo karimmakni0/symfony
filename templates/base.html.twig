@@ -136,6 +136,23 @@
       display: inline-block !important;
     }
     
+    /* Clean, simple dropdown menu styling */
+    .menu-item-has-children .subnav a {
+      padding: 12px 20px !important;
+      text-align: left;
+    }
+
+    .menu-item-has-children .subnav a:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    /* RTL support */
+    html[dir="rtl"] .menu-item-has-children .subnav a {
+      text-align: right;
+    }
+    
+
+    
     /* Fix to match the exact appearance in the screenshots */
     .menu-item-has-children {
       position: relative;
@@ -245,12 +262,27 @@
                           <li class="subnav__backBtn js-nav-list-back">
                             <a href="javascript:void(0)" class="text-white"><i class="icon icon-chevron-sm-down"></i>{{ "activities"|trans }}</a>
                           </li>
-                          <li><a href="{{ path("app_activities") }}" class="text-white">{{ "activities_list"|trans }}</a></li>
-                          <li><a href="{{ path("app_activities_map") }}" class="text-white d-flex align-items-center">
-                              <i class="icon-map-marker text-blue-1 mr-5"></i>
-                              <span>{{ "activities_map"|trans }}</span>
-                            </a></li>
+                          <li>
+                            <a href="{{ path("app_activities") }}" class="text-white">
+                              {{ "activities_list"|trans }}
+                            </a>
+                          </li>
+                          <li>
+                            <a href="{{ path("app_activities_map") }}" class="text-white">
+                              {{ "activities_map"|trans }}
+                            </a>
+                          </li>
                         </ul>
+                      </li>
+                      <li>
+                        <a href="{{ path("app_donate") }}" class="text-white">
+                          <span class="mr-10">{{ "donate_us"|trans }}</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="{{ path("app_download") }}" class="text-white">
+                          <span class="mr-10">{{ "download"|trans }}</span>
+                        </a>
                       </li>
                      
                       <!-- About and Contact links removed -->
