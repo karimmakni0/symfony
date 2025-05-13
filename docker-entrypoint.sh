@@ -74,9 +74,14 @@ if [ ! -z "$OPENWEATHERMAP_API_KEY" ]; then
   echo "OPENWEATHERMAP_API_KEY=$OPENWEATHERMAP_API_KEY" >> .env.local
 fi
 
-# Warm up Symfony cache
-php bin/console cache:clear --no-warmup
-php bin/console cache:warmup
+# Set up Symfony for production
+export APP_ENV=prod
+export APP_DEBUG=0
+
+# Install assets and warm up cache
+php bin/console assets:install --no-debug
+php bin/console cache:clear --no-warmup --no-debug --env=prod
+php bin/console cache:warmup --no-debug --env=prod
 
 # Fix permissions
 chown -R www-data:www-data var

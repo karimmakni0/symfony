@@ -30,8 +30,12 @@ COPY . /var/www/html/
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Set up environment
+RUN echo 'APP_ENV=prod' > .env.local
+RUN echo 'APP_DEBUG=0' >> .env.local
+
+# Install dependencies without running scripts
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Set permissions
 RUN mkdir -p var/cache var/log var/sessions public/uploads
