@@ -817,7 +817,8 @@ class ActivitiesController extends AbstractController
     {
         try {
             // Set your secret key directly 
-            Stripe\Stripe::setApiKey('sk_test_51RFcLuFZnnbGj2Q6ReU6Xr9UjQ7ghUGjlJ3e7HmaEsmYhwVH38a3Bm8OGPxLlygueAg0NJUY1w430o9ewALBirUf00TKzamiv4');
+            // Use environment variable for Stripe API key
+            Stripe\Stripe::setApiKey($_ENV['STRIPE_ALT_SECRET_KEY']);
             
             // For testing purposes, we'll use a test token
             // In production, you would generate tokens client-side using Stripe.js
